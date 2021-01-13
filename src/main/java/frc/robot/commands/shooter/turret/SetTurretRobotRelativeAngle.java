@@ -1,4 +1,4 @@
-package frc.robot.commands.turret;
+package frc.robot.commands.shooter.turret;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
