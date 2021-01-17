@@ -7,7 +7,12 @@ sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
-
+repositories {
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://nexus.otake.pw/repository/maven-public/' }
+    maven { url 'https://frcmaven.wpi.edu/artifactory/release/' }
+    maven { url 'https://frcmaven.wpi.edu/artifactory/development/' }
+}
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project EmbeddedTools.
 deploy {
@@ -63,6 +68,8 @@ dependencies {
     // Websocket extensions require additional configuration.
     // simulation wpi.deps.sim.ws_server(wpi.platforms.desktop, false)
     // simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, false)
+
+    compile "com.github.jonathandao0:badlog:v0.1.2.4"
 }
 
 // Simulation configuration (e.g. environment variables).

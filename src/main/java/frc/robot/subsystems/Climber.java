@@ -10,11 +10,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
@@ -81,7 +77,7 @@ climbPistons[1].set(state ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value
     climbMotors[0].set(ControlMode.PercentOutput, value);
   }
   
-  public int getClimberPosition() {
+  public double getClimberPosition() {
 	  return climbMotors[0].getSelectedSensorPosition();
   }
 

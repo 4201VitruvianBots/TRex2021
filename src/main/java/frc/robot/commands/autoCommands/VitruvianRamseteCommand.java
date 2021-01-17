@@ -7,14 +7,10 @@ import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.SwerveDrive;
 
 import java.util.ArrayList;
@@ -41,7 +37,7 @@ public class VitruvianRamseteCommand extends RamseteCommand {
 	@Override
     public void execute() {
         super.execute();
-        SmartDashboardTab.putBoolean("DriveTrain", "isRunning", true);
+//        SmartDashboardTab.putBoolean("DriveTrain", "isRunning", true);
     }
 
     @Override
@@ -67,13 +63,13 @@ public class VitruvianRamseteCommand extends RamseteCommand {
         double deltaY = Units.metersToFeet(Math.abs(m_pose.get().getTranslation().getY() - m_path.get(m_path.size() - 1).getTranslation().getY()));
         double deltaRot = Math.abs(m_pose.get().getRotation().getDegrees() - m_path.get(m_path.size() - 1).getRotation().getDegrees());
         boolean isFinished = ((deltaX < 0.25) && (deltaY < 0.25) && (deltaRot < 4)) || (Timer.getFPGATimestamp() > (autoDuration + autoStartTime));
-        SmartDashboardTab.putBoolean("DriveTrain", "Ramsete Command Finished", isFinished);
+//        SmartDashboardTab.putBoolean("DriveTrain", "Ramsete Command Finished", isFinished);
         return isFinished;
     }
 
     @Override
     public void end(boolean interrupted) {
         super.end(interrupted);
-        SmartDashboardTab.putBoolean("DriveTrain", "isRunning", false);
+//        SmartDashboardTab.putBoolean("DriveTrain", "isRunning", false);
     }
 }

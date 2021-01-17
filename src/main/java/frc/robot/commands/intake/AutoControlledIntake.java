@@ -7,7 +7,6 @@
 
 package frc.robot.commands.intake;
 
-import com.team254.lib.util.MinTimeBoolean;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;

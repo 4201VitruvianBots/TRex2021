@@ -4,14 +4,17 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
-public class ExampleSubsystem extends SubsystemBase {
+public class Uptake extends SubsystemBase {
 
   private TalonFX uptakeMotor = new TalonFX(Constants.uptakeMotor);
 
   /** Creates a new ExampleSubsystem. */
-  public ExampleSubsystem() {
+  public Uptake() {
     uptakeMotor.configFactoryDefault();
     uptakeMotor.setInverted(false);
   }
