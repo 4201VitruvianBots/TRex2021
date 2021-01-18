@@ -41,7 +41,7 @@ public class TimedIntake extends CommandBase {
     public void initialize() {
         startTime = Timer.getFPGATimestamp();
         if (m_intake.getIntakePistonExtendStatus() != true)
-            m_intake.setintakePiston(true);
+            m_intake.setIntakePiston(true);
 
     }
 
@@ -60,7 +60,7 @@ public class TimedIntake extends CommandBase {
         m_indexer.setKickerOutput(0);
         m_intake.setIntakePercentOutput(0);
         if (m_intake.getIntakePistonExtendStatus() != false)
-            m_intake.setintakePiston(false);
+            m_intake.setIntakePiston(false);
     }
 
     // Returns true when the command should end.

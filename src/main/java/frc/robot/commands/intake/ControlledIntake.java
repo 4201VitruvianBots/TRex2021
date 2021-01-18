@@ -45,7 +45,7 @@ public class ControlledIntake extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        m_intake.setIntakingState(true);
+        m_intake.setIntakeState(true);
         timestamp = Timer.getFPGATimestamp();
     }
 
@@ -87,7 +87,7 @@ public class ControlledIntake extends CommandBase {
     public void end(boolean interrupted) {
         m_controller.setRumble(GenericHID.RumbleType.kLeftRumble, 0);
         m_controller.setRumble(GenericHID.RumbleType.kRightRumble, 0);
-        m_intake.setIntakingState(false);
+        m_intake.setIntakeState(false);
         m_intake.setIntakePercentOutput(0);
         m_indexer.setIndexerOutput(0);
         m_indexer.setKickerOutput(0);

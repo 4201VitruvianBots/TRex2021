@@ -21,7 +21,7 @@ public class SetIntake extends CommandBase {
     /**
      * Creates a new ExampleCommand.
      *
-     * @param subsystem The subsystem used by this command.
+     * @param intake The subsystem used by this command.
      */
     public SetIntake(Intake intake, double output) {
         m_intake = intake;
@@ -33,7 +33,7 @@ public class SetIntake extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        m_intake.setIntakingState(true);
+        m_intake.setIntakeState(true);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -46,7 +46,7 @@ public class SetIntake extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         m_intake.setIntakePercentOutput(0);
-        m_intake.setIntakingState(false);
+        m_intake.setIntakeState(false);
     }
 
     // Returns true when the command should end.

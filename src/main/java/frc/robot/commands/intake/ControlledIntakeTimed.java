@@ -46,7 +46,7 @@ public class ControlledIntakeTimed extends CommandBase {
     @Override
     public void initialize() {
         startTime = Timer.getFPGATimestamp();
-        m_intake.setIntakingState(true);
+        m_intake.setIntakeState(true);
         timestamp = Timer.getFPGATimestamp();
     }
 
@@ -94,12 +94,12 @@ public class ControlledIntakeTimed extends CommandBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        m_intake.setIntakingState(false);
+        m_intake.setIntakeState(false);
         m_intake.setIntakePercentOutput(0);
         m_indexer.setIndexerOutput(0);
         m_indexer.setKickerOutput(0);
 //    if(intakeState == IntakeStates.INTAKE_FIVE_BALLS)
-        m_intake.setintakePiston(false);
+        m_intake.setIntakePiston(false);
     }
 
     // Returns true when the command should end.
