@@ -9,22 +9,27 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.*;
+import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class SwerveDrive extends SubsystemBase {
+    private final ADXRS450_Gyro gyro = new ADXRS450_Gyro();
+    private ADXRS450_GyroSim gyroSim;
 
-
-  public int controlMode = 0;
+    public int controlMode = 0;
   
   public static final double kMaxSpeed = 3.0; // 3 meters per second
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
@@ -77,6 +82,12 @@ public class SwerveDrive extends SubsystemBase {
     m_pdp = pdp;
 
     mNavX.reset();
+
+      SmartDashboard.putData(this);
+      if (RobotBase.isSimulation()){
+      gyroSim = new ADXRS450_GyroSim(gyro);
+      }
+
   }
 
   public AHRS getNavX() {
@@ -98,7 +109,11 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public double getRawGyroAngle() {
-    return mNavX.getAngle();
+    if (RobotBase.isReal()){
+        return mNavX.getAngle();
+    } else {
+        return gyro.getAngle();
+    }
   }
 
   /**

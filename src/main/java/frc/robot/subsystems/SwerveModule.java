@@ -216,8 +216,10 @@ public class SwerveModule extends SubsystemBase {
     final double turnFeedforward =
             m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
-    mDriveMotor.set(ControlMode.PercentOutput,(driveOutput + driveFeedforward)/ m_pdp.getVoltage());
-    mTurningMotor.set(ControlMode.PercentOutput,(turnOutput + turnFeedforward)/ m_pdp.getVoltage());
+//    mDriveMotor.set(ControlMode.PercentOutput,(driveOutput + driveFeedforward)/ m_pdp.getVoltage());
+//    mTurningMotor.set(ControlMode.PercentOutput,(turnOutput + turnFeedforward)/ m_pdp.getVoltage());
+    mDriveMotor.set(ControlMode.PercentOutput,driveOutput);
+    mTurningMotor.set(ControlMode.PercentOutput,turnOutput);
   }
 
   public void setPercentOutput(double speed) {

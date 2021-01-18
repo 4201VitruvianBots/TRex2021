@@ -9,23 +9,26 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.SetSwerveDrive;
 import frc.robot.commands.autoCommands.DriveStraight;
 import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.intake.ControlledIntake;
-import frc.robot.commands.intake.SetIntake;
 import frc.robot.commands.intake.ToggleIntakePistons;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.vitruvianlib.utils.JoystickWrapper;
+import frc.vitruvianlib.utils.XBoxTrigger;
 
 import java.util.Map;
 
@@ -38,6 +41,8 @@ import static java.util.Map.entry;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
+
   // The robot's subsystems and commands are defined here...
   private final PowerDistributionPanel pdp = new PowerDistributionPanel();
   private final Indexer m_indexer = new Indexer();
@@ -56,11 +61,14 @@ public class RobotContainer {
   static JoystickWrapper leftJoystick = new JoystickWrapper(Constants.leftJoystick);
   static JoystickWrapper rightJoystick = new JoystickWrapper(Constants.rightJoystick);
   static JoystickWrapper xBoxController = new JoystickWrapper(Constants.xBoxController);
+  static JoystickWrapper testController = new JoystickWrapper(3);
+  public Button[] testButtons = new Button[10];
   public Button[] leftButtons = new Button[2];
   public Button[] rightButtons = new Button[2];
   public Button[] xBoxButtons = new Button[10];
   public Button[] xBoxPOVButtons = new Button[8];
   public Button xBoxLeftTrigger, xBoxRightTrigger;
+
 
 
   /**
@@ -102,9 +110,31 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    leftButtons[2].whileHeld(new FeedAll(m_indexer));
-    xBoxButtons[10].whenPressed(new ToggleIntakePistons(m_intake));
-    xBoxLeftTrigger.whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
+    if(RobotBase.isReal()) {
+      leftJoystick.invertRawAxis(1, true);
+      rightJoystick.invertRawAxis(0, true);
+      xBoxController.invertRawAxis(1, true);
+      xBoxController.invertRawAxis(5, true);
+      for (int i = 0; i < leftButtons.length; i++)
+        leftButtons[i] = new JoystickButton(leftJoystick, (i + 1));
+      for (int i = 0; i < rightButtons.length; i++)
+        rightButtons[i] = new JoystickButton(rightJoystick, (i + 1));
+      for (int i = 0; i < xBoxButtons.length; i++)
+        xBoxButtons[i] = new JoystickButton(xBoxController, (i + 1));
+      for (int i = 0; i < xBoxPOVButtons.length; i++)
+        xBoxPOVButtons[i] = new POVButton(xBoxController, (i * 45));
+      xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
+      xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
+    }else{
+      testController.invertRawAxis(1, true);
+      testController.invertRawAxis(5, true);
+      for (int i = 0; i < testButtons.length; i++)
+        testButtons[i] = new JoystickButton(testController, (i + 1));
+
+      testButtons[1].whileHeld(new FeedAll(m_indexer));
+      testButtons[9].whenPressed(new ToggleIntakePistons(m_intake));
+      testButtons[6].whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
+    }
   }
 
   /**
