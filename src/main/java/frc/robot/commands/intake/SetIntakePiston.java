@@ -14,42 +14,43 @@ import frc.robot.subsystems.Intake;
  * An example command that uses an example subsystem.
  */
 public class SetIntakePiston extends CommandBase {
-  boolean extend;
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final Intake intake;
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
-  public SetIntakePiston(Intake subsystem, boolean extend) {
-    intake = subsystem;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
-    this.extend = extend;
-  }
+    boolean extend;
+    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+    private final Intake intake;
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    if(intake.getIntakePistonExtendStatus() != extend)
-      intake.setintakePiston(extend);
-  }
+    /**
+     * Creates a new ExampleCommand.
+     *
+     * @param subsystem The subsystem used by this command.
+     */
+    public SetIntakePiston(Intake subsystem, boolean extend) {
+        intake = subsystem;
+        // Use addRequirements() here to declare subsystem dependencies.
+        addRequirements(subsystem);
+        this.extend = extend;
+    }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute(){
-  }
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        if (intake.getIntakePistonExtendStatus() != extend)
+            intake.setintakePiston(extend);
+    }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+    }
 
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return true;
-  }
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }

@@ -15,47 +15,48 @@ import frc.robot.subsystems.Intake;
  * An example command that uses an example subsystem.
  */
 public class SetIntakeManual extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final Intake m_intake;
-  private final Indexer m_indexer;
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
-  public SetIntakeManual(Intake intake, Indexer indexer) {
-    m_intake = intake;
-    m_indexer = indexer;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intake);
-    addRequirements(indexer);
-  }
+    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+    private final Intake m_intake;
+    private final Indexer m_indexer;
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
+    /**
+     * Creates a new ExampleCommand.
+     *
+     * @param subsystem The subsystem used by this command.
+     */
+    public SetIntakeManual(Intake intake, Indexer indexer) {
+        m_intake = intake;
+        m_indexer = indexer;
+        // Use addRequirements() here to declare subsystem dependencies.
+        addRequirements(intake);
+        addRequirements(indexer);
+    }
 
-  }
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    m_indexer.setIndexerOutput(1);
-    m_indexer.setKickerOutput(-0.25);
-    m_intake.setIntakePercentOutput(0.5);
-  }
+    }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    m_indexer.setIndexerOutput(0);
-    m_indexer.setKickerOutput(0);
-    m_intake.setIntakePercentOutput(0);
-  }
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        m_indexer.setIndexerOutput(1);
+        m_indexer.setKickerOutput(-0.25);
+        m_intake.setIntakePercentOutput(0.5);
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        m_indexer.setIndexerOutput(0);
+        m_indexer.setKickerOutput(0);
+        m_intake.setIntakePercentOutput(0);
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }

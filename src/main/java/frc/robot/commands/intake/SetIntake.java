@@ -14,43 +14,44 @@ import frc.robot.subsystems.Intake;
  * An example command that uses an example subsystem.
  */
 public class SetIntake extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final Intake m_intake;
-  private final double m_output;
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
-  public SetIntake(Intake intake, double output) {
-    m_intake = intake;
-    m_output = output;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intake);
-  }
+    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+    private final Intake m_intake;
+    private final double m_output;
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    m_intake.setIntakingState(true);
-  }
+    /**
+     * Creates a new ExampleCommand.
+     *
+     * @param subsystem The subsystem used by this command.
+     */
+    public SetIntake(Intake intake, double output) {
+        m_intake = intake;
+        m_output = output;
+        // Use addRequirements() here to declare subsystem dependencies.
+        addRequirements(intake);
+    }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    m_intake.setIntakePercentOutput(m_output);
-  }
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        m_intake.setIntakingState(true);
+    }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    m_intake.setIntakePercentOutput(0);
-    m_intake.setIntakingState(false);
-  }
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        m_intake.setIntakePercentOutput(m_output);
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        m_intake.setIntakePercentOutput(0);
+        m_intake.setIntakingState(false);
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }
