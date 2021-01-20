@@ -4,22 +4,22 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Carousel extends SubsystemBase {
-  private TalonFX carouselMotor = new TalonFX(Constants.carouselMotor);
+  private CANSparkMax carouselMotor = new CANSparkMax(Constants.carouselMotor, MotorType.kBrushless);
 
   /** Creates a new ExampleSubsystem. */
   public Carousel() {
-    carouselMotor.configFactoryDefault();
+    carouselMotor.restoreFactoryDefaults();
     carouselMotor.setInverted(false);
   }
 
   public void setCarouselMotor(double output) {
-    carouselMotor.set(ControlMode.PercentOutput, output);
+    carouselMotor.set(output);
   }
 
   @Override
