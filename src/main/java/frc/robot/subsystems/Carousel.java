@@ -18,7 +18,7 @@ public class Carousel extends SubsystemBase {
     carouselMotor.setInverted(false);
   }
 
-  public void setCarouselMotor(double output) {
+  public void setPercentOutput(double output) {
     carouselMotor.set(output);
   }
 
