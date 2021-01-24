@@ -22,7 +22,7 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
     private final Vision m_vision;
     private final Shooter m_shooter;
     private final Climber m_climber;
-    private Joystick m_controller;
+    private final Joystick m_controller;
     double setpoint;
     private final double deadZone = 0.5;
     boolean timeout = false;
@@ -71,10 +71,10 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
                     else
                         setpoint = Math.toDegrees(Math.atan2(m_controller.getRawAxis(0), m_controller.getRawAxis(1)));
 
-                    if(setpoint > m_turret.getMaxAngle())
+                    if (setpoint > m_turret.getMaxAngle())
                         setpoint = m_turret.getMaxAngle();
 
-                    if(setpoint < m_turret.getMinAngle())
+                    if (setpoint < m_turret.getMinAngle())
                         setpoint = m_turret.getMinAngle();
 //                    if (!directionTripped) {
 //                        direction = m_controller.getRawAxis(1) < 0;
@@ -145,8 +145,8 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
                     m_controller.setRumble(GenericHID.RumbleType.kLeftRumble, 0);
                     m_controller.setRumble(GenericHID.RumbleType.kRightRumble, 0);
                 }
-                
-                if(m_shooter.canShoot()) {
+
+                if (m_shooter.canShoot()) {
                     m_controller.setRumble(GenericHID.RumbleType.kLeftRumble, 0.8);
                     m_controller.setRumble(GenericHID.RumbleType.kRightRumble, 0.8);
                 } else {

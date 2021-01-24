@@ -22,6 +22,7 @@ public class AutoUseVisionCorrection extends CommandBase {
     boolean turning, usingVisionSetpoint;
     private double setpoint;
     private double startTime;
+
     /**
      * Creates a new ExampleCommand.
      */
