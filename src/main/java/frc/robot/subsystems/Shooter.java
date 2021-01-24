@@ -56,7 +56,7 @@ public class Shooter extends SubsystemBase {
     private boolean canShoot;
 
     public Shooter(Vision vision, PowerDistributionPanel pdp) {
-        // Setup shooterMotors
+        // setup shooterMotors
         for (TalonFX outtakeMotor : shooterMotors) {
             outtakeMotor.configFactoryDefault();
             outtakeMotor.setNeutralMode(NeutralMode.Coast);

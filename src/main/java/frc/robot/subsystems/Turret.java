@@ -14,7 +14,6 @@ import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.sensors.CANCoder;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
@@ -50,23 +49,21 @@ public class Turret extends SubsystemBase {
     double gearRatio = 18.0 / 120.0;
     private double setpoint = 0; //angle
 
-    private int encoderUnitsPerRotation = 4096;
+    private final int encoderUnitsPerRotation = 4096;
     private int controlMode = 1;
     private boolean initialHome;
 
     private final SwerveDrive m_swerveDrive;
 
-    private Timer timeout = new Timer();
+    private final CANCoder encoder = new CANCoder(Constants.turretEncoder);
 
-    private CANCoder encoder = new CANCoder(Constants.turretEncoder);
+    private final VictorSPX turretMotor = new VictorSPX(Constants.turretMotor);
 
-    private VictorSPX turretMotor = new VictorSPX(Constants.turretMotor);
-
-    private DigitalInput turretHomeSensor = new DigitalInput(Constants.turretHomeSensor);
+    private final DigitalInput turretHomeSensor = new DigitalInput(Constants.turretHomeSensor);
     private boolean turretHomeSensorLatch = false;
 
     public Turret(SwerveDrive swerveDrive) {
-        // Setup turrent motors
+        // Setup turret motors
         m_swerveDrive = swerveDrive;
         encoder.configFactoryDefault();
         encoder.setPositionToAbsolute();
@@ -92,7 +89,7 @@ public class Turret extends SubsystemBase {
         //initShuffleboard();
     }
 
-    // self-explanatory comnmands
+    // self-explanatory commands
 
     public void resetEncoder() {
         turretMotor.setSelectedSensorPosition(0);
