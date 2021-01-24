@@ -5,17 +5,22 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package frc.robot.commands.carousel;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Carousel;
+import frc.robot.subsystems.Uptake;
 
 /**
  * An example command that uses an example subsystem.
  */
 public class RunCarouselAndUptake extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final Intake m_subsystem;
+    private final Uptake m_uptake;
+    private final Carousel m_carousel;
+
+    private double startTime;
 
     /**
      * Creates a new ExampleCommand.
