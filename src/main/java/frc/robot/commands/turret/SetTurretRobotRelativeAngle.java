@@ -7,8 +7,9 @@ import frc.robot.subsystems.Turret;
 public class SetTurretRobotRelativeAngle extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Turret m_turret;
-    private double m_setpoint;
+    private final double m_setpoint;
     private double startTime;
+
     /**
      * Creates a new ExampleCommand.
      *
