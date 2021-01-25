@@ -51,9 +51,8 @@ public class FeedAll extends CommandBase {
   }
 
   // Returns true when the command should end.
-
-  /*
-  @Override
+//turn into a correct isFinished function.
+/*  @Override
   public boolean isFinished() {
     double time = Timer.getFPGATimestamp();
     if(m_indexer.leftButtons[2]()){
@@ -63,6 +62,5 @@ public class FeedAll extends CommandBase {
       return true;
     else
       return false;
-  }
-  */
+  }*/
 }

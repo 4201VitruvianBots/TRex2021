@@ -36,7 +36,6 @@ public class Indexer extends SubsystemBase {
 
   VictorSPX kicker = new VictorSPX(Constants.kickerMotor);
 
-
   private double targetSetpoint;
 
   // PID terms/other constants
