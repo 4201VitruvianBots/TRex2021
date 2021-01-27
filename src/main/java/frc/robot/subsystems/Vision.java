@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.net.PortForwarder;
 
 /*
-Subsystem for interacting with the Limelight and OpenSight vision systems
+Subsystem for interacting with the Limelight and photonVision vision systems
  */
 
 public class Vision extends SubsystemBase {
@@ -45,7 +45,7 @@ public class Vision extends SubsystemBase {
 
 	// NetworkTables for reading vision data
 	private NetworkTable limelight;
-	private NetworkTable openSight;
+	private NetworkTable photonVision;
 
 	// Subsystems that will be controlled based on vision data
     private final SwerveDrive m_swerveDrive;
@@ -79,17 +79,18 @@ public class Vision extends SubsystemBase {
 	    camera.setResolution(320, 240);
 	    camera.setPixelFormat(VideoMode.PixelFormat.kMJPEG);
 
-		//CameraServer.getInstance().addAxisCamera("opensight", "opensight.local");
+		//CameraServer.getInstance().addAxisCamera("photonVision", "photonVision.local");
 
-	    // TODO: What port does opensight use?
-		PortForwarder.add(6000, "opensight.local", 22);
+	    // TODO: What port does photonVision use?
+		// TODO: is this needed?
+		PortForwarder.add(6000, "photonVision.local", 22);
 		PortForwarder.add(5800, "10.42.1.11", 5800);
 		PortForwarder.add(5801, "10.42.1.11", 5801);
 		PortForwarder.add(5805, "10.42.1.11", 5805);
 
 		// Init vision NetworkTables
 		limelight = NetworkTableInstance.getDefault().getTable("limelight");
-		openSight = NetworkTableInstance.getDefault().getTable("OpenSight");
+		photonVision = NetworkTableInstance.getDefault().getTable("photonVision");
 		setPipeline(0);
 
 		//initShuffleboard();
@@ -249,16 +250,7 @@ public class Vision extends SubsystemBase {
 		return data[highestIndex]; // Final distance in feet
 	}
 
-	// Read ball position data from OpenSight (Raspberry Pi)
-    public double getPowerCellX() {
-        // TODO: Calculate degrees from pixels?
-        // return openSight.getEntry("found-x").getDouble(0) * 5.839; // 5.839 pixels per degree
-        return openSight.getEntry("found-x").getDouble(0);
-    }
-
-	public boolean hasPowerCell() {
-		return openSight.getEntry("found").getBoolean(false);
-	}
+	// TODO: Read powercell position from PhotonVision over NetworkTables
 
 	private void initShuffleboard() {
 		// Unstable. Don''t use until WPILib fixes this
