@@ -34,8 +34,6 @@ public class Indexer extends SubsystemBase {
   CANEncoder encoder = master.getEncoder();
   CANPIDController pidController = master.getPIDController();
 
-  VictorSPX kicker = new VictorSPX(Constants.kickerMotor);
-
   private double targetSetpoint;
 
   // PID terms/other constants
@@ -72,9 +70,6 @@ public class Indexer extends SubsystemBase {
     pidController.setSmartMotionAllowedClosedLoopError(1, 0);
     pidController.setIZone(kI_Zone);
 
-    kicker.configFactoryDefault();
-    kicker.setInverted(true);
-
 //    SmartDashboard.putNumber("kF", kF);
 //    SmartDashboard.putNumber("kP", kP);
 //    SmartDashboard.putNumber("kI", kI);
@@ -93,10 +88,6 @@ public class Indexer extends SubsystemBase {
 
   public int getControlMode() {
     return controlMode;
-  }
-  
-  public void setKickerOutput(double output) {
-    kicker.set(ControlMode.PercentOutput, output);
   }
 
   public void setIndexerOutput(double output) {
