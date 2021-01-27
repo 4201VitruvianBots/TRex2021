@@ -25,6 +25,11 @@ Subsystem for controlling the turret
  */
 
 public class Turret extends SubsystemBase {
+    private final int encoderUnitsPerRotation = 4096;
+    private final SwerveDrive m_swerveDrive;
+    private final CANCoder encoder = new CANCoder(Constants.turretEncoder);
+    private final VictorSPX turretMotor = new VictorSPX(Constants.turretMotor);
+    private final DigitalInput turretHomeSensor = new DigitalInput(Constants.turretHomeSensor);
     /**
      * Creates a new ExampleSubsystem.
      */
@@ -36,30 +41,18 @@ public class Turret extends SubsystemBase {
     double kP = 0.2;    //0.155
     double kI = 0.0015;    //0.00075
     double kD = 0.0;  //0.00766
-
     int kI_Zone = 900;    //900 // 254: 1/kP?
     int kMaxIAccum = 1000000;//kI_Zone *3; //500000;    //900
     int kErrorBand = 50;//degreesToEncoderUnits(0.5);
-
     int kCruiseVelocity = 14000;
     int kMotionAcceleration = kCruiseVelocity * 10;
-
+    double[][] restrictedMovement = {{270, 300}, {60, 90}};
     double minAngle = -90;  // -135;
     double maxAngle = 90;   // 195;
     double gearRatio = 18.0 / 120.0;
     private double setpoint = 0; //angle
-
-    private final int encoderUnitsPerRotation = 4096;
     private int controlMode = 1;
     private boolean initialHome;
-
-    private final SwerveDrive m_swerveDrive;
-
-    private final CANCoder encoder = new CANCoder(Constants.turretEncoder);
-
-    private final VictorSPX turretMotor = new VictorSPX(Constants.turretMotor);
-
-    private final DigitalInput turretHomeSensor = new DigitalInput(Constants.turretHomeSensor);
     private boolean turretHomeSensorLatch = false;
 
     public Turret(SwerveDrive swerveDrive) {
@@ -96,12 +89,12 @@ public class Turret extends SubsystemBase {
         encoder.setPosition(0);
     }
 
-    public void setControlMode(int mode) {
-        controlMode = mode;
-    }
-
     public int getControlMode() {
         return controlMode;
+    }
+
+    public void setControlMode(int mode) {
+        controlMode = mode;
     }
 
     public double getTurretAngle() {
@@ -130,6 +123,18 @@ public class Turret extends SubsystemBase {
 
     public double getSetpoint() {
         return setpoint;
+    }
+
+    public boolean isRestricted() {
+        boolean value = false;
+        for (double[] i : restrictedMovement) {
+            if (i[0] < i[1]) {
+                value = (this.getTurretAngle() > i[0] && this.getTurretAngle() < i[1]);
+            } else {
+                value = (this.getTurretAngle() > i[1] && this.getTurretAngle() < i[0]);
+            }
+        }
+        return value;
     }
 
     public void setPercentOutput(double output) {
@@ -180,13 +185,13 @@ public class Turret extends SubsystemBase {
         turretMotor.setIntegralAccumulator(0);
     }
 
+    private boolean getTurretLatch() {
+        return turretHomeSensorLatch;
+    }
+
     // ???
     private void setTurretLatch(boolean state) {
         turretHomeSensorLatch = state;
-    }
-
-    private boolean getTurretLatch() {
-        return turretHomeSensorLatch;
     }
 
     private void initShuffleboard() {
