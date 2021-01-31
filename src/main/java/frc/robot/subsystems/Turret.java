@@ -7,13 +7,11 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.ctre.phoenix.sensors.CANCoder;
-import edu.wpi.first.wpilibj.DigitalInput;
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANPIDController;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
@@ -27,15 +25,10 @@ Subsystem for controlling the turret
 public class Turret extends SubsystemBase {
     private final int encoderUnitsPerRotation = 4096;
     private final SwerveDrive m_swerveDrive;
-    private final CANCoder encoder = new CANCoder(Constants.turretEncoder);
-    private final VictorSPX turretMotor = new VictorSPX(Constants.turretMotor);
-    private final DigitalInput turretHomeSensor = new DigitalInput(Constants.turretHomeSensor);
-    /**
-     * Creates a new ExampleSubsystem.
-     */
-
-    // setup variables
-
+    // setup motor and encoder variables
+    CANSparkMax turretMotor = new CANSparkMax(Constants.indexerMotor, MotorType.kBrushless);
+    CANEncoder encoder = turretMotor.getEncoder();
+    CANPIDController pidController = turretMotor.getPIDController();
     // Turret PID gains
     double kF = 0.07;     //0.05
     double kP = 0.2;    //0.155
@@ -46,6 +39,7 @@ public class Turret extends SubsystemBase {
     int kErrorBand = 50;//degreesToEncoderUnits(0.5);
     int kCruiseVelocity = 14000;
     int kMotionAcceleration = kCruiseVelocity * 10;
+    // setup variables
     double[][] restrictedMovement = {{270, 300}, {60, 90}};
     double minAngle = -90;  // -135;
     double maxAngle = 90;   // 195;
@@ -56,34 +50,26 @@ public class Turret extends SubsystemBase {
     private boolean turretHomeSensorLatch = false;
 
     public Turret(SwerveDrive swerveDrive) {
+        this.m_swerveDrive = swerveDrive;
         // Setup turret motors
-        m_swerveDrive = swerveDrive;
-        encoder.configFactoryDefault();
-        encoder.setPositionToAbsolute();
-        encoder.configSensorDirection(true);
+        turretMotor.restoreFactoryDefaults();
+        turretMotor.setInverted(false);
+        turretMotor.setIdleMode(IdleMode.kBrake);
 
-        turretMotor.configFactoryDefault();
-        turretMotor.setNeutralMode(NeutralMode.Brake);
-        turretMotor.setInverted(true);
-        turretMotor.configRemoteFeedbackFilter(61, RemoteSensorSource.CANCoder, 0, 0);
-        turretMotor.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0);
-        turretMotor.config_kF(0, kF);
-        turretMotor.config_kP(0, kP);
-        turretMotor.config_kI(0, kI);
-        turretMotor.config_IntegralZone(0, kI_Zone);
-        turretMotor.configMaxIntegralAccumulator(0, kMaxIAccum);
-        turretMotor.config_kD(0, kD);
-        turretMotor.configMotionCruiseVelocity(kCruiseVelocity);
-        turretMotor.configMotionAcceleration(kMotionAcceleration);
-        turretMotor.configAllowableClosedloopError(0, kErrorBand);
-
-        //turretPID.enableContinuousInput(0, 360);
-
-        //initShuffleboard();
+        // Setup PID Controller
+        pidController.setFF(kF);
+        pidController.setP(kP);
+        pidController.setI(kI);
+        pidController.setD(kD);
+        double maxVel = 1.1e4;
+        pidController.setSmartMotionMaxVelocity(maxVel, 0); // Formerly 1.1e4
+        double maxAccel = 1e6;
+        pidController.setSmartMotionMaxAccel(maxAccel, 0); // Formerly 1e6
+        pidController.setSmartMotionAllowedClosedLoopError(1, 0);
+        pidController.setIZone(kI_Zone);
     }
 
     // self-explanatory commands
-
     public void resetEncoder() {
         turretMotor.setSelectedSensorPosition(0);
         encoder.setPosition(0);
@@ -138,7 +124,7 @@ public class Turret extends SubsystemBase {
     }
 
     public void setPercentOutput(double output) {
-        turretMotor.set(ControlMode.PercentOutput, output);
+        turretMotor.set(output);
     }
 
     // ???
@@ -159,9 +145,9 @@ public class Turret extends SubsystemBase {
     }
 
     // ???
-    public void setClosedLoopPosition() {
-        turretMotor.set(ControlMode.MotionMagic, degreesToEncoderUnits(getSetpoint()));
-    }
+//    public void setClosedLoopPosition() {
+//        turretMotor.set(ControlMode.MotionMagic, degreesToEncoderUnits(getSetpoint()));
+//    }
 
 //    public void setSetpointOutput(double setpoint) {
 //        turretMotor.set(ControlMode.MotionMagic, degreesToEncoderUnits(setpoint));
@@ -176,14 +162,14 @@ public class Turret extends SubsystemBase {
     }
 
     // checks if the turret is pointing within the tolerance of the target
-    public boolean onTarget() {
-        return Math.abs(turretMotor.getClosedLoopError()) < kErrorBand;
-    }
+//    public boolean onTarget() {
+//        return Math.abs(turretMotor.getClosedLoopError()) < kErrorBand;
+//    }
 
     // ???
-    public void clearIAccum() {
-        turretMotor.setIntegralAccumulator(0);
-    }
+//    public void clearIAccum() {
+//        turretMotor.setIntegralAccumulator(0);
+//    }
 
     private boolean getTurretLatch() {
         return turretHomeSensorLatch;
