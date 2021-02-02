@@ -46,6 +46,8 @@ public class Vision extends SubsystemBase {
 	// NetworkTables for reading vision data
 	private NetworkTable limelight;
 	private NetworkTable photonVision;
+	private NetworkTable powercell_count;
+	private NetworkTable powercellX;
 
 	// Subsystems that will be controlled based on vision data
     private final SwerveDrive m_swerveDrive;
@@ -251,6 +253,13 @@ public class Vision extends SubsystemBase {
 	}
 
 	// TODO: Read powercell position from PhotonVision over NetworkTables
+
+	private void photonNetwork(){
+	 	photonVision.getEntry("photonVision");
+			
+		powercellX = powercell_count;
+		
+	}
 
 	private void initShuffleboard() {
 		// Unstable. Don''t use until WPILib fixes this
