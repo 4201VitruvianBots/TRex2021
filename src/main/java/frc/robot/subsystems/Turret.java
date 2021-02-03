@@ -71,7 +71,6 @@ public class Turret extends SubsystemBase {
 
     // self-explanatory commands
     public void resetEncoder() {
-        turretMotor.setSelectedSensorPosition(0);
         encoder.setPosition(0);
     }
 
@@ -84,7 +83,7 @@ public class Turret extends SubsystemBase {
     }
 
     public double getTurretAngle() {
-        return encoderUnitsToDegrees(turretMotor.getSelectedSensorPosition());
+        return encoderUnitsToDegrees(encoder.getPosition());
     }
 
     public double getFieldRelativeAngle() {
@@ -109,6 +108,10 @@ public class Turret extends SubsystemBase {
 
     public double getSetpoint() {
         return setpoint;
+    }
+
+    public double getError(){
+        return 0 - getTurretAngle();
     }
 
     public boolean isRestricted() {
@@ -182,11 +185,11 @@ public class Turret extends SubsystemBase {
 
     private void initShuffleboard() {
         // Unstable. Don''t use until WPILib fixes this
-        Shuffleboard.getTab("Turret").addNumber("Turret Motor Output", turretMotor::getMotorOutputPercent);
+        Shuffleboard.getTab("Turret").addNumber("Turret Motor Output Current", turretMotor::getOutputCurrent);
         Shuffleboard.getTab("Turret").addNumber("Turret Robot Relative Angle", this::getTurretAngle);
         Shuffleboard.getTab("Turret").addNumber("Turret Field Relative Angle", this::getFieldRelativeAngle);
         Shuffleboard.getTab("Turret").addNumber("Turret Setpoint", this::getSetpoint);
-        Shuffleboard.getTab("Turret").addNumber("Turret Error", turretMotor::getClosedLoopError);
+        Shuffleboard.getTab("Turret").addNumber("Turret Error", this::getError);
         Shuffleboard.getTab("Turret").addNumber("Turret IAccum", turretMotor::getIntegralAccumulator);
         Shuffleboard.getTab("Turret").addBoolean("Home", this::getTurretHome);
     }
@@ -199,18 +202,18 @@ public class Turret extends SubsystemBase {
         SmartDashboardTab.putNumber("Turret", "Turret Robot Relative Angle", getTurretAngle());
         SmartDashboardTab.putNumber("Turret", "Turret Field Relative Angle", getFieldRelativeAngle());
         SmartDashboardTab.putNumber("Turret", "Turret Setpoint", getSetpoint());
-//    SmartDashboardTab.putNumber("Turret", "Turret Error", turretMotor.getClosedLoopError());
-//    SmartDashboardTab.putNumber("Turret", "Turret Controller Setpoint", turretMotor.getClosedLoopTarget());
-//    SmartDashboardTab.putString("Turret", "Turret Control Mode", turretMotor.getControlMode().toString());
-//    SmartDashboardTab.putNumber("Turret", "Turret IAccum", turretMotor.getIntegralAccumulator());
+    SmartDashboardTab.putNumber("Turret", "Turret Error", turretMotor.getClosedLoopError());
+    SmartDashboardTab.putNumber("Turret", "Turret Controller Setpoint", turretMotor.getClosedLoopTarget());
+    SmartDashboardTab.putString("Turret", "Turret Control Mode", turretMotor.getControlMode().toString());
+    SmartDashboardTab.putNumber("Turret", "Turret IAccum", turretMotor.getIntegralAccumulator());
         SmartDashboardTab.putBoolean("Turret", "Home", getTurretHome());
 
-//        try {
-//            SmartDashboardTab.putString("DriveTrain", "Turret Command", this.getCurrentCommand().getName());
-//        }catch (Exception e) {
-//
-//        }
-//    SmartDashboardTab.putNumber("Turret", "Control Mode", getControlMode());
+        try {
+            SmartDashboardTab.putString("DriveTrain", "Turret Command", this.getCurrentCommand().getName());
+        }catch (Exception e) {
+
+        }
+    SmartDashboardTab.putNumber("Turret", "Control Mode", getControlMode());
     }
 
     @Override
@@ -227,7 +230,7 @@ public class Turret extends SubsystemBase {
         } else if (getTurretLatch() && !getTurretHome())
             setTurretLatch(false);
 
-        if (!initialHome)
+        if (!getInitialHome())
             if (getTurretHome())
                 initialHome = true;
 
