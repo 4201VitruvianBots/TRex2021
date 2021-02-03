@@ -254,15 +254,8 @@ public class Vision extends SubsystemBase {
 
 	// TODO: Read powercell position from PhotonVision over NetworkTables
 
-	public double getPowerCellX() {
-
-	}
-
-	private void photonNetwork(){
-	 	photonVision.getEntry("photonVision");
-			
-		powercellX = powercell_count;
-		
+	public double getPowercellX(){
+	 	return photonVision.getEntry("powercell-x").getDouble(0);
 	}
 
 	private void initShuffleboard() {
