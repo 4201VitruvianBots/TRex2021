@@ -131,4 +131,10 @@ public final class Constants {
     // placeholder values
     public static final int uptakeMotor = 4201;
 
+    // Shooting physics constants
+    public static final double g = 9.81; // Absolute value, in meters per second squared
+    public static final double verticalTargetDistance = Units.inchesToMeters(98.25 - 38); // Distance between shooter and target heights from ground
+    public static final double verticalShooterAngle = Math.PI / 3; // Angle ball is shot from shooter relative to the ground 
+    // TODO: Find accurate measurements for T-rex
+
 }

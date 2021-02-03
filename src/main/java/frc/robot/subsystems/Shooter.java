@@ -54,6 +54,9 @@ public class Shooter extends SubsystemBase {
     private boolean timerStart;
     private double timeStamp;
     private boolean canShoot;
+    private double idealRPM; // The RPM the shooter should be set to in order to hit the target from this distance
+
+    private final double metersPerSecondToRPM = 315; // How much to multiply a speed by to get ideal RPM. This is only a preliminary estimate
 
     public Shooter(Vision vision, PowerDistributionPanel pdp) {
         // setup shooterMotors
@@ -140,6 +143,16 @@ public class Shooter extends SubsystemBase {
         return (RPM / 600.0) * 2048.0;
     }
 
+    private void calculateIdealRPM() {
+        double targetDistance = Units.feetToMeters(m_vision.getTargetDistance());
+        double shootSpeed = targetDistance * Math.sqrt(0.5 * Constants.g / (targetDistance * Math.tan(Constants.verticalShooterAngle) - Constants.verticalTargetDistance)) / Math.cos(Constants.verticalShooterAngle);
+        idealRPM = shootSpeed * metersPerSecondToRPM;
+    }
+
+    public void setIdealRPM() {
+        setpoint = idealRPM;
+    }
+
     // Smart Dashboard settings
 
     private void initShuffleboard() {
@@ -186,6 +199,7 @@ public class Shooter extends SubsystemBase {
 //        updatePidRPM();
         updateShuffleboard();
         updatePIDValues();
+        calculateIdealRPM();
 
         if ((Math.abs(getSetpoint() - getRPM(0)) < getRPMTolerance()) && m_vision.hasTarget() &&
                 (Math.abs(m_vision.getTargetX()) < 1) && !timerStart) {

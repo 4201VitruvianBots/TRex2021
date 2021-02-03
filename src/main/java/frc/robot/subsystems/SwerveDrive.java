@@ -272,6 +272,12 @@ public class SwerveDrive extends SubsystemBase {
 //    }
 //  }
 
+  public void stopMotors() { // Sets all motors to stop moving
+    for (SwerveModule swerveModule : mSwerveModules) {
+      swerveModule.setPercentOutput(0);
+    }
+  }
+
   /**
    * Updates the field relative position of the robot.
    */
