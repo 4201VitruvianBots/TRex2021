@@ -42,7 +42,7 @@ public class SetSwerveDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_swerveDrive.drive(m_leftX.getAsDouble(),m_leftX.getAsDouble(),m_rightX.getAsDouble(),true);
+    m_swerveDrive.drive(m_leftX.getAsDouble(), m_leftY.getAsDouble(), m_rightX.getAsDouble(),true);
   }
 
   // Called once the command ends or is interrupted.

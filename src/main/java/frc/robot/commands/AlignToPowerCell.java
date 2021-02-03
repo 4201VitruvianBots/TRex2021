@@ -8,8 +8,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Vision;
 
 /**
  * An example command that uses an example subsystem.
@@ -18,7 +18,7 @@ public class AlignToPowerCell extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Vision m_vision;
     private final SwerveDrive m_swerveDrive;
-    private final double PowerCellX;
+    private double powerCellX = 0;
 
     /**
      * Creates a new ExampleCommand.
@@ -26,7 +26,7 @@ public class AlignToPowerCell extends CommandBase {
      * @param subsystem The subsystem used by this command.
      */
 
-    public AlignToPowercell(Vision vision, SwerveDrive swerveDrive) {
+    public AlignToPowerCell(Vision vision, SwerveDrive swerveDrive) {
         m_vision = vision;
         m_swerveDrive = swerveDrive;
         // Use addRequirements() here to declare subsystem dependencies.
@@ -43,18 +43,18 @@ public class AlignToPowerCell extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        powerCellX = Vision.getPowerCellX();
+        powerCellX = m_vision.getPowercellX();
         if (powerCellX > 0) {
-            SetSwerveDrive(m_swerveDrive, -0.5, 0, 0);
+            m_swerveDrive.drive(-0.5, 0, 0, false);
         } else {
-            SetSwerveDrive(m_swerveDrive, 0.5, 0, 0);
+            m_swerveDrive.drive(0.5, 0, 0, false);
         }
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        SetSwerveDrive(m_swerveDrive, 0, 0, 0);
+        m_swerveDrive.drive(0, 0, 0, false);
     }
 
     // Returns true when the command should end.
