@@ -99,7 +99,8 @@ public class Turret extends SubsystemBase {
     }
 
     public boolean getTurretHome() {
-        return !turretHomeSensor.get();
+//        return !turretHomeSensor.get(); cannot understand what the turret home sensor is refering to.
+        return true;
     }
 
     public boolean getInitialHome() { //Checks if the bot is in its starting position??
@@ -110,7 +111,7 @@ public class Turret extends SubsystemBase {
         return setpoint;
     }
 
-    public double getError(){
+    public double getError() {
         return 0 - getTurretAngle();
     }
 
@@ -147,10 +148,9 @@ public class Turret extends SubsystemBase {
         this.setpoint = setpoint;
     }
 
-    // ???
-//    public void setClosedLoopPosition() {
-//        turretMotor.set(ControlMode.MotionMagic, degreesToEncoderUnits(getSetpoint()));
-//    }
+    public void setClosedLoopPosition() {
+        turretMotor.set(degreesToEncoderUnits(getSetpoint()));
+    }
 
 //    public void setSetpointOutput(double setpoint) {
 //        turretMotor.set(ControlMode.MotionMagic, degreesToEncoderUnits(setpoint));
@@ -190,30 +190,29 @@ public class Turret extends SubsystemBase {
         Shuffleboard.getTab("Turret").addNumber("Turret Field Relative Angle", this::getFieldRelativeAngle);
         Shuffleboard.getTab("Turret").addNumber("Turret Setpoint", this::getSetpoint);
         Shuffleboard.getTab("Turret").addNumber("Turret Error", this::getError);
-        Shuffleboard.getTab("Turret").addNumber("Turret IAccum", turretMotor::getIntegralAccumulator);
+//        Shuffleboard.getTab("Turret").addNumber("Turret IAccum", turretMotor::getIntegralAccumulator); can't find CANSparkmax equivalent
         Shuffleboard.getTab("Turret").addBoolean("Home", this::getTurretHome);
     }
 
     // set smartdashboard
     private void updateSmartdashboard() {
         SmartDashboard.putNumber("Turret Angle", getFieldRelativeAngle());
-
-        SmartDashboardTab.putNumber("Turret", "Turret Motor Output", turretMotor.getMotorOutputPercent());
-        SmartDashboardTab.putNumber("Turret", "Turret Robot Relative Angle", getTurretAngle());
-        SmartDashboardTab.putNumber("Turret", "Turret Field Relative Angle", getFieldRelativeAngle());
-        SmartDashboardTab.putNumber("Turret", "Turret Setpoint", getSetpoint());
-    SmartDashboardTab.putNumber("Turret", "Turret Error", turretMotor.getClosedLoopError());
-    SmartDashboardTab.putNumber("Turret", "Turret Controller Setpoint", turretMotor.getClosedLoopTarget());
-    SmartDashboardTab.putString("Turret", "Turret Control Mode", turretMotor.getControlMode().toString());
-    SmartDashboardTab.putNumber("Turret", "Turret IAccum", turretMotor.getIntegralAccumulator());
+        Shuffleboard.getTab("Turret").addNumber("Turret Motor Output Current", turretMotor::getOutputCurrent);
+        Shuffleboard.getTab("Turret").addNumber("Turret Robot Relative Angle", this::getTurretAngle);
+        Shuffleboard.getTab("Turret").addNumber("Turret Field Relative Angle", this::getFieldRelativeAngle);
+        Shuffleboard.getTab("Turret").addNumber("Turret Setpoint", this::getSetpoint);
+        Shuffleboard.getTab("Turret").addNumber("Turret Error", this::getError);
+//        SmartDashboardTab.putNumber("Turret", "Turret Controller Setpoint", turretMotor.getClosedLoopTarget());  cannot understand what the getClosedLoopTarget is refering to. and can't find CANSparkmax equivalent
+        SmartDashboardTab.putString("Turret", "Turret Control Mode", String.valueOf(this.getControlMode()));
+//        SmartDashboardTab.putNumber("Turret", "Turret IAccum", turretMotor.getIntegralAccumulator()); can't find CANSparkmax equivalent
         SmartDashboardTab.putBoolean("Turret", "Home", getTurretHome());
 
         try {
             SmartDashboardTab.putString("DriveTrain", "Turret Command", this.getCurrentCommand().getName());
-        }catch (Exception e) {
+        } catch (Exception e) {
 
         }
-    SmartDashboardTab.putNumber("Turret", "Control Mode", getControlMode());
+        SmartDashboardTab.putNumber("Turret", "Control Mode", getControlMode());
     }
 
     @Override
@@ -224,7 +223,7 @@ public class Turret extends SubsystemBase {
         // This method will be called once per scheduler run
         // TODO: FIX
         if (!getTurretLatch() && getTurretHome()) {
-            turretMotor.setSelectedSensorPosition(0);
+//            turretMotor.setSelectedSensorPosition(0); no sensor on the CANSparkmax
             encoder.setPosition(0);
             setTurretLatch(true);
         } else if (getTurretLatch() && !getTurretHome())
