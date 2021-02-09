@@ -19,22 +19,20 @@ import java.util.List;
 
 //import frc.vitruvianlib.utils.TrajectoryUtils;
 
-public class AutoNavSlalom extends SequentialCommandGroup {
-    public AutoNavSlalom(SwerveDrive swerveDrive) {
+public class AutoNavBounce extends SequentialCommandGroup {
+    public AutoNavBounce(SwerveDrive swerveDrive) {
         Pose2d[] waypoints = {
-                new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(30))),
-                new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(60))),
-                new Pose2d(Units.inchesToMeters(120), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(240), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(270), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(-45))),
-                new Pose2d(Units.inchesToMeters(315), Units.inchesToMeters(34), new Rotation2d(Units.degreesToRadians(30))),
-                new Pose2d(Units.inchesToMeters(315), Units.inchesToMeters(86), new Rotation2d(Units.degreesToRadians(150))),
-                new Pose2d(Units.inchesToMeters(270), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(225))),
-                new Pose2d(Units.inchesToMeters(240), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(180))),
-                new Pose2d(Units.inchesToMeters(120), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(180))),
-                new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(135))),
-                new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(150)))
+                new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(30))),
+                new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(90))),
+                new Pose2d(Units.inchesToMeters(105), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(120))),
+                new Pose2d(Units.inchesToMeters(150), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(180))),
+                new Pose2d(Units.inchesToMeters(180), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(-90))),
+                new Pose2d(Units.inchesToMeters(210), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(255), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(270), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(90))),
+                new Pose2d(Units.inchesToMeters(330), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(150))),
         };
+        boolean[] pathIsReversed = {false, true, true, true, false, false, false, true};
         Pose2d startPosition = waypoints[0];
 
         // Create config for trajectory
@@ -49,14 +47,15 @@ public class AutoNavSlalom extends SequentialCommandGroup {
         // new SetDriveNeutralMode(swerveDrive) TODO: Write a function to set drive neutral mode
         );
 
+        double[] startVelocities = {config.getMaxVelocity(), 0, config.getMaxVelocity(), config.getMaxVelocity(), 0, 
+                config.getMaxVelocity(), config.getMaxVelocity(), 0, 0};
+        double[] endVelocities = {0, config.getMaxVelocity(), config.getMaxVelocity(), 0, config.getMaxVelocity(), 
+                config.getMaxVelocity(), 0, 0};
+
         for (int i = 0; i < waypoints.length - 1; i++) {
-                if (i != 0) {
-                        config.setEndVelocity(config.getMaxVelocity());
-                        config.setStartVelocity(config.getMaxVelocity());
-                }
-                if (i == waypoints.length - 2) {
-                        config.setEndVelocity(0);
-                }
+                config.setStartVelocity(startVelocities[i]);
+                config.setEndVelocity(endVelocities[i]);
+                config.setReversed(pathIsReversed[i]);
                 Trajectory trajectory = TrajectoryGenerator.generateTrajectory(waypoints[i],
                         List.of(),
                         waypoints[i + 1],

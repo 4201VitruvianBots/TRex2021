@@ -1,5 +1,6 @@
 package frc.robot.commands.autoCommands;
 
+import java.util.ArrayList;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -27,12 +28,14 @@ public class DriveForwardDistance extends SequentialCommandGroup {
                     .setKinematics(Constants.DriveConstants.kDriveKinematics);
                 configA.setReversed(false);
                 configA.setEndVelocity(0);
-                ArrayList<Pose2d> driveForwardPath = new ArrayList();
-                driveForwardPath.add(startPosition);
-                driveForwardPath.add(endPosition);
+
+                Trajectory trajectory = TrajectoryGenerator.generateTrajectory(startPosition,
+                        List.of(),
+                        endPosition,
+                        configA);
 
                 SwerveControllerCommand driveForwardCommand = new SwerveControllerCommand(
-                exampleTrajectory,
+                trajectory,
                 swerveDrive::getPose, //Functional interface to feed supplier
                 Constants.DriveConstants.kDriveKinematics,
 
@@ -49,7 +52,7 @@ public class DriveForwardDistance extends SequentialCommandGroup {
         );
         
                 addCommands(
-                        new SetOdometry(driveTrain, startPosition),
+                        new SetOdometry(swerveDrive, startPosition),
                         //new SetDriveNeutralMode(driveTrain,0),
                         driveForwardCommand
                     );

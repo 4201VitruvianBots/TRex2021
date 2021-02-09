@@ -8,11 +8,14 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.Intake;
 import frc.vitruvianlib.utils.TrajectoryUtils;
 
 import java.util.List;
@@ -21,7 +24,7 @@ import java.util.List;
 
 public class PowerCellSearchChallenge extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final SwerveDrive swerveDrive;
+    private final SwerveDrive m_swerveDrive;
     private final Shooter m_shooter;
     private final Indexer m_indexer;
     private final Intake m_intake;
@@ -31,13 +34,12 @@ public class PowerCellSearchChallenge extends CommandBase {
      *
      * @param RobotContainer.m_shooter The subsystem used by this command.
      */
-    public PowerCellSearchChallenge(SwerveDrive swerveDrive, Shooter shooter, Indexer indexer, Intake intake, double rpm) {
+    public PowerCellSearchChallenge(SwerveDrive swerveDrive, Shooter shooter, Indexer indexer, Intake intake) {
       // Use addRequirements() here to declare subsystem dependencies.
       m_swerveDrive = swerveDrive;
       m_shooter = shooter;
       m_indexer = indexer;
       m_intake = intake;
-      m_rpm = rpm;
       addRequirements(shooter);
       addRequirements(indexer);
       addRequirements(intake);

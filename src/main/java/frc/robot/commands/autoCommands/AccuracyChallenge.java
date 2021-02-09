@@ -10,9 +10,16 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj.util.Units;
 import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Indexer;
+import frc.robot.commands.shooter.SetRPM;
+import frc.robot.commands.autoCommands.DriveForwardDistance;
+import frc.robot.commands.autoCommands.DriveBackwardDistance;
+import frc.robot.commands.shooter.ControlledFireNew;
 import frc.vitruvianlib.utils.TrajectoryUtils;
 
 import java.util.List;
@@ -33,7 +40,7 @@ public class AccuracyChallenge extends SequentialCommandGroup {
             new SetOdometry(swerveDrive, new Pose2d()),
             // TODO: Set drive neutral mode
             new SetRPM(shooter, baseRPM),
-            new DriveFowardDistance(swerveDrive, distancesToDrive[index]).andThen(() -> swerveDrive.stopMotors()),
+            new DriveForwardDistance(swerveDrive, distancesToDrive[index]).andThen(() -> swerveDrive.stopMotors()),
             new InstantCommand(() -> shooter.setIdealRPM()),
             new ControlledFireNew(shooter, indexer).withTimeout(3),
             new SetRPM(shooter, baseRPM),
