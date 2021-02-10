@@ -45,8 +45,8 @@ public class AutoNavSlalom extends SequentialCommandGroup {
                         .setKinematics(Constants.DriveConstants.kDriveKinematics);
         config.setReversed(false);
 
-        addCommands(new SetOdometry(swerveDrive, startPosition)
-        // new SetDriveNeutralMode(swerveDrive) TODO: Write a function to set drive neutral mode
+        addCommands(new SetOdometry(swerveDrive, startPosition),
+                new SetDriveNeutralMode(swerveDrive)
         );
 
         for (int i = 0; i < waypoints.length - 1; i++) {

@@ -222,6 +222,11 @@ public class SwerveModule extends SubsystemBase {
     mTurningMotor.set(ControlMode.PercentOutput,turnOutput);
   }
 
+  public void setBrakeMode() {
+    mDriveMotor.setNeutralMode(NeutralMode.Brake);
+    mTurningMotor.setNeutralMode(NeutralMode.Brake);
+  }
+
   public void setPercentOutput(double speed) {
     mDriveMotor.set(ControlMode.PercentOutput, speed);
   }

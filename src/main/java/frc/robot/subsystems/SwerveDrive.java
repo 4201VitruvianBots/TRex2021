@@ -215,6 +215,13 @@ public class SwerveDrive extends SubsystemBase {
     mSwerveModules[3].setDesiredState(desiredStates[3]);
   }
 
+  public void setSwerveDriveNeutralMode() {
+    mSwerveModules[0].setBrakeMode();
+    mSwerveModules[1].setBrakeMode();
+    mSwerveModules[2].setBrakeMode();
+    mSwerveModules[3].setBrakeMode();
+  }
+
 //  public void holonomicDrive(double forward, double strafe, double rotationSpeed) {
 //    forward *= throttle; //because if they are both 1, then max output is sqrt(2), which is more than 1.
 //    strafe *= throttle;

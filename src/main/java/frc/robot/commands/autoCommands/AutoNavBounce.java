@@ -43,8 +43,8 @@ public class AutoNavBounce extends SequentialCommandGroup {
                         .setKinematics(Constants.DriveConstants.kDriveKinematics);
         config.setReversed(false);
 
-        addCommands(new SetOdometry(swerveDrive, startPosition)
-        // new SetDriveNeutralMode(swerveDrive) TODO: Write a function to set drive neutral mode
+        addCommands(new SetOdometry(swerveDrive, startPosition),
+                new SetDriveNeutralMode(swerveDrive)
         );
 
         double[] startVelocities = {config.getMaxVelocity(), 0, config.getMaxVelocity(), config.getMaxVelocity(), 0, 
