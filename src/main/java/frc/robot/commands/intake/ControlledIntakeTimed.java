@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Uptake;
 
 /**
  * An example command that uses an example subsystem.
@@ -19,6 +20,7 @@ public class ControlledIntakeTimed extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Indexer m_indexer;
     private final Intake m_intake;
+    private final Uptake m_uptake;
 
     private final double intakeRPM = 5000;
     private final double indexRPM = 300;
@@ -97,7 +99,7 @@ public class ControlledIntakeTimed extends CommandBase {
         m_intake.setIntakingState(false);
         m_intake.setIntakePercentOutput(0);
         m_indexer.setIndexerOutput(0);
-        m_indexer.setKickerOutput(0);
+        m_uptake.setUptakeMotor(0);
 //    if(intakeState == IntakeStates.INTAKE_FIVE_BALLS)
         m_intake.setintakePiston(false);
     }

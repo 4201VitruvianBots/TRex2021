@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Uptake;
 
 /**
  * An example command that uses an example subsystem.
@@ -24,6 +25,8 @@ public class TestShooterDelayed extends CommandBase {
   private double time;
   private boolean test, stopTest;
   private boolean printed = false;
+  private final Uptake m_uptake;
+
   /**
    * Creates a new ExampleCommand.
    *
@@ -52,14 +55,14 @@ public class TestShooterDelayed extends CommandBase {
     if(m_shooter.getTestRPM() != 0)
       if (Math.abs(m_shooter.getRPM(0) - m_shooter.getTestRPM()) < m_shooter.getRPMTolerance()) {
         m_indexer.setIndexerOutput(0.95);
-        m_indexer.setKickerOutput(0.95);
+        m_uptake.setUptakeMotor(0.95);
         m_intake.setIntakePercentOutput(0.95);
 //    } else if (!m_indexer.getIndexerTopSensor()) {
 //      m_indexer.setIndexerOutput(1);
-//      m_indexer.setKickerOutput(-0.25);
+//      m_uptake.setUptakeMotor(-0.25);
       } else {
         m_indexer.setIndexerOutput(0);
-        m_indexer.setKickerOutput(0);
+        m_uptake.setUptakeMotor(0);
       }
   }
 
@@ -68,7 +71,7 @@ public class TestShooterDelayed extends CommandBase {
   public void end(boolean interrupted) {
     m_intake.setIntakePercentOutput(0);
     m_indexer.setIndexerOutput(0);
-    m_indexer.setKickerOutput(0);
+    m_uptake.setUptakeMotor(0);
     m_shooter.setPower(0);
   }
 

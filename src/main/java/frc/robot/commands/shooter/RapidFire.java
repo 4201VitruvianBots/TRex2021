@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Uptake;
 
 /**
  * An example command that uses an example subsystem.
@@ -24,6 +25,7 @@ public class RapidFire extends CommandBase {
     private double startTime, timestamp;
     private boolean timerStart;
     private double m_rpm;
+    private final Uptake m_uptake;
 
     /**
      * Creates a new ExampleCommand.
@@ -63,7 +65,7 @@ public class RapidFire extends CommandBase {
         if (timestamp != 0 || Timer.getFPGATimestamp() - startTime > 3)
             if (timerStart && Timer.getFPGATimestamp() - timestamp > 0.1 || Timer.getFPGATimestamp() - startTime > 2) {
                 m_indexer.setIndexerOutput(1);
-                m_indexer.setKickerOutput(1);
+                m_uptake.setUptakeMotor(1);
                 m_intake.setIntakePercentOutput(1);
             }
     }
@@ -73,7 +75,7 @@ public class RapidFire extends CommandBase {
     public void end(boolean interrupted) {
         m_intake.setIntakePercentOutput(0);
         m_indexer.setIndexerOutput(0);
-        m_indexer.setKickerOutput(0);
+        m_uptake.setUptakeMotor(0);
         m_shooter.setPower(0);
     }
 

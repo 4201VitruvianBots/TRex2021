@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Uptake;
 
 /**
  * An example command that uses an example subsystem.
@@ -24,6 +25,8 @@ public class TestShooter extends CommandBase {
   private double timestamp;
   private boolean timerStart;
   private boolean printed = false;
+  private final Uptake m_uptake;
+
   /**
    * Creates a new ExampleCommand.
    *
@@ -62,11 +65,11 @@ public class TestShooter extends CommandBase {
       if (timestamp != 0)
         if (timerStart && Timer.getFPGATimestamp() - timestamp > 0.1) {
           m_indexer.setIndexerOutput(1);
-          m_indexer.setKickerOutput(1);
+          m_uptake.setUptakeMotor(1);
           m_intake.setIntakePercentOutput(1);
         } else {
           m_indexer.setIndexerOutput(0);
-          m_indexer.setKickerOutput(0);
+          m_uptake.setUptakeMotor(0);
           m_intake.setIntakePercentOutput(0);
 
         }
@@ -79,10 +82,10 @@ public class TestShooter extends CommandBase {
       //      }
       //    } else if (!m_indexer.getIndexerTopSensor()) {
       //      m_indexer.setIndexerOutput(1);
-      //      m_indexer.setKickerOutput(-0.25);
+      //      m_uptake.setUptakeMotor(-0.25);
       //    } else {
       //      m_indexer.setIndexerOutput(0);
-      //      m_indexer.setKickerOutput(0);
+      //      m_uptake.setUptakeMotor(0);
     }
   }
 
@@ -91,7 +94,7 @@ public class TestShooter extends CommandBase {
   public void end(boolean interrupted) {
     m_intake.setIntakePercentOutput(0);
     m_indexer.setIndexerOutput(0);
-    m_indexer.setKickerOutput(0);
+    m_uptake.setUptakeMotor(0);
     m_shooter.setPower(0);
   }
 

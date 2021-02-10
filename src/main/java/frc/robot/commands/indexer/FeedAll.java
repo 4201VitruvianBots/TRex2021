@@ -9,6 +9,7 @@ package frc.robot.commands.indexer;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.Uptake;
 
 /**
  * An example command that uses an example subsystem.
@@ -16,6 +17,7 @@ import frc.robot.subsystems.Indexer;
 public class FeedAll extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Indexer m_indexer;
+  private final Uptake m_uptake;
 
   /**
    * Creates a new ExampleCommand.
@@ -40,19 +42,19 @@ public class FeedAll extends CommandBase {
   @Override
   public void execute() {
     m_indexer.setIndexerOutput(0.6);
-    m_indexer.setKickerOutput(0.5);
+    m_uptake.setUptakeMotor(1);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(final boolean interrupted) {  
-    m_indexer.setKickerOutput(0);
     m_indexer.setIndexerOutput(0);
+    m_uptake.setUptakeMotor(0);
   }
 
   // Returns true when the command should end.
 
-  /*
+  
   @Override
   public boolean isFinished() {
     double time = Timer.getFPGATimestamp();
@@ -64,5 +66,5 @@ public class FeedAll extends CommandBase {
     else
       return false;
   }
-  */
+
 }

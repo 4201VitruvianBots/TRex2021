@@ -7,14 +7,13 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ControlType;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,9 +32,6 @@ public class Indexer extends SubsystemBase {
   CANSparkMax master = new CANSparkMax(Constants.indexerMotor, MotorType.kBrushless);
   CANEncoder encoder = master.getEncoder();
   CANPIDController pidController = master.getPIDController();
-
-  VictorSPX kicker = new VictorSPX(Constants.kickerMotor);
-
 
   private double targetSetpoint;
 
@@ -73,9 +69,6 @@ public class Indexer extends SubsystemBase {
     pidController.setSmartMotionAllowedClosedLoopError(1, 0);
     pidController.setIZone(kI_Zone);
 
-    kicker.configFactoryDefault();
-    kicker.setInverted(true);
-
 //    SmartDashboard.putNumber("kF", kF);
 //    SmartDashboard.putNumber("kP", kP);
 //    SmartDashboard.putNumber("kI", kI);
@@ -95,71 +88,31 @@ public class Indexer extends SubsystemBase {
   public int getControlMode() {
     return controlMode;
   }
-  
-  public void setKickerOutput(double output) {
-    kicker.set(ControlMode.PercentOutput, output);
-  }
 
   public void setIndexerOutput(double output) {
     master.set(output);
   }
 
-  // Detect whether a new ball has been picked up
-  // There is a new ball if the intake sensor is blocked and was not blocked before
-
-
-//  public void incrementIndexer(double setpoint){
-//    targetSetpoint = setpoint;
-//    SmartDashboard.putNumber("Target Setpoint", targetSetpoint);
-//    pidController.setReference(targetSetpoint, ControlType.kSmartMotion);
-//  }
-//
   public void setRPM(double rpm) {
     double setpoint = rpm / gearRatio;
     SmartDashboard.putNumber("Indexer Setpoint", setpoint);
     pidController.setReference(setpoint, ControlType.kSmartVelocity);
   }
-//
-//  public void resetEncoderPosition(){
-//    encoder.setPosition(0);
-//  }
-//
-//  public double getPosition(){
-//    return encoder.getPosition();
-//  }
-//
-//  public boolean onTarget() {
-//    return Math.abs(encoder.getPosition() - targetSetpoint) < 1;
-//  }
-//
-//  public double getRPM() {
-//    return encoder.getVelocity() * gearRatio;
-//  }
 
-
+ public double getRPM() {
+   return encoder.getVelocity() * gearRatio;
+ }
 
   private void initShuffleboard() {
-    // Unstable. Don''t use until WPILib fixes this
-    /*
-    Shuffleboard.getTab("Indexer").addBoolean("Intake Sensor", this::getIntakeSensor);
-    Shuffleboard.getTab("Indexer").addBoolean("Indexer Bottom Sensor", this::getIndexerBottomSensor);
-    Shuffleboard.getTab("Indexer").addBoolean("Indexer Top Sensor", this::getIndexerTopSensor);
-    */
+    Shuffleboard.getTab("Indexer").addNumber("Carousel RPM", this.getRPM());
   }
 
   private void updateSmartDashboard(){
-    /*
-    SmartDashboardTab.putBoolean("Indexer","Intake Sensor", getIntakeSensor());
-    SmartDashboardTab.putBoolean("Indexer","Indexer Bottom Sensor", getIndexerBottomSensor());
-    SmartDashboardTab.putBoolean("Indexer","Indexer Top Sensor", getIndexerTopSensor());
-    */
-    SmartDashboardTab.putNumber("Indexer", "Indexer Control Mode", controlMode);
-
+    SmartDashboardTab.putBoolean("Indexer","Carousel RPM", this.getRPM());
   }
 
   private void updatePIDValues() {
-    // Allow PID values to be set through SmartDashboard
-    // ???
+    // Allow PID values to be set through SmartDashboard ???
     kF = SmartDashboard.getNumber("kF", 0);
     kP = SmartDashboard.getNumber("kP", 0);
     kI = SmartDashboard.getNumber("kI", 0);

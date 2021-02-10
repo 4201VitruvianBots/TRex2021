@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Uptake;
 
 /**
  * An example command that uses an example subsystem.
@@ -23,6 +24,7 @@ public class AutoRapidFireSetpoint extends CommandBase {
     private final Intake m_intake;
     private double startTime, m_shootTimeout;
     private boolean timerStart;
+    private final Uptake m_uptake;
 
     /**
      * Creates a new ExampleCommand.
@@ -51,7 +53,7 @@ public class AutoRapidFireSetpoint extends CommandBase {
     public void execute() {
         if (m_shooter.canShoot() || (Timer.getFPGATimestamp() - startTime) > m_shootTimeout) {
             m_indexer.setIndexerOutput(1);
-            m_indexer.setKickerOutput(1);
+            m_uptake.setUptakeMotor(1);
             m_intake.setIntakePercentOutput(1);
         }
     }
@@ -61,7 +63,7 @@ public class AutoRapidFireSetpoint extends CommandBase {
     public void end(boolean interrupted) {
         m_intake.setIntakePercentOutput(0);
         m_indexer.setIndexerOutput(0);
-        m_indexer.setKickerOutput(0);
+        m_uptake.setUptakeMotor(0);
         m_shooter.setPower(0);
     }
 
