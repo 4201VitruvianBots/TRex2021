@@ -38,7 +38,7 @@ public class AccuracyChallenge extends SequentialCommandGroup {
             };
         addCommands(
             new SetOdometry(swerveDrive, new Pose2d()),
-            // TODO: Set drive neutral mode
+            new SetDriveNeutralMode(swerveDrive),
             new SetRPM(shooter, baseRPM),
             new DriveForwardDistance(swerveDrive, distancesToDrive[index]).andThen(() -> swerveDrive.stopMotors()),
             new InstantCommand(() -> shooter.setIdealRPM()),
