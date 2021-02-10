@@ -33,7 +33,3 @@ public class Uptake extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
   }
 }
-
-import frc.robot.subsystems.Uptake;
-private final Uptake m_uptake;
-m_uptake.setUptakeMotor
