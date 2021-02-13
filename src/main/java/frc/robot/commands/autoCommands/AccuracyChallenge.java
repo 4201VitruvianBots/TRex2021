@@ -38,13 +38,13 @@ public class AccuracyChallenge extends SequentialCommandGroup {
             };
         addCommands(
             new SetOdometry(swerveDrive, new Pose2d()),
-            new SetDriveNeutralMode(swerveDrive),
+            new SetDriveNeutralMode(swerveDrive, true),
             new SetRPM(shooter, baseRPM),
-            new DriveForwardDistance(swerveDrive, distancesToDrive[index]).andThen(() -> swerveDrive.stopMotors()),
+            new DriveForwardDistance(swerveDrive, distancesToDrive[index]).andThen(() -> swerveDrive.drive(0, 0, 0, false)),
             new InstantCommand(() -> shooter.setIdealRPM()),
             new ControlledFireNew(shooter, indexer).withTimeout(3),
             new SetRPM(shooter, baseRPM),
-            new DriveBackwardDistance(swerveDrive, distancesToDrive[index]).andThen(() -> swerveDrive.stopMotors())
+            new DriveBackwardDistance(swerveDrive, distancesToDrive[index]).andThen(() -> swerveDrive.drive(0, 0, 0, false))
         );
     }
 }

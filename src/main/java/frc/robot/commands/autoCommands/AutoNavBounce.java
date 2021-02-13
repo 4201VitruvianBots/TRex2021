@@ -44,7 +44,7 @@ public class AutoNavBounce extends SequentialCommandGroup {
         config.setReversed(false);
 
         addCommands(new SetOdometry(swerveDrive, startPosition),
-                new SetDriveNeutralMode(swerveDrive)
+                new SetDriveNeutralMode(swerveDrive, true)
         );
 
         double[] startVelocities = {config.getMaxVelocity(), 0, config.getMaxVelocity(), config.getMaxVelocity(), 0, 

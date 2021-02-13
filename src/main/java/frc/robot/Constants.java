@@ -9,8 +9,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.system.LinearSystem;
+import edu.wpi.first.wpilibj.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Units;
+import edu.wpi.first.wpiutil.math.numbers.N2;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -37,9 +41,9 @@ public final class Constants {
     public static final int backRightTurningMotor = 7;
 
     public static final class DriveConstants {
-        public static final double kTrackWidth = 0.5;
+        public static final double kTrackWidth = Units.inchesToMeters(30);
         //Distance between centers of right and left wheels on robot. Meters?
-        public static final double kWheelBase = 0.7;
+        public static final double kWheelBase = Units.inchesToMeters(30);
         //Distance between front and back wheels on robot. Meters?
         public static final SwerveDriveKinematics kDriveKinematics =
                 new SwerveDriveKinematics(
@@ -49,6 +53,8 @@ public final class Constants {
                         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
         public static final boolean kGyroReversed = false;
+
+        public static final DCMotor kDriveGearbox = DCMotor.getFalcon500(2);
 
         // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
         // These characterization values MUST be determined either experimentally or theoretically
@@ -60,16 +66,23 @@ public final class Constants {
         public static final double kaVoltSecondsSquaredPerMeter = 0.15;
 
         public static final double kMaxSpeedMetersPerSecond = 3;
+
+        public static final double kvVoltSecondsPerRadian = 3.41; // originally 1.5
+        public static final double kaVoltSecondsSquaredPerRadian = 0.111; // originally 0.3
+
+        public static final LinearSystem<N2, N2, N2> kDrivetrainPlant =
+                LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
+                        kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
     }
 
     public static final class ModuleConstants {
         public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
         public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
 
-        public static final int kDriveMotorGearRatio = 1;
-        public static final int kTurningMotorGearRatio = 1;
+        public static final double kDriveMotorGearRatio = 6.89;
+        public static final int kTurningMotorGearRatio = 12;
         public static final int kEncoderCPR = 2048;
-        public static final double kWheelDiameterMeters = 0.15;
+        public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
         public static final double kDriveEncoderDistancePerPulse =
                 // Assumes the encoders are directly mounted on the wheel shafts
                 (kWheelDiameterMeters * Math.PI) / ((double) kEncoderCPR*kDriveMotorGearRatio);
@@ -128,6 +141,12 @@ public final class Constants {
 
     // DIO
 
+    public static final int xEncoderPortA = 0;
+    public static final int xEncoderPortB = 1;
+    public static final int yEncoderPortA = 2;
+    public static final int yEncoderPortB = 3;
+    public static final int rotationEncoderPortA = 4;
+    public static final int rotationEncoderPortB = 5;
 
     // placeholder values
     public static final int uptakeMotor = 4201;

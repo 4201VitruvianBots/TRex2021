@@ -46,7 +46,7 @@ public class AutoNavSlalom extends SequentialCommandGroup {
         config.setReversed(false);
 
         addCommands(new SetOdometry(swerveDrive, startPosition),
-                new SetDriveNeutralMode(swerveDrive)
+                new SetDriveNeutralMode(swerveDrive, true)
         );
 
         for (int i = 0; i < waypoints.length - 1; i++) {

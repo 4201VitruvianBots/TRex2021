@@ -11,13 +11,15 @@ import frc.robot.subsystems.SwerveDrive;
 public class SetDriveNeutralMode extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final SwerveDrive m_swerveDrive;
+    private final boolean m_mode;
     /**
      * Creates a new ExampleCommand.
      *
      * @param swerveDrive The subsystem used by this command.
      */
-    public SetDriveNeutralMode(SwerveDrive swerveDrive) {
+    public SetDriveNeutralMode(SwerveDrive swerveDrive, boolean mode) {
         m_swerveDrive = swerveDrive;
+        m_mode = mode;
 
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(swerveDrive);
@@ -26,7 +28,7 @@ public class SetDriveNeutralMode extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        m_swerveDrive.setSwerveDriveNeutralMode();
+        m_swerveDrive.setSwerveDriveNeutralMode(m_mode);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
