@@ -7,10 +7,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,13 +17,13 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.SetSwerveDrive;
+import frc.robot.commands.autoCommands.AutoNavBarrel;
 import frc.robot.commands.autoCommands.DriveStraight;
 import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.intake.ControlledIntake;
 import frc.robot.commands.intake.ToggleIntakePistons;
-import frc.robot.subsystems.Indexer;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.SwerveDrive;
+import frc.robot.simulation.FieldSim;
+import frc.robot.subsystems.*;
 import frc.vitruvianlib.utils.JoystickWrapper;
 import frc.vitruvianlib.utils.XBoxTrigger;
 
@@ -48,6 +45,11 @@ public class RobotContainer {
   private final Indexer m_indexer = new Indexer();
   private final Intake m_intake = new Intake();
   private final SwerveDrive m_swerveDrive = new SwerveDrive(pdp);
+  private final Turret m_turret = new Turret(m_swerveDrive);
+  private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
+  private final Shooter m_shooter = new Shooter(m_vision, pdp);
+
+  private FieldSim m_FieldSim;
 
 
   private enum CommandSelector {
@@ -97,6 +99,8 @@ public class RobotContainer {
   }
 
   public void initializeSubsystems() {
+    m_FieldSim = new FieldSim(m_swerveDrive, m_turret, m_shooter);
+
     m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
             () -> leftJoystick.getRawAxis(0), //left x
             () -> leftJoystick.getRawAxis(1), //left y
@@ -149,10 +153,58 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
 //    return m_autoCommand;
-        return new WaitCommand(0);
+        //return new WaitCommand(0);
+    return new AutoNavBarrel(m_swerveDrive);
+  }
+
+  public void disabledInit() {
+    m_swerveDrive.setSwerveDriveNeutralMode(true);
+  }
+
+  public void robotPeriodic() {
+
+  }
+
+  public void teleOpInit() {
+    if(RobotBase.isReal()) {
+      m_swerveDrive.resetEncoders();
+      m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
+      m_swerveDrive.setSwerveDriveNeutralMode(false);
+    } else {
+      m_swerveDrive.resetEncoders();
+      m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
+    }
+  }
+
+  public void teleOpPeriodic() {
+
+  }
+
+  public void autonomousInit() {
+    if (RobotBase.isReal()) {
+      m_swerveDrive.resetEncoders();
+      m_swerveDrive.resetOdometry(m_swerveDrive.getPose(), m_FieldSim.getRobotPose().getRotation());
+    } else {
+      m_FieldSim.initSim();
+      m_swerveDrive.resetEncoders();
+      m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
+    }
+  }
+
+  public void autonomousPeriodic() {
   }
 
   public void initializeLogTopics() {
 //    m_controls.initLogging();
+  }
+
+  public void simulationInit() {
+    m_FieldSim.initSim();
+    //m_driveTrain.setSimPose(new Pose2d(5,5, new Rotation2d()));
+  }
+
+  public void simulationPeriodic() {
+    if(!RobotState.isTest())
+      m_FieldSim.simulationPeriodic();
   }
 }

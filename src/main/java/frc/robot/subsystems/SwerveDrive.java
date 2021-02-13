@@ -76,6 +76,10 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose, Rotation2d rotation) {
+        if (RobotBase.isSimulation()) {
+            resetEncoders();
+            simulateSwerveDrive.setPose(pose);
+        }
         m_odometry.resetPosition(pose, rotation);
     }
 
@@ -125,7 +129,7 @@ public class SwerveDrive extends SubsystemBase {
                 return 0;
             }
         } else {
-            return gyro.getAngle();
+            return 0;//return gyro.getAngle();
         }
     }
 
@@ -171,6 +175,8 @@ public class SwerveDrive extends SubsystemBase {
     public void resetEncoders() {
         for (int i = 0; i < 4; i++){
             mSwerveModules[i].resetEncoders();
+        }
+        if (RobotBase.isSimulation()) {
         }
     }
 
@@ -345,6 +351,9 @@ public class SwerveDrive extends SubsystemBase {
 
         SmartDashboardTab.putNumber("SwerveDrive","navXDebug",navXDebug);
         SmartDashboardTab.putNumber("SwerveDrive","State",mSwerveModules[0].getState().angle.getDegrees());
+
+        SmartDashboardTab.putNumber("SwerveDrive", "X coordinate", getPose().getX());
+        SmartDashboardTab.putNumber("SwerveDrive", "Y coordinate", getPose().getY());
 //    SmartDashboardTab.putNumber("SwerveDrive","Front Right Speed",mSwerveModules[0].getState().speedMetersPerSecond);
 //    SmartDashboardTab.putNumber("SwerveDrive","Front Left Speed",mSwerveModules[1].getState().speedMetersPerSecond);
 //    SmartDashboardTab.putNumber("SwerveDrive","Back Left Speed",mSwerveModules[2].getState().speedMetersPerSecond);

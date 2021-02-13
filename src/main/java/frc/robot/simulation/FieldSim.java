@@ -1,8 +1,20 @@
 package frc.robot.simulation;
 
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
+import edu.wpi.first.wpilibj.util.Units;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Turret;
+
 public class FieldSim {
     private Field2d m_field2d;
-    private final DriveTrain m_driveTrain;
+    private final SwerveDrive m_swerveDrive;
     private final Turret m_turret;
     private final Shooter m_shooter;
     private final Powercell[] m_powercells = new Powercell[17];
@@ -17,8 +29,8 @@ public class FieldSim {
 
     private double m_autoStartTime;
 
-    public FieldSim(DriveTrain driveTrain, Turret turret, Shooter shooter) {
-        m_driveTrain = driveTrain;
+    public FieldSim(SwerveDrive swerveDrive, Turret turret, Shooter shooter) {
+        m_swerveDrive = swerveDrive;
         m_turret = turret;
         m_shooter = shooter;
 
@@ -55,7 +67,7 @@ public class FieldSim {
 
         Pose2d startPosition = new Pose2d(12.557047,7.275692, new Rotation2d(Units.degreesToRadians(0)));
         m_field2d.setRobotPose(startPosition);
-        m_driveTrain.resetOdometry(startPosition, startPosition.getRotation());
+        m_swerveDrive.resetOdometry(startPosition, startPosition.getRotation());
         m_autoStartTime = Timer.getFPGATimestamp();
     }
 
@@ -71,7 +83,7 @@ public class FieldSim {
          */
 
         // Look up rotating a point about another point in 2D space for the math explanation
-        Pose2d robotPose = m_driveTrain.getRobotPose();
+        Pose2d robotPose = m_swerveDrive.getPose();
         double robotX = robotPose.getX();
         double robotY = robotPose.getY();
         double cos = robotPose.getRotation().getCos();
@@ -145,9 +157,9 @@ public class FieldSim {
 //                robotPose.getY() < 0 || robotPose.getY() > SimConstants.fieldHieght)
 //            resetRobotPose(new Pose2d(SimConstants.fieldWidth / 2.0 ,SimConstants.fieldHieght / 2.0 , new Rotation2d(0)));
 
-        m_field2d.setRobotPose(m_driveTrain.getRobotPose());
+        m_field2d.setRobotPose(m_swerveDrive.getPose());
 
-        m_field2d.getObject("Turret").setPose(new Pose2d(m_driveTrain.getRobotPose().getTranslation(),
+        m_field2d.getObject("Turret").setPose(new Pose2d(m_swerveDrive.getPose().getTranslation(),
                 new Rotation2d(Math.toRadians(getIdealTurretAngle()))));
 
         updateIntakePoses();
@@ -189,7 +201,7 @@ public class FieldSim {
 
     public synchronized void resetRobotPose(Pose2d pose){
         m_field2d.setRobotPose(pose);
-        m_driveTrain.resetOdometry(pose, pose.getRotation());
+        m_swerveDrive.resetOdometry(pose, pose.getRotation());
     }
 
     private void updateBallState(Powercell powercell) {
@@ -216,14 +228,10 @@ public class FieldSim {
                 double currentTime = RobotController.getFPGATime();
                 // FPGA time is in microseonds, need to convert it into seconds
                 double deltaT = (currentTime - powercell.getLastTimestamp()) / 1e6;
-                //double distanceTraveled = SimConstants.shotSpeed * deltaT;
-
-                double deltaX = powercell.getBallXYVel().getX() * deltaT;
-                double deltaY = powercell.getBallXYVel().getY() * deltaT;
-                powercell.setBallZVel(powercell.getBallZVel() - Constants.g * deltaT); // Update vertical velocity by gravity
-                double deltaZ = powercell.getBallZVel() * deltaT;
-                //System.out.println("Delta X: " + deltaX + "\tDelta Y: " + deltaY + "\tDelta T: " + deltaT);
-                SmartDashboardTab.putNumber("Shoot on the Move", "Ball height", powercell.getBallZPos());
+                double distanceTraveled = SimConstants.shotSpeed * deltaT;
+                double deltaX = distanceTraveled * ballPose.getRotation().getCos();
+                double deltaY = distanceTraveled * ballPose.getRotation().getSin();
+//                System.out.println("Delta X: " + deltaX + "\tDelta Y: " + deltaY + "\tDelta T: " + deltaT);
                 powercell.setBallPose(new Pose2d(deltaX + ballPose.getX(),
                         deltaY + ballPose.getY(),
                         ballPose.getRotation()));
