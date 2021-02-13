@@ -25,7 +25,7 @@ public class ControlledIntake extends CommandBase {
     private final double intakeRPM = 5000;
     private final double indexRPM = 300;
     private double timestamp, intakeTimestamp, indexerTimestamp, fourBallTimestamp;
-    private boolean intaking, haveFour, haveFourTripped;
+    private boolean intaking;
     private final Joystick m_controller;
 
     /*
@@ -57,14 +57,7 @@ public class ControlledIntake extends CommandBase {
         m_indexer.setIndexerOutput(0);
     }
 
-//        if(m_indexer.getIndexerTopSensor() && m_indexer.getIndexerBottomSensor() && !haveFourTripped) {
-//          fourBallTimestamp = Timer.getFPGATimestamp();
-//          haveFourTripped = true;
-//        } else if(!m_indexer.getIndexerBottomSensor() || !m_indexer.getIndexerTopSensor()){
-//          fourBallTimestamp = 0;
-//          haveFourTripped = false;
-//          haveFour = false;
-//        }
+
 
 
     //updateTimedRollers();

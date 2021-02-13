@@ -55,12 +55,7 @@ public class ControlledIntakeOld extends CommandBase {
 
 //        m_intake.setRPM(intakeRPM);
 //        m_indexer.setKickerOutput(-0.25);
-//        if (m_indexer.getIntakeSensor() && !intaking) {
-//          indexerTimestamp = Timer.getFPGATimestamp();
-//          intaking = true;
-//        } else if(intaking && m_indexer.getRPM() == 0)
-//          intakeState = IntakeStates.INTAKE_ONE_BALL;
-//        m_intake.setRPM(intakeRPM);
+
         if (intaking) {
             m_indexer.setRPM(0);
             intaking = true;

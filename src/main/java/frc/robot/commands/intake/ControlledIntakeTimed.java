@@ -59,15 +59,6 @@ public class ControlledIntakeTimed extends CommandBase {
 //          m_indexer.setRPM(0);
     }
 
-//        if(m_indexer.getIndexerTopSensor() && m_indexer.getIndexerBottomSensor() && !haveFourTripped) {
-//          fourBallTimestamp = Timer.getFPGATimestamp();
-//          haveFourTripped = true;
-//        } else if(!m_indexer.getIndexerBottomSensor() || !m_indexer.getIndexerTopSensor()){
-//          fourBallTimestamp = 0;
-//          haveFourTripped = false;
-//          haveFour = false;
-//        }
-
 
     //updateTimedRollers();
 

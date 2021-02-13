@@ -23,7 +23,7 @@ public class AutoControlledIntake extends CommandBase {
     private final double intakeRPM = 5000;
     private final double indexRPM = 300;
     private double timestamp, intakeTimestamp, indexerTimestamp, fourBallTimestamp;
-    private boolean intaking, haveFour, haveFourTripped;
+    private boolean intaking;
 
     /**
      * Creates a new ExampleCommand.
@@ -61,14 +61,7 @@ public class AutoControlledIntake extends CommandBase {
 //          m_indexer.setRPM(0);
         }
 
-//        if(m_indexer.getIndexerTopSensor() && m_indexer.getIndexerBottomSensor() && !haveFourTripped) {
-//          fourBallTimestamp = Timer.getFPGATimestamp();
-//          haveFourTripped = true;
-//        } else if(!m_indexer.getIndexerBottomSensor() || !m_indexer.getIndexerTopSensor()){
-//          fourBallTimestamp = 0;
-//          haveFourTripped = false;
-//          haveFour = false;
-//        }
+
     }
 
     //updateTimedRollers();
