@@ -47,6 +47,8 @@ public class SwerveDrive extends SubsystemBase {
 
     private SimulateSwerveDrive simulateSwerveDrive;
 
+    private boolean gyroWasNull = false;
+
     PowerDistributionPanel m_pdp;
     /**
      * Just like a graph's quadrants
@@ -129,7 +131,11 @@ public class SwerveDrive extends SubsystemBase {
                 return 0;
             }
         } else {
-            return 0;//return gyro.getAngle();
+            if (gyro == null) {
+                return 0;
+            } else {
+                return gyro.getAngle();
+            }
         }
     }
 
@@ -166,7 +172,11 @@ public class SwerveDrive extends SubsystemBase {
      * @return the robot's heading in degrees, from 180 to 180
      */
     public double getHeading() {
-        return Math.IEEEremainder(mNavX.getAngle(), 360);
+        if (RobotBase.isReal()) {
+            return Math.IEEEremainder(mNavX.getAngle(), 360);
+        } else {
+            return Math.IEEEremainder(gyro.getAngle(), 360);
+        }
     }
 
     /**
@@ -249,6 +259,11 @@ public class SwerveDrive extends SubsystemBase {
         mSwerveModules[2].setDesiredState(desiredStates[1]);
         mSwerveModules[1].setDesiredState(desiredStates[2]);
         mSwerveModules[3].setDesiredState(desiredStates[3]);
+        ChassisSpeeds speeds = Constants.DriveConstants.kDriveKinematics.toChassisSpeeds(desiredStates);
+        Rotation2d robotAngle = getRotation();
+        xInput = speeds.vxMetersPerSecond * robotAngle.getCos() - speeds.vyMetersPerSecond * robotAngle.getSin();
+        yInput = speeds.vyMetersPerSecond * robotAngle.getSin() + speeds.vyMetersPerSecond * robotAngle.getCos();
+        rotationInput = speeds.omegaRadiansPerSecond;
 //    mSwerveModules[0].setDesiredState(desiredStates[0]);
 //    mSwerveModules[1].setDesiredState(desiredStates[1]);
 //    mSwerveModules[2].setDesiredState(desiredStates[2]);
@@ -391,6 +406,5 @@ public class SwerveDrive extends SubsystemBase {
         );
         SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
         simulationSwerveModuleStates = swerveModuleStates;
-
     }
 }

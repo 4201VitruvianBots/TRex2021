@@ -71,6 +71,8 @@ public class RobotContainer {
   public Button[] xBoxPOVButtons = new Button[8];
   public Button xBoxLeftTrigger, xBoxRightTrigger;
 
+  private static boolean init = false;
+
 
 
   /**
@@ -96,6 +98,14 @@ public class RobotContainer {
     initializeSubsystems();
     // Configure the button bindings
     configureButtonBindings();
+  }
+
+  public static boolean getInitializationState() {
+    return init;
+  }
+
+  public static void setInitializationState(boolean state) {
+    init = state;
   }
 
   public void initializeSubsystems() {
@@ -154,10 +164,11 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
 //    return m_autoCommand;
         //return new WaitCommand(0);
-    return new AutoNavBarrel(m_swerveDrive);
+    return new AutoNavBarrel(m_swerveDrive, m_FieldSim);
   }
 
   public void disabledInit() {
+    setInitializationState(true);
     m_swerveDrive.setSwerveDriveNeutralMode(true);
   }
 
@@ -195,7 +206,7 @@ public class RobotContainer {
   }
 
   public void initializeLogTopics() {
-//    m_controls.initLogging();
+    //m_controls.initLogging();
   }
 
   public void simulationInit() {
