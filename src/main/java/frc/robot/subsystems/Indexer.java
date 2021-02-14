@@ -20,113 +20,89 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 /*
-Susbsystem for interacting with the robot's indexer (feeds balls from intake to shooter)
+Subsystem for interacting with the robot's indexer (feeds balls from intake to shooter)
  */
 
 public class Indexer extends SubsystemBase {
-  /**
-   * Creates a new ExampleSubsystem.
-   */
+    private final double kI_Zone = 1;
+    private final double maxVel = 1.1e4;
+    private final double maxAccel = 1e6;
+    private final double gearRatio = 1.0 / 27.0;
 
-  // Setup indexer motor controller (SparkMax)
-  CANSparkMax master = new CANSparkMax(Constants.indexerMotor, MotorType.kBrushless);
-  CANEncoder encoder = master.getEncoder();
-  CANPIDController pidController = master.getPIDController();
+    // Setup indexer motor controller (SparkMax)
+    CANSparkMax master = new CANSparkMax(Constants.indexerMotor, MotorType.kBrushless);
+    CANEncoder encoder = master.getEncoder();
+    CANPIDController pidController = master.getPIDController();
 
-  private double targetSetpoint;
+    // PID terms/other constants
+    private double kF = 0.0001;
+    private double kP = 0.000001;
+    private double kI = 80;
+    private double kD = 0.0001;
 
-  // PID terms/other constants
-//  private double kF = 1.67;
-//  private double kP = 2.36;
-//  private double kI = 0;
-//  private double kD = 1070;
-  private double kF = 0.0001;
-  private double kP = 0.000001;
-  private double kI = 80;
-  private double kD = 0.0001;
+    public Indexer() {
+        // Motor and PID controller setup
+        master.restoreFactoryDefaults();
+        master.setInverted(false);
 
-  private double kI_Zone = 1;
-  private double maxVel = 1.1e4;
-  private double maxAccel = 1e6;
+        master.setIdleMode(IdleMode.kBrake);
 
-  private double gearRatio = 1.0 / 27.0;
+        pidController.setFF(kF);
+        pidController.setP(kP);
+        pidController.setI(kI);
+        pidController.setD(kD);
+        pidController.setSmartMotionMaxVelocity(maxVel, 0); // Formerly 1.1e4
+        pidController.setSmartMotionMaxAccel(maxAccel, 0); // Formerly 1e6
+        pidController.setSmartMotionAllowedClosedLoopError(1, 0);
+        pidController.setIZone(kI_Zone);
 
-  private int controlMode = 1;
+        initShuffleboard();
+    }
 
-  public Indexer() {
-    // Motor and PID controller setup
-    master.restoreFactoryDefaults();
-    master.setInverted(false);
+    // Self-explanatory commands
 
-    master.setIdleMode(IdleMode.kBrake);
+    public void setIndexerOutput(double output) {
+        master.set(output);
+    }
 
-    pidController.setFF(kF);
-    pidController.setP(kP);
-    pidController.setI(kI);
-    pidController.setD(kD);
-    pidController.setSmartMotionMaxVelocity(maxVel, 0); // Formerly 1.1e4
-    pidController.setSmartMotionMaxAccel(maxAccel, 0); // Formerly 1e6
-    pidController.setSmartMotionAllowedClosedLoopError(1, 0);
-    pidController.setIZone(kI_Zone);
+    public double getRPM() {
+        return encoder.getVelocity() * gearRatio;
+    }
 
-//    SmartDashboard.putNumber("kF", kF);
-//    SmartDashboard.putNumber("kP", kP);
-//    SmartDashboard.putNumber("kI", kI);
-//    SmartDashboard.putNumber("kD", kD);
-    //initShuffleboard();
-  }
+    public void setRPM(double rpm) {
+        double setpoint = rpm / gearRatio;
+        SmartDashboard.putNumber("Indexer Setpoint", setpoint);
+        pidController.setReference(setpoint, ControlType.kSmartVelocity);
+    }
 
-  // Self-explanatory commands
+    private void initShuffleboard() {
+        Shuffleboard.getTab("Indexer").addNumber("Carousel RPM", this::getRPM);
+    }
 
-  public void toggleControlMode() {
-    if(controlMode == 0)
-      controlMode = 1;
-    else
-      controlMode = 0;
-  }
+    private void updateSmartDashboard() {
+        SmartDashboardTab.putNumber("Indexer", "Carousel RPM", this.getRPM());
+        SmartDashboard.putNumber("kF", kF);
+        SmartDashboard.putNumber("kP", kP);
+        SmartDashboard.putNumber("kI", kI);
+        SmartDashboard.putNumber("kD", kD);
+    }
 
-  public int getControlMode() {
-    return controlMode;
-  }
+//    private void updatePIDValues() {
+//        Allow PID values to be set through SmartDashboard ???
+//        kF = SmartDashboard.getNumber("kF", 0);
+//        kP = SmartDashboard.getNumber("kP", 0);
+//        kI = SmartDashboard.getNumber("kI", 0);
+//        kD = SmartDashboard.getNumber("kD", 0);
+//        pidController.setFF(kF);
+//        pidController.setP(kP);
+//        pidController.setI(kI);
+//        pidController.setD(kD);
+//    }
 
-  public void setIndexerOutput(double output) {
-    master.set(output);
-  }
-
-  public void setRPM(double rpm) {
-    double setpoint = rpm / gearRatio;
-    SmartDashboard.putNumber("Indexer Setpoint", setpoint);
-    pidController.setReference(setpoint, ControlType.kSmartVelocity);
-  }
-
- public double getRPM() {
-   return encoder.getVelocity() * gearRatio;
- }
-
-  private void initShuffleboard() {
-    Shuffleboard.getTab("Indexer").addNumber("Carousel RPM", this.getRPM());
-  }
-
-  private void updateSmartDashboard(){
-    SmartDashboardTab.putBoolean("Indexer","Carousel RPM", this.getRPM());
-  }
-
-  private void updatePIDValues() {
-    // Allow PID values to be set through SmartDashboard ???
-    kF = SmartDashboard.getNumber("kF", 0);
-    kP = SmartDashboard.getNumber("kP", 0);
-    kI = SmartDashboard.getNumber("kI", 0);
-    kD = SmartDashboard.getNumber("kD", 0);
-    pidController.setFF(kF);
-    pidController.setP(kP);
-    pidController.setI(kI);
-    pidController.setD(kD);
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    updateSmartDashboard();
-    //updatePIDValues();
-  }
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+        updateSmartDashboard();
+        //updatePIDValues();
+    }
 }
