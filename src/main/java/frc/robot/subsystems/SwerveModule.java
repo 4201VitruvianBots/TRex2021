@@ -11,14 +11,19 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -41,7 +46,8 @@ public class SwerveModule extends SubsystemBase {
   int kCruiseVelocity = 14000;
   int kMotionAcceleration = kCruiseVelocity * 10;
 
-
+  private static Encoder turnEncoderSim; 
+  private static EncoderSim turnSimulatedTurnEncoder;
   private double kS = 0.19;
   private double kV = 2.23;
   private double kA = 0.0289;
@@ -102,6 +108,21 @@ public class SwerveModule extends SubsystemBase {
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
+    switch(moduleNumber) {
+      case 3:
+      turnEncoderSim = new Encoder(15,14);
+      break;
+      case 2:
+      turnEncoderSim = new Encoder(13,12);
+      break;
+      case 1:
+      turnEncoderSim = new Encoder(11,10);
+      break;
+      case 0:
+      turnEncoderSim = new Encoder(9,8);
+    }
+    turnEncoderSim.setDistancePerPulse(360);
+    turnSimulatedTurnEncoder = new EncoderSim(turnEncoderSim);
   }
 
   /**
@@ -112,14 +133,25 @@ public class SwerveModule extends SubsystemBase {
     mDriveMotor.setSelectedSensorPosition(0);
   }
 
+  public Rotation2d getHeading() {
+    return new Rotation2d(Units.degreesToRadians(getTurnAngle())); 
+  }
 
+  public EncoderSim getEncoderSim() {
+    return turnSimulatedTurnEncoder;
+  }
   /**
    * Returns the current angle of the module.
    *
    * @return The current angle of the module in radians.
    */
   public double getTurningRadians() {
-    return mTurningMotor.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
+    if (RobotBase.isReal()) {
+      return mTurningMotor.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
+    }
+    else {
+      return turnEncoderSim.getDistance();
+    }
   }
 
   public double getTurnAngle() {

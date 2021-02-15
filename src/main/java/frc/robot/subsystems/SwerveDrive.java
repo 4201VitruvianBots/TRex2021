@@ -383,12 +383,23 @@ public class SwerveDrive extends SubsystemBase {
         // This method will be called once per scheduler run
     }
 
+    public Rotation2d [] getModuleHeadings() {
+        Rotation2d [] modulePositions = {
+            mSwerveModules [0].getHeading(),
+            mSwerveModules [2].getHeading(),
+            mSwerveModules [1].getHeading(),
+            mSwerveModules [3].getHeading()
+        };
+        return modulePositions;
+    }
+
     @Override
     public void simulationPeriodic() {
         simulateSwerveDrive.setInputs(xInput * RobotController.getBatteryVoltage(),
                 yInput * RobotController.getBatteryVoltage(),
                 rotationInput * RobotController.getBatteryVoltage());
         simulateSwerveDrive.update(0.020);
+        
 
         xSimEncoder.setDistance(simulateSwerveDrive.getXPositionMeters());
         ySimEncoder.setDistance(simulateSwerveDrive.getYPositionMeters());
@@ -406,5 +417,10 @@ public class SwerveDrive extends SubsystemBase {
         );
         SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
         simulationSwerveModuleStates = swerveModuleStates;
+        //setModuleStates(swerveModuleStates);
+        for (int i=0; i<4; i++) {
+            //mSwerveModules [i].getEncoderSim().setDistance(swerveModuleStates[i].angle.getDegrees());
+            //mSwerveModules [i].getEncoderSim().setDistance();
+        }
     }
 }

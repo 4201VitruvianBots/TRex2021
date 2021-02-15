@@ -4,13 +4,17 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.util.Units;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.Turret;
+import static frc.robot.Constants.DriveConstants.kTrackWidth;
+import static frc.robot.Constants.DriveConstants.kWheelBase;
 
 public class FieldSim {
     private Field2d m_field2d;
@@ -20,7 +24,7 @@ public class FieldSim {
     private final Powercell[] m_powercells = new Powercell[17];
 
     private int ballCount;
-    private Pose2d[] intakePose = {
+    private Pose2d[] SwerveModulePose = {
             new Pose2d(),
             new Pose2d(),
             new Pose2d(),
@@ -84,7 +88,18 @@ public class FieldSim {
 
         // Look up rotating a point about another point in 2D space for the math explanation
         Pose2d robotPose = m_swerveDrive.getPose();
-        double robotX = robotPose.getX();
+        Translation2d [] ModuleLocations = {
+            new Translation2d(kWheelBase/2, kTrackWidth/2),
+            new Translation2d(kWheelBase/2, -kTrackWidth/2),
+            new Translation2d(-kWheelBase/2, kTrackWidth/2),
+            new Translation2d(-kWheelBase/2, -kTrackWidth/2)
+        };
+        for (int i = 0; i < ModuleLocations.length; i++) {
+            Translation2d updatedPositions = ModuleLocations[i].rotateBy(robotPose.getRotation()).plus(robotPose.getTranslation());
+            SwerveModulePose [i] = new Pose2d(updatedPositions,m_swerveDrive.getModuleHeadings()[i]);
+        }
+
+       /* double robotX = robotPose.getX();
         double robotY = robotPose.getY();
         double cos = robotPose.getRotation().getCos();
         double sin = robotPose.getRotation().getSin();
@@ -106,12 +121,14 @@ public class FieldSim {
         intakePose[3] = new Pose2d(cos * deltaXb - sin * deltaYa + robotX,
                 sin * deltaXb + cos * deltaYa + robotY,
                 new Rotation2d());
-    }
+    */}
 
     private boolean isBallInIntakeZone(Pose2d ballPose){
+        return false;
+
         // The rise/run between intake points 0 to 1
         // Since the intake is a rectangle, this is the same as the slope between points 2 to 3
-        double slope0to1 = (intakePose[1].getY() - intakePose[0].getY()) /(intakePose[1].getX() - intakePose[0].getX());
+        /*double slope0to1 = (intakePose[1].getY() - intakePose[0].getY()) /(intakePose[1].getX() - intakePose[0].getX());
 
         // The rise/run between points 1 to 2
         // Same as slope between points 3 and 0
@@ -127,7 +144,7 @@ public class FieldSim {
                 (ballPose.getY() >= slope1to2 * (ballPose.getX() - intakePose[0].getX()) + intakePose[0].getY()) ==
                         (ballPose.getY() <= slope1to2 * (ballPose.getX() - intakePose[1].getX()) + intakePose[1].getY())
         );
-
+*/
         /*List<Double> xValues = new ArrayList<>();
         List<Double> yValues = new ArrayList<>();
         for (Pose2d p:intakePose) {
@@ -164,10 +181,10 @@ public class FieldSim {
 
         updateIntakePoses();
 
-        m_field2d.getObject("Intake A").setPose(intakePose[0]);
-        m_field2d.getObject("Intake B").setPose(intakePose[1]);
-        m_field2d.getObject("Intake C").setPose(intakePose[2]);
-        m_field2d.getObject("Intake D").setPose(intakePose[3]);
+        m_field2d.getObject("SwerveModulePositions FL").setPose(SwerveModulePose[0]);
+        m_field2d.getObject("SwerveModulePositions FR").setPose(SwerveModulePose[1]);
+        m_field2d.getObject("SwerveModulePositions BL").setPose(SwerveModulePose[2]);
+        m_field2d.getObject("SwerveModulePositions BR").setPose(SwerveModulePose[3]);
 
         for(Powercell p:m_powercells) {
             updateBallState(p);
