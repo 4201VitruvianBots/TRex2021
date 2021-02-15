@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Uptake;
 
 /**
  * An example command that uses an example subsystem.
@@ -21,7 +20,6 @@ public class ControlledIntakeOld extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Indexer m_indexer;
     private final Intake m_intake;
-    private final Uptake m_uptake;
 
     private final double intakeRPM = 500;
     private final double indexRPM = 200;
@@ -52,11 +50,9 @@ public class ControlledIntakeOld extends CommandBase {
     @Override
     public void execute() {
 //        m_intake.setRPM(0);
-        m_uptake.setUptakeMotor(0);
         m_indexer.setIndexerOutput(0);
 
 //        m_intake.setRPM(intakeRPM);
-//        m_uptake.setUptakeMotor(-0.25);
 //        if (m_indexer.getIntakeSensor() && !intaking) {
 //          indexerTimestamp = Timer.getFPGATimestamp();
 //          intaking = true;
@@ -89,7 +85,6 @@ public class ControlledIntakeOld extends CommandBase {
     public void end(boolean interrupted) {
         m_intake.setIntakePercentOutput(0);
         m_indexer.setIndexerOutput(0);
-        m_uptake.setUptakeMotor(0);
         //if(intakeState == IntakeStates.INTAKE_FIVE_BALLS)
         //m_intake.setintakePiston(false);
     }

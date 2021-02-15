@@ -165,9 +165,9 @@ public class Turret extends SubsystemBase {
     }
 
     // checks if the turret is pointing within the tolerance of the target
-//    public boolean onTarget() {
-//        return Math.abs(turretMotor.getClosedLoopError()) < kErrorBand;
-//    }
+    public boolean onTarget() {
+        return Math.abs(pidController.getSmartMotionAllowedClosedLoopError(1)) < kErrorBand; //not sure if this is the correct slot
+    }
 
     // ???
 //    public void clearIAccum() {

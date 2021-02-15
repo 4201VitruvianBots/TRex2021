@@ -32,11 +32,12 @@ public class TestShooterDelayed extends CommandBase {
    *
    * @param RobotContainer.m_shooter The subsystem used by this command.
    */
-  public TestShooterDelayed(Shooter shooter, Indexer indexer, Intake intake) {
+  public TestShooterDelayed(Shooter shooter, Indexer indexer, Intake intake, Uptake uptake) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooter = shooter;
     m_indexer = indexer;
     m_intake = intake;
+    m_uptake = uptake;
     addRequirements(shooter);
     addRequirements(indexer);
   }

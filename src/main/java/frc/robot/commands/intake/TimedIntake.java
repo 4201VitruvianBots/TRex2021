@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Uptake;
 
 /**
  * An example command that uses an example subsystem.
@@ -22,7 +21,6 @@ public class TimedIntake extends CommandBase {
     private final Indexer m_indexer;
     private double startTime;
     private final double m_time;
-    private final Uptake m_uptake;
 
     /**
      * Creates a new ExampleCommand.
@@ -51,7 +49,6 @@ public class TimedIntake extends CommandBase {
     @Override
     public void execute() {
         m_indexer.setIndexerOutput(1);
-        m_uptake.setUptakeMotor(-0.25);
         m_intake.setIntakePercentOutput(0.9);
     }
 
@@ -59,7 +56,6 @@ public class TimedIntake extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         m_indexer.setIndexerOutput(0);
-        m_uptake.setUptakeMotor(0);
         m_intake.setIntakePercentOutput(0);
         if (m_intake.getIntakePistonExtendStatus() != false)
             m_intake.setintakePiston(false);

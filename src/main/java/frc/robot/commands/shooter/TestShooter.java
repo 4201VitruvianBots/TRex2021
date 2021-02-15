@@ -22,21 +22,18 @@ public class TestShooter extends CommandBase {
   private final Shooter m_shooter;
   private final Indexer m_indexer;
   private final Intake m_intake;
+  private final Uptake m_uptake;
   private double timestamp;
   private boolean timerStart;
   private boolean printed = false;
-  private final Uptake m_uptake;
 
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param RobotContainer.m_shooter The subsystem used by this command.
-   */
-  public TestShooter(Shooter shooter, Indexer indexer, Intake intake) {
+
+  public TestShooter(Shooter shooter, Indexer indexer, Intake intake, Uptake uptake) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooter = shooter;
     m_indexer = indexer;
     m_intake = intake;
+    m_uptake = uptake;
     addRequirements(shooter);
     addRequirements(indexer);
   }
@@ -65,11 +62,9 @@ public class TestShooter extends CommandBase {
       if (timestamp != 0)
         if (timerStart && Timer.getFPGATimestamp() - timestamp > 0.1) {
           m_indexer.setIndexerOutput(1);
-          m_uptake.setUptakeMotor(1);
           m_intake.setIntakePercentOutput(1);
         } else {
           m_indexer.setIndexerOutput(0);
-          m_uptake.setUptakeMotor(0);
           m_intake.setIntakePercentOutput(0);
 
         }
@@ -82,10 +77,8 @@ public class TestShooter extends CommandBase {
       //      }
       //    } else if (!m_indexer.getIndexerTopSensor()) {
       //      m_indexer.setIndexerOutput(1);
-      //      m_uptake.setUptakeMotor(-0.25);
       //    } else {
       //      m_indexer.setIndexerOutput(0);
-      //      m_uptake.setUptakeMotor(0);
     }
   }
 

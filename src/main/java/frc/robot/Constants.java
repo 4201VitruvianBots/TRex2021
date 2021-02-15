@@ -125,8 +125,6 @@ public final class Constants {
     public static final int indexerMotor = 35;
     public static final int uptakeMotor = 36;
 
-    // DIO - WRRYYYYYYYYYYYYYYY
-
+    // Undetermined IDs
     public static final int carouselMotor = 4201;
-
 }

@@ -27,6 +27,7 @@ import frc.robot.commands.intake.ToggleIntakePistons;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Uptake;
 import frc.vitruvianlib.utils.JoystickWrapper;
 import frc.vitruvianlib.utils.XBoxTrigger;
 
@@ -47,6 +48,7 @@ public class RobotContainer {
   private final PowerDistributionPanel pdp = new PowerDistributionPanel();
   private final Indexer m_indexer = new Indexer();
   private final Intake m_intake = new Intake();
+  private final Uptake m_uptake = new Uptake();
   private final SwerveDrive m_swerveDrive = new SwerveDrive(pdp);
 
 
@@ -131,7 +133,7 @@ public class RobotContainer {
       for (int i = 0; i < testButtons.length; i++)
         testButtons[i] = new JoystickButton(testController, (i + 1));
 
-      testButtons[1].whileHeld(new FeedAll(m_indexer));
+      testButtons[1].whileHeld(new FeedAll(m_indexer, m_uptake));
       testButtons[9].whenPressed(new ToggleIntakePistons(m_intake));
       testButtons[6].whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
     }

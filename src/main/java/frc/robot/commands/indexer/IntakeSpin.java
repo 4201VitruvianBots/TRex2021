@@ -9,25 +9,18 @@ package frc.robot.commands.indexer;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
-import frc.robot.subsystems.Uptake;
 
 /**
  * An example command that uses an example subsystem.
  */
-public class FeedAll extends CommandBase {
+public class IntakeSpin extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Indexer m_indexer;
 
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
-  public FeedAll(Indexer indexer) {
-    m_indexer = indexer;
+  public IntakeSpin(Indexer indexer) {
+    this.m_indexer = indexer;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(indexer);
-
   }
 
   // Called when the command is initially scheduled.
