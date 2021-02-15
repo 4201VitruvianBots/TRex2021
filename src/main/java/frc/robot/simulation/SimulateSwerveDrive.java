@@ -243,23 +243,4 @@ public class SimulateSwerveDrive {
     yDistance = 0;
     rotationDistance = 0;
   }
-
-  /** Represents the different states of the drivetrain. */
-  enum State {
-    kX(0),
-    kY(1),
-    kHeading(2),
-    kLeftVelocity(3),
-    kRightVelocity(4),
-    kLeftPosition(5),
-    kRightPosition(6);
-
-    @SuppressWarnings("MemberName")
-    public final int value;
-
-    @SuppressWarnings("ParameterName")
-    State(int i) {
-      this.value = i;
-    }
-  }
 }

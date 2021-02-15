@@ -13,7 +13,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -46,8 +45,6 @@ public class SwerveModule extends SubsystemBase {
   int kCruiseVelocity = 14000;
   int kMotionAcceleration = kCruiseVelocity * 10;
 
-  private static Encoder turnEncoderSim; 
-  private static EncoderSim turnSimulatedTurnEncoder;
   private double kS = 0.19;
   private double kV = 2.23;
   private double kA = 0.0289;
@@ -72,6 +69,9 @@ public class SwerveModule extends SubsystemBase {
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
   private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
+
+  private Encoder simulationTurnEncoder;
+  private EncoderSim simulationTurnEncoderSim;
 
   public SwerveModule(int moduleNumber, TalonFX TurningMotor, TalonFX driveMotor, double zeroOffset, boolean invertTurn, boolean invertThrottle) {
     mModuleNumber = moduleNumber;
@@ -110,19 +110,20 @@ public class SwerveModule extends SubsystemBase {
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
     switch(moduleNumber) {
       case 3:
-      turnEncoderSim = new Encoder(15,14);
-      break;
+        simulationTurnEncoder = new Encoder(15,14);
+        break;
       case 2:
-      turnEncoderSim = new Encoder(13,12);
-      break;
+        simulationTurnEncoder = new Encoder(13,12);
+        break;
       case 1:
-      turnEncoderSim = new Encoder(11,10);
-      break;
+        simulationTurnEncoder = new Encoder(11,10);
+        break;
       case 0:
-      turnEncoderSim = new Encoder(9,8);
+        simulationTurnEncoder = new Encoder(9,8);
+        break;
     }
-    turnEncoderSim.setDistancePerPulse(360);
-    turnSimulatedTurnEncoder = new EncoderSim(turnEncoderSim);
+    simulationTurnEncoder.setDistancePerPulse(1);
+    simulationTurnEncoderSim = new EncoderSim(simulationTurnEncoder);
   }
 
   /**
@@ -134,11 +135,19 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public Rotation2d getHeading() {
-    return new Rotation2d(Units.degreesToRadians(getTurnAngle())); 
+    return new Rotation2d(getTurningRadians());
   }
 
   public EncoderSim getEncoderSim() {
-    return turnSimulatedTurnEncoder;
+    return simulationTurnEncoderSim;
+  }
+
+  public void setTurnEncoderSimAngle(double angle) {
+    simulationTurnEncoderSim.setDistance(angle);
+  }
+
+  public void setTurnEncoderSimRate(double rate) {
+    simulationTurnEncoderSim.setRate(rate);
   }
   /**
    * Returns the current angle of the module.
@@ -150,12 +159,12 @@ public class SwerveModule extends SubsystemBase {
       return mTurningMotor.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
     }
     else {
-      return turnEncoderSim.getDistance();
+      return Units.degreesToRadians(simulationTurnEncoder.getDistance());
     }
   }
 
   public double getTurnAngle() {
-    return getTurningRadians() * 180.0 / Math.PI;
+    return Units.radiansToDegrees(getTurningRadians());
   }
 
 

@@ -59,9 +59,9 @@ public class SwerveDrive extends SubsystemBase {
      */
     private SwerveModule[] mSwerveModules = new SwerveModule[] {
             new SwerveModule(0, new TalonFX(Constants.frontLeftTurningMotor), new TalonFX(Constants.frontLeftDriveMotor), 0, true, false),
-            new SwerveModule(1, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), 0, true, false),
-            new SwerveModule(2, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), 0, true, false), //true
-            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), 0, true, false) //true
+            new SwerveModule(1, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), 0, true, false),
+            new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), 0, true, false),
+            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), 0, true, false)
     };
 
     private SwerveModuleState[] simulationSwerveModuleStates = new SwerveModuleState[] {
@@ -131,10 +131,10 @@ public class SwerveDrive extends SubsystemBase {
                 return 0;
             }
         } else {
-            if (gyro == null) {
-                return 0;
-            } else {
+            try {
                 return gyro.getAngle();
+            } catch (Exception e) {
+                return 0;
             }
         }
     }
@@ -239,13 +239,9 @@ public class SwerveDrive extends SubsystemBase {
         SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
         SmartDashboardTab.putNumber("SwerveDrive","Desired State",swerveModuleStates[0].angle.getDegrees());
         mSwerveModules[0].setDesiredState(swerveModuleStates[0]);
-        mSwerveModules[2].setDesiredState(swerveModuleStates[1]);
-        mSwerveModules[1].setDesiredState(swerveModuleStates[2]);
+        mSwerveModules[1].setDesiredState(swerveModuleStates[1]);
+        mSwerveModules[2].setDesiredState(swerveModuleStates[2]);
         mSwerveModules[3].setDesiredState(swerveModuleStates[3]);
-//    mSwerveModules[0].setDesiredState(swerveModuleStates[0]);
-//    mSwerveModules[1].setDesiredState(swerveModuleStates[1]);
-//    mSwerveModules[2].setDesiredState(swerveModuleStates[2]);
-//    mSwerveModules[3].setDesiredState(swerveModuleStates[3]);
     }
 
     /**
@@ -256,18 +252,15 @@ public class SwerveDrive extends SubsystemBase {
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, Constants.DriveConstants.kMaxSpeedMetersPerSecond);
         mSwerveModules[0].setDesiredState(desiredStates[0]);
-        mSwerveModules[2].setDesiredState(desiredStates[1]);
-        mSwerveModules[1].setDesiredState(desiredStates[2]);
+        mSwerveModules[1].setDesiredState(desiredStates[1]);
+        mSwerveModules[2].setDesiredState(desiredStates[2]);
         mSwerveModules[3].setDesiredState(desiredStates[3]);
+
         ChassisSpeeds speeds = Constants.DriveConstants.kDriveKinematics.toChassisSpeeds(desiredStates);
         Rotation2d robotAngle = getRotation();
         xInput = speeds.vxMetersPerSecond * robotAngle.getCos() - speeds.vyMetersPerSecond * robotAngle.getSin();
         yInput = speeds.vyMetersPerSecond * robotAngle.getSin() + speeds.vyMetersPerSecond * robotAngle.getCos();
         rotationInput = speeds.omegaRadiansPerSecond;
-//    mSwerveModules[0].setDesiredState(desiredStates[0]);
-//    mSwerveModules[1].setDesiredState(desiredStates[1]);
-//    mSwerveModules[2].setDesiredState(desiredStates[2]);
-//    mSwerveModules[3].setDesiredState(desiredStates[3]);
     }
 
     public void setSwerveDriveNeutralMode(boolean mode) {
@@ -385,10 +378,10 @@ public class SwerveDrive extends SubsystemBase {
 
     public Rotation2d [] getModuleHeadings() {
         Rotation2d [] modulePositions = {
-            mSwerveModules [0].getHeading(),
-            mSwerveModules [2].getHeading(),
-            mSwerveModules [1].getHeading(),
-            mSwerveModules [3].getHeading()
+            mSwerveModules[0].getHeading(),
+            mSwerveModules[1].getHeading(),
+            mSwerveModules[2].getHeading(),
+            mSwerveModules[3].getHeading()
         };
         return modulePositions;
     }
@@ -417,10 +410,10 @@ public class SwerveDrive extends SubsystemBase {
         );
         SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
         simulationSwerveModuleStates = swerveModuleStates;
-        //setModuleStates(swerveModuleStates);
-        for (int i=0; i<4; i++) {
-            //mSwerveModules [i].getEncoderSim().setDistance(swerveModuleStates[i].angle.getDegrees());
-            //mSwerveModules [i].getEncoderSim().setDistance();
+        setModuleStates(swerveModuleStates);
+        for (int i = 0; i < 4; i++) {
+            mSwerveModules[i].setTurnEncoderSimAngle(simulationSwerveModuleStates[i].angle.getDegrees());
+            mSwerveModules[i].setTurnEncoderSimRate(simulationSwerveModuleStates[i].speedMetersPerSecond);
         }
     }
 }
