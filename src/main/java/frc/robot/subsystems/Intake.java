@@ -12,9 +12,6 @@ Subsystem for interacting with the robot's intake
  */
 
 public class Intake extends SubsystemBase {
-    /**
-     * Creates a new ExampleSubsystem.
-     */
     // PID and FeedForward loop terms
     private double kFF = 0.00068; //0.06; //0.122
     private double kP = 6e-5; //0.492

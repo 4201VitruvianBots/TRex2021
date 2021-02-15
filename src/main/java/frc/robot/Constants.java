@@ -123,12 +123,8 @@ public final class Constants {
     public static final int climbPistonBForward = 33;
     public static final int climbPistonBReverse = 34;
     public static final int indexerMotor = 35;
-    public static final int kickerMotor = 36;
+    public static final int uptakeMotor = 36;
 
-    // DIO
-
-
-    // placeholder values
-    public static final int uptakeMotor = 4201;
-
+    // Undetermined IDs
+    public static final int carouselMotor = 4201;
 }

@@ -24,6 +24,7 @@ public class ControlledFire extends CommandBase {
   private double timestamp;
   private boolean timerStart;
   private double m_rpm;
+
   /**
    * Creates a new ExampleCommand.
    *
@@ -61,11 +62,9 @@ public class ControlledFire extends CommandBase {
     if (timestamp != 0)
       if (timerStart && Timer.getFPGATimestamp() - timestamp > 0.1) {
         m_indexer.setIndexerOutput(1);
-        m_indexer.setKickerOutput(1);
         m_intake.setIntakePercentOutput(1);
       } else {
         m_indexer.setIndexerOutput(0);
-        m_indexer.setKickerOutput(0);
         m_intake.setIntakePercentOutput(0);
 
       }
@@ -76,7 +75,6 @@ public class ControlledFire extends CommandBase {
   public void end(boolean interrupted) {
     m_intake.setIntakePercentOutput(0);
     m_indexer.setIndexerOutput(0);
-    m_indexer.setKickerOutput(0);
     m_shooter.setPower(0);
   }
 

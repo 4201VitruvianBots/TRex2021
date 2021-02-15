@@ -97,7 +97,6 @@ public class ControlledIntakeTimed extends CommandBase {
         m_intake.setIntakingState(false);
         m_intake.setIntakePercentOutput(0);
         m_indexer.setIndexerOutput(0);
-        m_indexer.setKickerOutput(0);
 //    if(intakeState == IntakeStates.INTAKE_FIVE_BALLS)
         m_intake.setintakePiston(false);
     }

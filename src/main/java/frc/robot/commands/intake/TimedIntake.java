@@ -49,7 +49,6 @@ public class TimedIntake extends CommandBase {
     @Override
     public void execute() {
         m_indexer.setIndexerOutput(1);
-        m_indexer.setKickerOutput(-0.25);
         m_intake.setIntakePercentOutput(0.9);
     }
 
@@ -57,7 +56,6 @@ public class TimedIntake extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         m_indexer.setIndexerOutput(0);
-        m_indexer.setKickerOutput(0);
         m_intake.setIntakePercentOutput(0);
         if (m_intake.getIntakePistonExtendStatus() != false)
             m_intake.setintakePiston(false);

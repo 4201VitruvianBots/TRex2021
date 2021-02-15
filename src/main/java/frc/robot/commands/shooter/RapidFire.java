@@ -63,7 +63,6 @@ public class RapidFire extends CommandBase {
         if (timestamp != 0 || Timer.getFPGATimestamp() - startTime > 3)
             if (timerStart && Timer.getFPGATimestamp() - timestamp > 0.1 || Timer.getFPGATimestamp() - startTime > 2) {
                 m_indexer.setIndexerOutput(1);
-                m_indexer.setKickerOutput(1);
                 m_intake.setIntakePercentOutput(1);
             }
     }
@@ -73,7 +72,6 @@ public class RapidFire extends CommandBase {
     public void end(boolean interrupted) {
         m_intake.setIntakePercentOutput(0);
         m_indexer.setIndexerOutput(0);
-        m_indexer.setKickerOutput(0);
         m_shooter.setPower(0);
     }
 

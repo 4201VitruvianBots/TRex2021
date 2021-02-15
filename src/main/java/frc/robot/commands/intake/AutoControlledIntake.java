@@ -25,11 +25,6 @@ public class AutoControlledIntake extends CommandBase {
     private double timestamp, intakeTimestamp, indexerTimestamp, fourBallTimestamp;
     private boolean intaking, haveFour, haveFourTripped;
 
-    /**
-     * Creates a new ExampleCommand.
-     *
-     * @param subsystem The subsystem used by this command.
-     */
     public AutoControlledIntake(Intake intake, Indexer indexer) {
         m_intake = intake;
         m_indexer = indexer;
@@ -49,7 +44,6 @@ public class AutoControlledIntake extends CommandBase {
     @Override
     public void execute() {
         m_intake.setIntakePercentOutput(0);
-        m_indexer.setKickerOutput(0);
         if (!intaking) {
             //indexerTimestamp = Timer.getFPGATimestamp();
             intaking = true;
@@ -92,7 +86,6 @@ public class AutoControlledIntake extends CommandBase {
         m_intake.setIntakingState(false);
         m_intake.setIntakePercentOutput(0);
         m_indexer.setIndexerOutput(0);
-        m_indexer.setKickerOutput(0);
     }
 
     // Returns true when the command should end.

@@ -128,6 +128,11 @@ public class Shooter extends SubsystemBase {
         return (Math.abs(shooterMotors[motorIndex].getClosedLoopError()) < 100.0);
     }
 
+    /**
+    *Returns the RMP of the shooter motor.
+    *@param motorIndex The index of the measured motor
+    *@return the rmp of the selected motor
+    */
     public double getRPM(int motorIndex) {
         return falconUnitsToRPM(shooterMotors[motorIndex].getSelectedSensorVelocity());
     }

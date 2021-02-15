@@ -7,60 +7,60 @@
 
 package frc.robot.commands.indexer;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.Uptake;
 
 /**
- * An example command that uses an example subsystem.
+ * turn on the indexer and the uptake for a certain amount of time
  */
 public class FeedAll extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final Indexer m_indexer;
+    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+    private final Indexer m_indexer;
+    private final Uptake m_uptake;
+    double m_setpoint;
+    private Timer timer = new Timer();
 
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
-  double m_setpoint;
-  private double startTime;
-  public FeedAll(Indexer indexer) {
-    m_indexer = indexer;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(indexer);
+    private double startTime;
 
-  }
+    public FeedAll(Indexer indexer, Uptake uptake) {
+        this.m_indexer = indexer;
+        this.m_uptake = uptake;
+        // Use addRequirements() here to declare subsystem dependencies.
+        addRequirements(indexer);
+    }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-  }
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+      timer.start();
+    }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    m_indexer.setIndexerOutput(0.6);
-    m_indexer.setKickerOutput(0.5);
-  }
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        m_indexer.setIndexerOutput(0.6);
+        m_uptake.setUptakeMotor(1);
+    }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(final boolean interrupted) {  
-    m_indexer.setKickerOutput(0);
-    m_indexer.setIndexerOutput(0);
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(final boolean interrupted) {
+        m_indexer.setIndexerOutput(0);
+        m_uptake.setUptakeMotor(0);
+        timer.stop();
+    }
 
-  // Returns true when the command should end.
-//turn into a correct isFinished function.
-/*  @Override
-  public boolean isFinished() {
-    double time = Timer.getFPGATimestamp();
-    if(m_indexer.leftButtons[2]()){
-      time = Timer.getFPGATimestamp();
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+      return timer.get() >= 2;
     }
     if(time >= 2)
       return true;
     else
       return false;
-  }*/
+  }
+  */
 }
