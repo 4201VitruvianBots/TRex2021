@@ -17,8 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.SetSwerveDrive;
-import frc.robot.commands.autoCommands.AutoNavBarrel;
-import frc.robot.commands.autoCommands.DriveStraight;
+import frc.robot.commands.autoCommands.*;
 import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.intake.ControlledIntake;
 import frc.robot.commands.intake.ToggleIntakePistons;
@@ -164,7 +163,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
 //    return m_autoCommand;
         //return new WaitCommand(0);
-    return new AutoNavBarrel(m_swerveDrive, m_FieldSim);
+    return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
   }
 
   public void disabledInit() {

@@ -20,6 +20,7 @@ import frc.robot.commands.shooter.SetRPM;
 import frc.robot.commands.autoCommands.DriveForwardDistance;
 import frc.robot.commands.autoCommands.DriveBackwardDistance;
 import frc.robot.commands.shooter.ControlledFireNew;
+import frc.robot.simulation.FieldSim;
 import frc.vitruvianlib.utils.TrajectoryUtils;
 
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.List;
 
 public class AccuracyChallenge extends SequentialCommandGroup {
     private int baseRPM = 3000;
-    public AccuracyChallenge(SwerveDrive swerveDrive, Shooter shooter, Indexer indexer, int index) {
+    public AccuracyChallenge(SwerveDrive swerveDrive, Shooter shooter, Indexer indexer, FieldSim fieldSim, int index) {
         double[] distancesToDrive = {
                 Units.inchesToMeters(180 + 6), // Green
                 Units.inchesToMeters(120 + 6), // Yellow
@@ -40,7 +41,7 @@ public class AccuracyChallenge extends SequentialCommandGroup {
             new SetOdometry(swerveDrive, new Pose2d()),
             new SetDriveNeutralMode(swerveDrive, true),
             new SetRPM(shooter, baseRPM),
-            new DriveForwardDistance(swerveDrive, distancesToDrive[index]).andThen(() -> swerveDrive.drive(0, 0, 0, false)),
+            new DriveForwardDistance(swerveDrive, fieldSim, distancesToDrive[index]).andThen(() -> swerveDrive.drive(0, 0, 0, false)),
             new InstantCommand(() -> shooter.setIdealRPM()),
             new ControlledFireNew(shooter, indexer).withTimeout(3),
             new SetRPM(shooter, baseRPM),

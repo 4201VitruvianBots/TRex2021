@@ -258,9 +258,22 @@ public class SwerveDrive extends SubsystemBase {
 
         ChassisSpeeds speeds = Constants.DriveConstants.kDriveKinematics.toChassisSpeeds(desiredStates);
         Rotation2d robotAngle = getRotation();
+
+        // Convert from robot-relative to field-relative
         xInput = speeds.vxMetersPerSecond * robotAngle.getCos() - speeds.vyMetersPerSecond * robotAngle.getSin();
-        yInput = speeds.vyMetersPerSecond * robotAngle.getSin() + speeds.vyMetersPerSecond * robotAngle.getCos();
+        yInput = speeds.vxMetersPerSecond * robotAngle.getSin() + speeds.vyMetersPerSecond * robotAngle.getCos();
         rotationInput = speeds.omegaRadiansPerSecond;
+
+        // Normalization
+        xInput /= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
+        yInput /= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
+        rotationInput /= Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;
+
+        double magnitude = Math.sqrt(Math.pow(xInput, 2) + Math.pow(yInput, 2));
+        if (magnitude > 1) {
+            xInput /= magnitude;
+            yInput /= magnitude;
+        }
     }
 
     public void setSwerveDriveNeutralMode(boolean mode) {

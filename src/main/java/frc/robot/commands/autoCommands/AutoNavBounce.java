@@ -11,7 +11,9 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj.util.Units;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.vitruvianlib.utils.TrajectoryUtils;
 
@@ -20,17 +22,17 @@ import java.util.List;
 //import frc.vitruvianlib.utils.TrajectoryUtils;
 
 public class AutoNavBounce extends SequentialCommandGroup {
-    public AutoNavBounce(SwerveDrive swerveDrive) {
+    public AutoNavBounce(SwerveDrive swerveDrive, FieldSim fieldSim) {
         Pose2d[] waypoints = {
-                new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(30))),
-                new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(90))),
-                new Pose2d(Units.inchesToMeters(105), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(120))),
-                new Pose2d(Units.inchesToMeters(150), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(180))),
-                new Pose2d(Units.inchesToMeters(180), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(-90))),
+                new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(105), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(150), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(180), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(0))),
                 new Pose2d(Units.inchesToMeters(210), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
                 new Pose2d(Units.inchesToMeters(255), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(270), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(90))),
-                new Pose2d(Units.inchesToMeters(330), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(150))),
+                new Pose2d(Units.inchesToMeters(270), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(330), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
         };
         boolean[] pathIsReversed = {false, true, true, true, false, false, false, true};
         Pose2d startPosition = waypoints[0];
@@ -43,7 +45,7 @@ public class AutoNavBounce extends SequentialCommandGroup {
                         .setKinematics(Constants.DriveConstants.kDriveKinematics);
         config.setReversed(false);
 
-        addCommands(new SetOdometry(swerveDrive, startPosition),
+        addCommands(new SetOdometry(swerveDrive, fieldSim, startPosition),
                 new SetDriveNeutralMode(swerveDrive, true)
         );
 
@@ -66,8 +68,8 @@ public class AutoNavBounce extends SequentialCommandGroup {
                         swerveDrive::getPose,
                         Constants.DriveConstants.kDriveKinematics,
                         //Position controllers
-                        new PIDController(Constants.AutoConstants.kPXController, 0, 0),
-                        new PIDController(Constants.AutoConstants.kPYController, 0, 0),
+                        new PIDController(Constants.AutoConstants.kPXController, Constants.AutoConstants.kIXController, Constants.AutoConstants.kDXController),
+                        new PIDController(Constants.AutoConstants.kPYController, Constants.AutoConstants.kIYController, Constants.AutoConstants.kDYController),
                         new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
                         Constants.AutoConstants.kThetaControllerConstraints),
 
@@ -78,6 +80,6 @@ public class AutoNavBounce extends SequentialCommandGroup {
                 addCommands(command);
         }
 
-        addCommands(new ResetOdometry(swerveDrive).andThen(() -> swerveDrive.drive(0, 0, 0, false)));// Run path following command, then stop at the end.
+        addCommands(new WaitCommand(0).andThen(() -> swerveDrive.drive(0, 0, 0, false)));// Run path following command, then stop at the end.
     }
 }
