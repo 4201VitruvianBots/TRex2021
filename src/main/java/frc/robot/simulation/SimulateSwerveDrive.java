@@ -238,6 +238,13 @@ public class SimulateSwerveDrive {
     this.m_currentGearing = newGearRatio;
   }
 
+  public void resetPose() {
+    swervePose = new Pose2d();
+    xSim.setPose(swervePose);
+    ySim.setPose(new Pose2d(new Translation2d(), new Rotation2d(Units.degreesToRadians(90))));
+    rotationSim.setPose(swervePose);
+  }
+
   /**
    * Sets the system pose.
    *
@@ -248,8 +255,8 @@ public class SimulateSwerveDrive {
     ySim.setPose(new Pose2d(pose.getTranslation(), new Rotation2d(Units.degreesToRadians(90))));
     rotationSim.setPose(pose);
     swervePose = pose;
-    xDistance = 0;
-    yDistance = 0;
-    rotationDistance = 0;
+//    xDistance = 0;
+//    yDistance = 0;
+//    rotationDistance = 0;
   }
 }
