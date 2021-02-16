@@ -243,6 +243,9 @@ public class SimulateSwerveDrive {
     xSim.setPose(swervePose);
     ySim.setPose(new Pose2d(new Translation2d(), new Rotation2d(Units.degreesToRadians(90))));
     rotationSim.setPose(swervePose);
+    xDistance = 0;
+    yDistance = 0;
+    rotationDistance = 0;
   }
 
   /**

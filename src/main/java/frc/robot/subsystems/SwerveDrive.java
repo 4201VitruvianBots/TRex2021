@@ -260,22 +260,26 @@ public class SwerveDrive extends SubsystemBase {
         Rotation2d robotAngle = getRotation();
 
         // Convert from robot-relative to field-relative
-        xInput = speeds.vxMetersPerSecond * robotAngle.getCos() - speeds.vyMetersPerSecond * robotAngle.getSin();
-        yInput = speeds.vxMetersPerSecond * robotAngle.getSin() + speeds.vyMetersPerSecond * robotAngle.getCos();
-        rotationInput = speeds.omegaRadiansPerSecond;
+        double xSpeed = speeds.vxMetersPerSecond * robotAngle.getCos() - speeds.vyMetersPerSecond * robotAngle.getSin();
+        double ySpeed = speeds.vxMetersPerSecond * robotAngle.getSin() + speeds.vyMetersPerSecond * robotAngle.getCos();
+        double rotationSpeed = speeds.omegaRadiansPerSecond;
 
         // Normalization
-        xInput /= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
-        yInput /= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
-        rotationInput /= Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;
+        xSpeed /= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
+        ySpeed /= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
+        rotationSpeed /= Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;
 
-        double magnitude = Math.sqrt(Math.pow(xInput, 2) + Math.pow(yInput, 2));
+       double magnitude = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
         if (magnitude > 1) {
-            xInput /= magnitude;
-            yInput /= magnitude;
+            xSpeed /= magnitude;
+            ySpeed /= magnitude;
         }
+        xInput = xSpeed;
+        yInput = ySpeed;
+        rotationInput = rotationSpeed;
 
         SmartDashboardTab.putNumber("SwerveDrive", "x input", xInput);
+        SmartDashboardTab.putNumber("SwerveDrive", "y input", yInput);
     }
 
     public void setSwerveDriveNeutralMode(boolean mode) {
@@ -431,7 +435,7 @@ public class SwerveDrive extends SubsystemBase {
                         xEncoder.getRate(), yEncoder.getRate(), rotationEncoder.getRate(), getRotation())
         );
         SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
-        simulationSwerveModuleStates = swerveModuleStates;
+        //simulationSwerveModuleStates = swerveModuleStates;
         setModuleStates(swerveModuleStates);
         for (int i = 0; i < 4; i++) {
             mSwerveModules[i].setTurnEncoderSimAngle(simulationSwerveModuleStates[i].angle.getDegrees());
