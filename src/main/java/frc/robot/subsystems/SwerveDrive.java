@@ -274,6 +274,8 @@ public class SwerveDrive extends SubsystemBase {
             xInput /= magnitude;
             yInput /= magnitude;
         }
+
+        SmartDashboardTab.putNumber("SwerveDrive", "x input", xInput);
     }
 
     public void setSwerveDriveNeutralMode(boolean mode) {
@@ -353,12 +355,19 @@ public class SwerveDrive extends SubsystemBase {
                     mSwerveModules[3].getState()
             );
         } else {
+            double xSpeed = xEncoder.getRate();
+            double ySpeed = yEncoder.getRate();
+            double rot = rotationEncoder.getRate();
+            var swerveModuleStates = Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(
+                    ChassisSpeeds.fromFieldRelativeSpeeds(
+                            xSpeed, ySpeed, rot, getRotation()));
+            SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
             m_odometry.update(
                     getRotation(),
-                    simulationSwerveModuleStates[0],
-                    simulationSwerveModuleStates[1],
-                    simulationSwerveModuleStates[2],
-                    simulationSwerveModuleStates[3]
+                    swerveModuleStates[0],
+                    swerveModuleStates[1],
+                    swerveModuleStates[2],
+                    swerveModuleStates[3]
             );
         }
     }

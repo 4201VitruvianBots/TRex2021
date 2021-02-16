@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
@@ -170,6 +171,14 @@ public class SimulateSwerveDrive {
     angularVel = rotationSim.getLeftVelocityMetersPerSecond();
     rotationSim.setPose(rotationPose);
     rotationSim.update(dtSeconds);
+
+    SmartDashboardTab.putNumber("SwerveDrive", "X distance", xDistance);
+    SmartDashboardTab.putNumber("SwerveDrive", "simulator x coordinate", swervePose.getX());
+
+    SmartDashboardTab.putNumber("SwerveDrive", "Y distance", yDistance);
+    SmartDashboardTab.putNumber("SwerveDrive", "simulator y coordinate", swervePose.getY());
+
+    SmartDashboardTab.putNumber("SwerveDrive", "x vel", xVel);
   }
 
   /**
