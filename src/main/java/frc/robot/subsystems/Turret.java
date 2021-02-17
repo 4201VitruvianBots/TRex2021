@@ -70,6 +70,9 @@ public class Turret extends SubsystemBase {
     }
 
     // self-explanatory commands
+    /**
+    *this function is used to sync the actual turret direction and the encoder.
+    */
     public void resetEncoder() {
         encoder.setPosition(0);
     }
@@ -81,23 +84,35 @@ public class Turret extends SubsystemBase {
     public void setControlMode(int mode) {
         controlMode = mode;
     }
-
+    /**
+    *this function gets the angle at wich the turret is facing reletave to the front of the robot (it's starting possition)
+    */
     public double getTurretAngle() {
         return encoderUnitsToDegrees(encoder.getPosition());
     }
 
+    /**
+    *this function gets the angle of the robot relitive to the field.
+    */
     public double getFieldRelativeAngle() {
         return getTurretAngle() - m_swerveDrive.getRawGyroAngle();
     }
 
+    /**
+    *this function determines the maximum angle that the turret can rotate relative to the drivetrain
+    */
     public double getMaxAngle() {
         return maxAngle;
     }
 
+    /**
+    *this function determines the minimum angle that the turret can rotate relative to the drivetrain
+    */
     public double getMinAngle() {
         return minAngle;
     }
 
+    
     public boolean getTurretHome() {
 //        return !turretHomeSensor.get(); cannot understand what the turret home sensor is refering to.
         return true;
@@ -111,6 +126,9 @@ public class Turret extends SubsystemBase {
         return setpoint;
     }
 
+    /**
+    *this function finds the difference of the encoder reletave to the actual angle of the turret
+    */
     public double getError() {
         return 0 - getTurretAngle();
     }
