@@ -26,12 +26,7 @@ public class TestShooterDelayed extends CommandBase {
   private boolean test, stopTest;
   private boolean printed = false;
   private final Uptake m_uptake;
-
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param RobotContainer.m_shooter The subsystem used by this command.
-   */
+  
   public TestShooterDelayed(Shooter shooter, Indexer indexer, Intake intake, Uptake uptake) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooter = shooter;
@@ -56,14 +51,14 @@ public class TestShooterDelayed extends CommandBase {
     if(m_shooter.getTestRPM() != 0)
       if (Math.abs(m_shooter.getRPM(0) - m_shooter.getTestRPM()) < m_shooter.getRPMTolerance()) {
         m_indexer.setIndexerOutput(0.95);
-        m_uptake.setUptakeMotor(0.95);
+        m_uptake.setPercentOutput(0.95);
         m_intake.setIntakePercentOutput(0.95);
 //    } else if (!m_indexer.getIndexerTopSensor()) {
 //      m_indexer.setIndexerOutput(1);
-//      m_uptake.setUptakeMotor(-0.25);
+//      m_uptake.setPercentOutput(-0.25);
       } else {
         m_indexer.setIndexerOutput(0);
-        m_uptake.setUptakeMotor(0);
+        m_uptake.setPercentOutput(0);
       }
   }
 
@@ -72,7 +67,7 @@ public class TestShooterDelayed extends CommandBase {
   public void end(boolean interrupted) {
     m_intake.setIntakePercentOutput(0);
     m_indexer.setIndexerOutput(0);
-    m_uptake.setUptakeMotor(0);
+    m_uptake.setPercentOutput(0);
     m_shooter.setPower(0);
   }
 
