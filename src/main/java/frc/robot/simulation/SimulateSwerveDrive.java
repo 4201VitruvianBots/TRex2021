@@ -14,6 +14,7 @@ import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import edu.wpi.first.wpiutil.math.numbers.N7;
+import frc.robot.Constants;
 
 public class SimulateSwerveDrive {
     private final DCMotor m_motor;
@@ -29,6 +30,7 @@ public class SimulateSwerveDrive {
   private DifferentialDrivetrainSim xSim, ySim, rotationSim;
   private double xDistance, yDistance, rotationDistance;
   private double xVel, yVel, angularVel;
+  private double lastXDistance;
   private Pose2d swervePose;
 
   /**
@@ -154,9 +156,10 @@ public class SimulateSwerveDrive {
     swervePose = new Pose2d(xSim.getPose().getX(), ySim.getPose().getY(), rotationSim.getHeading()); // Keeps track of robot's position
     Pose2d xPose = new Pose2d(swervePose.getTranslation(), new Rotation2d());
     xDistance += xSim.getLeftPositionMeters();
-    xVel = xSim.getLeftVelocityMetersPerSecond();
+    xVel = (xDistance - lastXDistance) / dtSeconds;
     xSim.setPose(xPose);
     xSim.update(dtSeconds);
+    lastXDistance = xDistance;
 
     swervePose = new Pose2d(xSim.getPose().getX(), ySim.getPose().getY(), rotationSim.getHeading()); // Keeps track of robot's position
     Pose2d yPose = new Pose2d(swervePose.getTranslation(), new Rotation2d(Units.degreesToRadians(90)));
@@ -173,7 +176,7 @@ public class SimulateSwerveDrive {
     rotationSim.update(dtSeconds);
 
     SmartDashboardTab.putNumber("SwerveDrive", "X distance", xDistance);
-    SmartDashboardTab.putNumber("SwerveDrive", "simulator x coordinate", swervePose.getX());
+    SmartDashboardTab.putNumber("SwerveDrive", "simulator x coordinate", xSim.getPose().getX());
 
     SmartDashboardTab.putNumber("SwerveDrive", "Y distance", yDistance);
     SmartDashboardTab.putNumber("SwerveDrive", "simulator y coordinate", swervePose.getY());

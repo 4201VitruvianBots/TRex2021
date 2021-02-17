@@ -23,11 +23,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import static frc.robot.Constants.AutoConstants.kMaxSpeedMetersPerSecond;
 import frc.robot.simulation.SimulateSwerveDrive;
 
 public class SwerveDrive extends SubsystemBase {
 
-    public static final double kMaxSpeed = 3.0; // 3 meters per second
+    public static final double kMaxSpeed = kMaxSpeedMetersPerSecond;
     public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
     private boolean isFieldOriented;
@@ -94,13 +95,14 @@ public class SwerveDrive extends SubsystemBase {
             yEncoder = new Encoder(Constants.yEncoderPortA, Constants.yEncoderPortB);
             rotationEncoder = new Encoder(Constants.rotationEncoderPortA, Constants.rotationEncoderPortB);
 
+            xEncoder.setDistancePerPulse(Constants.ModuleConstants.kDriveEncoderDistancePerPulse);
+            yEncoder.setDistancePerPulse(Constants.ModuleConstants.kDriveEncoderDistancePerPulse);
+            rotationEncoder.setDistancePerPulse(Constants.ModuleConstants.kDriveEncoderDistancePerPulse);
+
             xSimEncoder = new EncoderSim(xEncoder);
             ySimEncoder = new EncoderSim(yEncoder);
             rotationSimEncoder = new EncoderSim(rotationEncoder);
 
-            xEncoder.setDistancePerPulse(Constants.ModuleConstants.kDriveEncoderDistancePerPulse);
-            yEncoder.setDistancePerPulse(Constants.ModuleConstants.kDriveEncoderDistancePerPulse);
-            rotationEncoder.setDistancePerPulse(Constants.ModuleConstants.kDriveEncoderDistancePerPulse);
 
             gyro = new ADXRS450_Gyro();
             gyroSim = new ADXRS450_GyroSim(gyro);
@@ -260,20 +262,21 @@ public class SwerveDrive extends SubsystemBase {
         Rotation2d robotAngle = getRotation();
 
         // Convert from robot-relative to field-relative
-        double xSpeed = speeds.vxMetersPerSecond * robotAngle.getCos() - speeds.vyMetersPerSecond * robotAngle.getSin();
-        double ySpeed = speeds.vxMetersPerSecond * robotAngle.getSin() + speeds.vyMetersPerSecond * robotAngle.getCos();
+        double xSpeed = speeds.vxMetersPerSecond; //* robotAngle.getCos() - speeds.vyMetersPerSecond * robotAngle.getSin();
+        double ySpeed = speeds.vyMetersPerSecond; //* robotAngle.getSin() + speeds.vyMetersPerSecond * robotAngle.getCos();
         double rotationSpeed = speeds.omegaRadiansPerSecond;
+        SmartDashboardTab.putNumber("SwerveDrive", "Starting x speed", xSpeed);
 
         // Normalization
-        xSpeed /= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
+        /*xSpeed /= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
         ySpeed /= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
-        rotationSpeed /= Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;
+        rotationSpeed /= Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;*/
 
-       double magnitude = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
+       /*double magnitude = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
         if (magnitude > 1) {
             xSpeed /= magnitude;
             ySpeed /= magnitude;
-        }
+        }*/
         xInput = xSpeed;
         yInput = ySpeed;
         rotationInput = rotationSpeed;
@@ -365,7 +368,8 @@ public class SwerveDrive extends SubsystemBase {
             var swerveModuleStates = Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(
                     ChassisSpeeds.fromFieldRelativeSpeeds(
                             xSpeed, ySpeed, rot, getRotation()));
-            SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
+            SmartDashboardTab.putNumber("SwerveDrive", "X speed (odometry)", xSpeed);
+            //SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
             m_odometry.update(
                     getRotation(),
                     swerveModuleStates[0],
@@ -434,9 +438,9 @@ public class SwerveDrive extends SubsystemBase {
                 ChassisSpeeds.fromFieldRelativeSpeeds(
                         xEncoder.getRate(), yEncoder.getRate(), rotationEncoder.getRate(), getRotation())
         );
-        SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
+        //SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
         //simulationSwerveModuleStates = swerveModuleStates;
-        setModuleStates(swerveModuleStates);
+        //setModuleStates(swerveModuleStates);
         for (int i = 0; i < 4; i++) {
             mSwerveModules[i].setTurnEncoderSimAngle(simulationSwerveModuleStates[i].angle.getDegrees());
             mSwerveModules[i].setTurnEncoderSimRate(simulationSwerveModuleStates[i].speedMetersPerSecond);
