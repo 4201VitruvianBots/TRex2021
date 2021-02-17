@@ -19,7 +19,7 @@ public class Uptake extends SubsystemBase {
     uptakeMotor.setInverted(false);
   }
 
-  public void setUptakeMotor(double output) {
+  public void setPercentOutput(double output) {
     uptakeMotor.set(ControlMode.PercentOutput, output);
   }
 

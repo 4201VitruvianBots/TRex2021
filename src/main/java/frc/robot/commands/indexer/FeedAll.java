@@ -41,14 +41,14 @@ public class FeedAll extends CommandBase {
     @Override
     public void execute() {
         m_indexer.setIndexerOutput(0.6);
-        m_uptake.setUptakeMotor(1);
+        m_uptake.setPercentOutput(1);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(final boolean interrupted) {
         m_indexer.setIndexerOutput(0);
-        m_uptake.setUptakeMotor(0);
+        m_uptake.setPercentOutput(0);
         timer.stop();
     }
 
