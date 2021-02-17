@@ -97,7 +97,6 @@ public class FieldSim {
         for (int i = 0; i < ModuleLocations.length; i++) {
             Translation2d updatedPositions = ModuleLocations[i].rotateBy(robotPose.getRotation()).plus(robotPose.getTranslation());
             SwerveModulePose[i] = new Pose2d(updatedPositions,m_swerveDrive.getSwerveModule(i).getHeading());
-            System.out.println(i + " Sim Gyro Angle: " + m_swerveDrive.getSwerveModule(i).getHeading());
         }
 
        /* double robotX = robotPose.getX();

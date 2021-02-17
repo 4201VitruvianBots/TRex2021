@@ -30,7 +30,6 @@ public class SimulateSwerveDrive {
   private DifferentialDrivetrainSim xSim, ySim, rotationSim;
   private double xDistance, yDistance, rotationDistance;
   private double xVel, yVel, angularVel;
-  private double lastXDistance;
   private Pose2d swervePose;
 
   /**
@@ -141,9 +140,10 @@ public class SimulateSwerveDrive {
   }
 
   public void setInputs(double xVolts, double yVolts, double rotationVolts) {
-    xSim.setInputs(xVolts, xVolts);
-    ySim.setInputs(yVolts, yVolts);
-    rotationSim.setInputs(rotationVolts, -rotationVolts);
+    // Assume positive volts ic CW, and negative volts are CCW
+    xSim.setInputs(xVolts, -xVolts);
+    ySim.setInputs(yVolts, -yVolts);
+    rotationSim.setInputs(rotationVolts, rotationVolts);
   }
 
   /**
@@ -155,23 +155,22 @@ public class SimulateSwerveDrive {
   public void update(double dtSeconds) {
     swervePose = new Pose2d(xSim.getPose().getX(), ySim.getPose().getY(), rotationSim.getHeading()); // Keeps track of robot's position
     Pose2d xPose = new Pose2d(swervePose.getTranslation(), new Rotation2d());
-    xDistance += xSim.getLeftPositionMeters();
-    xVel = (xDistance - lastXDistance) / dtSeconds;
+    xDistance += (xSim.getLeftPositionMeters() - xSim.getRightPositionMeters()) / 2;
+    xVel = (xSim.getLeftVelocityMetersPerSecond() - xSim.getRightVelocityMetersPerSecond()) / 2;
     xSim.setPose(xPose);
     xSim.update(dtSeconds);
-    lastXDistance = xDistance;
 
     swervePose = new Pose2d(xSim.getPose().getX(), ySim.getPose().getY(), rotationSim.getHeading()); // Keeps track of robot's position
     Pose2d yPose = new Pose2d(swervePose.getTranslation(), new Rotation2d(Units.degreesToRadians(90)));
-    yDistance += ySim.getLeftPositionMeters();
-    yVel = ySim.getLeftVelocityMetersPerSecond();
+    yDistance += (ySim.getLeftPositionMeters() - ySim.getRightPositionMeters()) / 2;
+    yVel = (ySim.getLeftVelocityMetersPerSecond() - ySim.getRightVelocityMetersPerSecond()) / 2;
     ySim.setPose(yPose);
     ySim.update(dtSeconds);
 
     swervePose = new Pose2d(xSim.getPose().getX(), ySim.getPose().getY(), rotationSim.getHeading()); // Keeps track of robot's position
     Pose2d rotationPose = swervePose;
-    rotationDistance += rotationSim.getLeftPositionMeters();
-    angularVel = rotationSim.getLeftVelocityMetersPerSecond();
+    rotationDistance += (rotationSim.getLeftPositionMeters() + rotationSim.getRightPositionMeters()) / 2;
+    angularVel = (rotationSim.getLeftVelocityMetersPerSecond() + rotationSim.getRightVelocityMetersPerSecond()) / 2;
     rotationSim.setPose(rotationPose);
     rotationSim.update(dtSeconds);
 

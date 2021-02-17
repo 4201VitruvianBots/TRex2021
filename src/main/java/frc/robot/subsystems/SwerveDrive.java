@@ -52,7 +52,7 @@ public class SwerveDrive extends SubsystemBase {
 
     PowerDistributionPanel m_pdp;
     /**
-     * Just like a graph's quadrants
+     * Just like a graph's quadrants. This is relative to the robot's heading.
      * 0 is Front Left
      * 1 is Back Left
      * 2 is Front Right
@@ -74,18 +74,6 @@ public class SwerveDrive extends SubsystemBase {
 
     private AHRS mNavX = new AHRS(SerialPort.Port.kMXP);
 
-    public void testTurningMotor(double speed){
-        mSwerveModules[0].mTurningMotor.set(ControlMode.PercentOutput,speed);
-    }
-
-    public void resetOdometry(Pose2d pose, Rotation2d rotation) {
-        if (RobotBase.isSimulation()) {
-            resetEncoders();
-            simulateSwerveDrive.setPose(pose);
-        }
-        m_odometry.resetPosition(pose, rotation);
-    }
-
     public SwerveDrive(PowerDistributionPanel pdp) {
         m_pdp = pdp;
 
@@ -102,7 +90,6 @@ public class SwerveDrive extends SubsystemBase {
             xSimEncoder = new EncoderSim(xEncoder);
             ySimEncoder = new EncoderSim(yEncoder);
             rotationSimEncoder = new EncoderSim(rotationEncoder);
-
 
             gyro = new ADXRS450_Gyro();
             gyroSim = new ADXRS450_GyroSim(gyro);
@@ -199,7 +186,6 @@ public class SwerveDrive extends SubsystemBase {
         mNavX.reset();
     }
 
-
     public SwerveModule getSwerveModule(int i) {
         return mSwerveModules[i];
     }
@@ -252,6 +238,14 @@ public class SwerveDrive extends SubsystemBase {
      * @param desiredStates The desired SwerveModule states.
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
+        var testSpeeds = Constants.DriveConstants.kDriveKinematics.toChassisSpeeds(desiredStates);
+        double xOut = testSpeeds.vxMetersPerSecond;
+        double yOut = testSpeeds.vyMetersPerSecond;
+        double rotOut = testSpeeds.omegaRadiansPerSecond;
+        System.out.println("Swerve Controller Output X: " + xOut);
+        System.out.println("Swerve Controller Output Y: " + yOut);
+        System.out.println("Swerve Controller Output R: " + rotOut);
+
         SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, Constants.DriveConstants.kMaxSpeedMetersPerSecond);
         mSwerveModules[0].setDesiredState(desiredStates[0]);
         mSwerveModules[1].setDesiredState(desiredStates[1]);
@@ -262,21 +256,11 @@ public class SwerveDrive extends SubsystemBase {
         Rotation2d robotAngle = getRotation();
 
         // Convert from robot-relative to field-relative
-        double xSpeed = speeds.vxMetersPerSecond; //* robotAngle.getCos() - speeds.vyMetersPerSecond * robotAngle.getSin();
-        double ySpeed = speeds.vyMetersPerSecond; //* robotAngle.getSin() + speeds.vyMetersPerSecond * robotAngle.getCos();
+        double xSpeed = speeds.vxMetersPerSecond;
+        double ySpeed = speeds.vyMetersPerSecond;
         double rotationSpeed = speeds.omegaRadiansPerSecond;
         SmartDashboardTab.putNumber("SwerveDrive", "Starting x speed", xSpeed);
 
-        // Normalization
-        /*xSpeed /= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
-        ySpeed /= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
-        rotationSpeed /= Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;*/
-
-       /*double magnitude = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
-        if (magnitude > 1) {
-            xSpeed /= magnitude;
-            ySpeed /= magnitude;
-        }*/
         xInput = xSpeed;
         yInput = ySpeed;
         rotationInput = rotationSpeed;
@@ -292,62 +276,13 @@ public class SwerveDrive extends SubsystemBase {
         mSwerveModules[3].setBrakeMode(mode);
     }
 
-//  public void holonomicDrive(double forward, double strafe, double rotationSpeed) {
-//    forward *= throttle; //because if they are both 1, then max output is sqrt(2), which is more than 1.
-//    strafe *= throttle;
-//    //todo: rotationSpeed += PIDOutput //this PID calculates the speed needed to turn to a setpoint based off of a button input. Probably from the D-PAD
-//    rotationSpeed *= turningThrottle; //I'll also have to check to make sure this isn't too high.
-//    if (isFieldOriented) { //checks to see if it's field oriented
-//      double angleRad = Math.toRadians(getRawGyroAngle());
-//      double temp = forward * Math.cos(angleRad) + strafe * Math.sin(angleRad); //calculates new forward
-//      strafe = -forward * Math.sin(angleRad) + strafe * Math.cos(angleRad); //calculates new strafe
-//      forward = temp;
-//    }
-//
-//    double a = strafe - rotationSpeed * (WHEELBASE / 2); //calculations from document
-//    double b = strafe + rotationSpeed * (WHEELBASE / 2);
-//    double c = forward - rotationSpeed * (TRACKWIDTH / 2);
-//    double d = forward + rotationSpeed * (TRACKWIDTH / 2);
-//
-//    double[] angles = new double[]{ //calculates the angle needed for each module
-//            Math.atan2(b, c) * 180 / Math.PI,
-//            Math.atan2(b, d) * 180 / Math.PI,
-//            Math.atan2(a, d) * 180 / Math.PI,
-//            Math.atan2(a, c) * 180 / Math.PI
-//    };
-//
-//    double[] speeds = new double[]{ //calculates the speed needed for each module
-//            Math.sqrt(b * b + c * c),
-//            Math.sqrt(b * b + d * d),
-//            Math.sqrt(a * a + d * d),
-//            Math.sqrt(a * a + c * c)
-//    };
-//
-//    double max = speeds[0];
-//
-//    for (double speed : speeds) {
-//      if (speed > max) {
-//        max = speed; //looks for the max
-//      }
-//    }
-//
-//    if(max > 1) { //this makes sure that no speed is greater than 1.
-//      for (int i = 0; i < 4; i++){
-//        speeds[i] /= max; //if one is, scale them all down by the max.
-//      }
-//    }
-//
-//    for (int i = 0; i < 4; i++) {
-//      if (Math.abs(forward) > 0.05 ||
-//              Math.abs(strafe) > 0.05 ||
-//              Math.abs(rotationSpeed) > 0.05) {
-//        mSwerveModules[i].setTargetAngle(angles[i] + 180); //to get it within 0 to 360. It was in -180 to 180
-//      } else {
-//        mSwerveModules[i].setTargetAngle(mSwerveModules[i].getTargetAngle());
-//      }
-//      mSwerveModules[i].setPercentOutput(speeds[i]);
-//    }
-//  }
+    public void resetOdometry(Pose2d pose, Rotation2d rotation) {
+        if (RobotBase.isSimulation()) {
+            resetEncoders();
+            simulateSwerveDrive.setPose(pose);
+        }
+        m_odometry.resetPosition(pose, rotation);
+    }
 
     /**
      * Updates the field relative position of the robot.
@@ -369,7 +304,8 @@ public class SwerveDrive extends SubsystemBase {
                     ChassisSpeeds.fromFieldRelativeSpeeds(
                             xSpeed, ySpeed, rot, getRotation()));
             SmartDashboardTab.putNumber("SwerveDrive", "X speed (odometry)", xSpeed);
-            //SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
+
+            simulationSwerveModuleStates = swerveModuleStates;
             m_odometry.update(
                     getRotation(),
                     swerveModuleStates[0],
@@ -422,7 +358,6 @@ public class SwerveDrive extends SubsystemBase {
                 yInput * RobotController.getBatteryVoltage(),
                 rotationInput * RobotController.getBatteryVoltage());
         simulateSwerveDrive.update(0.020);
-        
 
         xSimEncoder.setDistance(simulateSwerveDrive.getXPositionMeters());
         ySimEncoder.setDistance(simulateSwerveDrive.getYPositionMeters());
@@ -432,15 +367,16 @@ public class SwerveDrive extends SubsystemBase {
         ySimEncoder.setRate(simulateSwerveDrive.getYVelocityMeters());
         rotationSimEncoder.setRate(simulateSwerveDrive.getRotationVelocityMeters());
 
+        System.out.println("X Distance: " + xSimEncoder.getDistance());
+        System.out.println("Y Distance: " + ySimEncoder.getDistance());
+        System.out.println("R Distance: " + rotationSimEncoder.getDistance());
+        System.out.println("X Rate: " + xSimEncoder.getRate());
+        System.out.println("Y Rate: " + ySimEncoder.getRate());
+        System.out.println("R Rate: " + rotationSimEncoder.getRate());
+        System.out.println("SwervePose: " + getPose());
+
         gyroSim.setAngle(-simulateSwerveDrive.getHeading().getDegrees());
 
-        var swerveModuleStates = Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(
-                ChassisSpeeds.fromFieldRelativeSpeeds(
-                        xEncoder.getRate(), yEncoder.getRate(), rotationEncoder.getRate(), getRotation())
-        );
-        //SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
-        //simulationSwerveModuleStates = swerveModuleStates;
-        //setModuleStates(swerveModuleStates);
         for (int i = 0; i < 4; i++) {
             mSwerveModules[i].setTurnEncoderSimAngle(simulationSwerveModuleStates[i].angle.getDegrees());
             mSwerveModules[i].setTurnEncoderSimRate(simulationSwerveModuleStates[i].speedMetersPerSecond);

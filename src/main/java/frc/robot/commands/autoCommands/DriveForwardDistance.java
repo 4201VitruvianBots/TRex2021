@@ -24,7 +24,7 @@ public class DriveForwardDistance extends SequentialCommandGroup {
                 Pose2d startPosition = new Pose2d();
                 Pose2d endPosition = new Pose2d(distance, 0, new Rotation2d());
                 TrajectoryConfig configA = new TrajectoryConfig(Constants.AutoConstants.kMaxSpeedMetersPerSecond,
-                Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+                Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared * 5)
                     // Add kinematics to ensure max speed is actually obeyed
                     .setKinematics(Constants.DriveConstants.kDriveKinematics);
                 configA.setReversed(false);
