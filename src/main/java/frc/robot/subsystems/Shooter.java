@@ -85,22 +85,43 @@ public class Shooter extends SubsystemBase {
 
     //Self-explanatory commands
 
+    /**
+     * getMotorInputCurrent is used to find the SupplyCurrent of a specific motor
+     * @param motorIndex is the specific motor
+     * @return the output current (in amps)
+     */
     public double getMotorInputCurrent(int motorIndex) {
         return shooterMotors[motorIndex].getSupplyCurrent();
     }
 
+    /**
+     * set the power output for the shooter motor
+     * @param output is the amount of power for shooterMotor[0]
+     */
     public void setPower(double output) {
         shooterMotors[0].set(ControlMode.PercentOutput, output);
     }
 
+    /**
+     * set the RPM to a setpoint
+     * @param setpoint is the target value
+     */
     public void setRPM(double setpoint) {
         this.setpoint = setpoint;
     }
 
+    /**
+     * gets the set point as a double
+     * @return returns the setpoint
+     */
     public double getSetpoint() {
         return setpoint;
     }
 
+    /**
+     * checks if the shooter can shoot
+     * @return returns if the shooter will shoot
+     */
     public boolean canShoot() {
         return canShoot;
     }
