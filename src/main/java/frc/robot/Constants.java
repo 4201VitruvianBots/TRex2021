@@ -40,6 +40,8 @@ public final class Constants {
     public static final int backRightDriveMotor = 6;
     public static final int backRightTurningMotor = 7;
 
+    public static final double freeMotorSpeedRPS = 638.0 / 6.0;
+
     public static final class DriveConstants {
         public static final double kTrackWidth = Units.inchesToMeters(30);
         //Distance between centers of right and left wheels on robot. Meters?
@@ -76,11 +78,13 @@ public final class Constants {
     }
 
     public static final class ModuleConstants {
-        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
-        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
 
         public static final double kDriveMotorGearRatio = 6.89;
         public static final int kTurningMotorGearRatio = 12;
+
+        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI / (kTurningMotorGearRatio * freeMotorSpeedRPS);
+        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
+
         public static final int kEncoderCPR = 2048;
         public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
         public static final double kDriveEncoderDistancePerPulse =
@@ -93,7 +97,7 @@ public final class Constants {
 
         public static final double kPModuleTurningController = 1;
 
-        public static final double kPModuleDriveController = 1;
+        public static final double kPModuleDriveController = 1.57;
 
     }
 
@@ -103,14 +107,14 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(14);
+        public static final double kMaxSpeedMetersPerSecond = DriveConstants.kMaxSpeedMetersPerSecond;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
         public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-        public static final double kPXController = 0.001;
-        public static final double kPYController = 0.001;
-        public static final double kPThetaController = 0.001;
+        public static final double kPXController = 1;
+        public static final double kPYController = 1;
+        public static final double kPThetaController = 1;
 
         public static final double kIXController = 0;
         public static final double kIYController = 0;

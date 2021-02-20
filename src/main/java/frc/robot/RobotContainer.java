@@ -163,7 +163,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
 //    return m_autoCommand;
         //return new WaitCommand(0);
-    return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
+    return new DriveForwardDistance(m_swerveDrive, m_FieldSim, 3);
 //    return new DriveForwardDistance(m_swerveDrive, m_FieldSim, 5);
   }
 
