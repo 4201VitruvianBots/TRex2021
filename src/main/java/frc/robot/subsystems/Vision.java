@@ -83,16 +83,15 @@ public class Vision extends SubsystemBase {
 
 		//CameraServer.getInstance().addAxisCamera("photonVision", "photonVision.local");
 
-	    // TODO: What port does photonVision use?
 		// TODO: is this needed?
-		PortForwarder.add(6000, "photonVision.local", 22);
+		PortForwarder.add(1375, "photonVision.local", 1375);
 		PortForwarder.add(5800, "10.42.1.11", 5800);
 		PortForwarder.add(5801, "10.42.1.11", 5801);
 		PortForwarder.add(5805, "10.42.1.11", 5805);
 
 		// Init vision NetworkTables
-		limelight = NetworkTableInstance.getDefault().getTable("limelight");
-		photonVision = NetworkTableInstance.getDefault().getTable("photonVision");
+		limelight = NetworkTableInstance.getDefault().getTable("limelight/Integrated_Webcam"); // Integrated_Webcam is placeholder until we can figure out what the robot's webcam name is
+		photonVision = NetworkTableInstance.getDefault().getTable("photonVision/Integrated_Webcam");
 		setPipeline(0);
 
 		//initShuffleboard();
@@ -252,10 +251,9 @@ public class Vision extends SubsystemBase {
 		return data[highestIndex]; // Final distance in feet
 	}
 
-	// TODO: Read powercell position from PhotonVision over NetworkTables
 
 	public double getPowercellX(){
-	 	return photonVision.getEntry("powercell-x").getDouble(0);
+	 	return photonVision.getEntry("targetPixelsX").getDouble(0);
 	}
 
 	private void initShuffleboard() {
