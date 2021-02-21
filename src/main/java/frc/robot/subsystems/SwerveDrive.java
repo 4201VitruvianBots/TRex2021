@@ -7,20 +7,15 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.*;
 import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
-import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import static frc.robot.Constants.AutoConstants.kMaxSpeedMetersPerSecond;
@@ -38,11 +33,6 @@ public class SwerveDrive extends SubsystemBase {
     private int navXDebug = 0;
 
     private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(Constants.DriveConstants.kDriveKinematics, getRotation());
-
-    private Encoder xEncoder, yEncoder, rotationEncoder;
-    private EncoderSim xSimEncoder, ySimEncoder, rotationSimEncoder;
-    private ADXRS450_Gyro gyro;
-    private ADXRS450_GyroSim gyroSim;
 
     private SimulateSwerveDrive simulateSwerveDrive;
 
@@ -71,27 +61,13 @@ public class SwerveDrive extends SubsystemBase {
     };
 
     private AHRS mNavX = new AHRS(SerialPort.Port.kMXP);
+    double xVelocity, yVelocity, rotVelocity;
 
     public SwerveDrive(PowerDistributionPanel pdp) {
         m_pdp = pdp;
 
         SmartDashboardTab.putData("SwerveDrive","swerveDriveSubsystem", this);
         if (RobotBase.isSimulation()) {
-            xEncoder = new Encoder(Constants.xEncoderPortA, Constants.xEncoderPortB);
-            yEncoder = new Encoder(Constants.yEncoderPortA, Constants.yEncoderPortB);
-            rotationEncoder = new Encoder(Constants.rotationEncoderPortA, Constants.rotationEncoderPortB);
-
-            xEncoder.setDistancePerPulse(Constants.ModuleConstants.kDriveEncoderDistancePerPulse);
-            yEncoder.setDistancePerPulse(Constants.ModuleConstants.kDriveEncoderDistancePerPulse);
-            rotationEncoder.setDistancePerPulse(Constants.ModuleConstants.kDriveEncoderDistancePerPulse);
-
-            xSimEncoder = new EncoderSim(xEncoder);
-            ySimEncoder = new EncoderSim(yEncoder);
-            rotationSimEncoder = new EncoderSim(rotationEncoder);
-
-            gyro = new ADXRS450_Gyro();
-            gyroSim = new ADXRS450_GyroSim(gyro);
-
             simulateSwerveDrive = new SimulateSwerveDrive(
                     Constants.DriveConstants.kDrivetrainPlant,
                     Constants.DriveConstants.kDriveGearbox,
@@ -119,7 +95,7 @@ public class SwerveDrive extends SubsystemBase {
             }
         } else {
             try {
-                return gyro.getAngle();
+                return simulateSwerveDrive.getAngle();
             } catch (Exception e) {
                 return 0;
             }
@@ -162,7 +138,7 @@ public class SwerveDrive extends SubsystemBase {
         if (RobotBase.isReal()) {
             return Math.IEEEremainder(mNavX.getAngle(), 360);
         } else {
-            return Math.IEEEremainder(gyro.getAngle(), 360);
+            return Math.IEEEremainder(simulateSwerveDrive.getAngle(), 360);
         }
     }
 
@@ -213,9 +189,10 @@ public class SwerveDrive extends SubsystemBase {
             ySpeed=0;
         if (Math.abs(rot)<=0.05)
             rot=0;
-//        xInput = xSpeed;
-//        yInput = ySpeed;
-//        rotationInput = rot;
+        xSpeed *= kMaxSpeed;
+        ySpeed *= kMaxSpeed;
+        rot *= (kMaxSpeed / Constants.DriveConstants.kTrackWidth);
+
         var swerveModuleStates = Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         xSpeed, ySpeed, rot, getRotation())
@@ -223,11 +200,12 @@ public class SwerveDrive extends SubsystemBase {
         ); //from 2910's code
         //todo: rotationSpeed += PIDOutput //this PID calculates the speed needed to turn to a setpoint based off of a button input. Probably from the D-PAD
         SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
-        SmartDashboardTab.putNumber("SwerveDrive","Desired State",swerveModuleStates[0].angle.getDegrees());
         mSwerveModules[0].setDesiredState(swerveModuleStates[0]);
         mSwerveModules[1].setDesiredState(swerveModuleStates[1]);
         mSwerveModules[2].setDesiredState(swerveModuleStates[2]);
         mSwerveModules[3].setDesiredState(swerveModuleStates[3]);
+
+        simulationSwerveModuleStates = swerveModuleStates;
     }
 
     /**
@@ -236,13 +214,12 @@ public class SwerveDrive extends SubsystemBase {
      * @param desiredStates The desired SwerveModule states.
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-
         SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, Constants.DriveConstants.kMaxSpeedMetersPerSecond);
         mSwerveModules[0].setDesiredState(desiredStates[0]);
         mSwerveModules[1].setDesiredState(desiredStates[1]);
         mSwerveModules[2].setDesiredState(desiredStates[2]);
         mSwerveModules[3].setDesiredState(desiredStates[3]);
-
+        simulationSwerveModuleStates = desiredStates;
     }
 
     public void setSwerveDriveNeutralMode(boolean mode) {
@@ -273,19 +250,16 @@ public class SwerveDrive extends SubsystemBase {
                     mSwerveModules[3].getState()
             );
         } else {
-            double xSpeed = xEncoder.getRate();
-            double ySpeed = yEncoder.getRate();
-            double rot = rotationEncoder.getRate();
+            double xSpeed = simulateSwerveDrive.getXVelocityMeters();
+            double ySpeed = simulateSwerveDrive.getYVelocityMeters();
+            double rot = simulateSwerveDrive.getRotationVelocityMeters();
+            var chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
             var swerveModuleStates = Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(
-                    ChassisSpeeds.fromFieldRelativeSpeeds(
-                            xSpeed, ySpeed, rot, getRotation()));
-            SmartDashboardTab.putNumber("SwerveDrive", "X speed (odometry)", xSpeed);
+                    chassisSpeeds);
 
             for (int i = 0; i < 4; i++) {
-                mSwerveModules[i].setModuleState(swerveModuleStates[i]);
+                mSwerveModules[i].updateModuleState(swerveModuleStates[i]);
             }
-
-            simulationSwerveModuleStates = swerveModuleStates;
             m_odometry.update(
                     getRotation(),
                     mSwerveModules[0].getState(),
@@ -293,6 +267,7 @@ public class SwerveDrive extends SubsystemBase {
                     mSwerveModules[2].getState(),
                     mSwerveModules[3].getState()
             );
+            System.out.println("SwerveDrive Pose:" + getPose());
         }
     }
 
@@ -334,41 +309,12 @@ public class SwerveDrive extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        ChassisSpeeds inputs =  Constants.DriveConstants.kDriveKinematics.toChassisSpeeds(
-                mSwerveModules[0].getInput(),
-                mSwerveModules[1].getInput(),
-                mSwerveModules[2].getInput(),
-                mSwerveModules[3].getInput()
-        );
-
-
-//        for (int i = 0; i < 4; i++) {
-//            mSwerveModules[i].setTurnEncoderSimAngle(simulationSwerveModuleStates[i].angle.getDegrees());
-//            mSwerveModules[i].setTurnEncoderSimRate(simulationSwerveModuleStates[i].speedMetersPerSecond);
-//        }
-
-        simulateSwerveDrive.setInputs(inputs.vxMetersPerSecond * RobotController.getBatteryVoltage() / Constants.DriveConstants.kMaxSpeedMetersPerSecond,
-                inputs.vyMetersPerSecond * RobotController.getBatteryVoltage() / Constants.DriveConstants.kMaxSpeedMetersPerSecond,
-                inputs.omegaRadiansPerSecond * RobotController.getBatteryVoltage() / Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond);
-        simulateSwerveDrive.update(0.020);
-
-        xSimEncoder.setDistance(simulateSwerveDrive.getXPositionMeters());
-//        ySimEncoder.setDistance(simulateSwerveDrive.getYPositionMeters());
-//        rotationSimEncoder.setDistance(simulateSwerveDrive.getRotationPositionMeters());
-
-        xSimEncoder.setRate(simulateSwerveDrive.getXVelocityMeters());
-//        ySimEncoder.setRate(simulateSwerveDrive.getYVelocityMeters());
-//        rotationSimEncoder.setRate(simulateSwerveDrive.getRotationVelocityMeters());
-
-        System.out.println("X Distance: " + xSimEncoder.getDistance());
-        System.out.println("Y Distance: " + ySimEncoder.getDistance());
-        System.out.println("R Distance: " + rotationSimEncoder.getDistance());
-        System.out.println("X Rate: " + xSimEncoder.getRate());
-        System.out.println("Y Rate: " + ySimEncoder.getRate());
-        System.out.println("R Rate: " + rotationSimEncoder.getRate());
-        System.out.println("SwervePose: " + getPose());
-
-        gyroSim.setAngle(-simulateSwerveDrive.getHeading().getDegrees());
-
+        simulateSwerveDrive.setFieldRelative(isFieldOriented);
+        simulateSwerveDrive.setInputState(simulationSwerveModuleStates);
+        simulateSwerveDrive.update(0.02);
+        for (int i = 0; i < 4; i++) {
+            mSwerveModules[i].setTurnEncoderSimAngle(simulationSwerveModuleStates[i].angle.getDegrees());
+            mSwerveModules[i].setTurnEncoderSimRate(simulationSwerveModuleStates[i].speedMetersPerSecond);
+        }
     }
 }

@@ -1,14 +1,25 @@
 package frc.robot.simulation;
 
 
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.numbers.N1;
@@ -28,9 +39,37 @@ public class SimulateSwerveDrive {
   private final double robotWidth, robotLength;
 
   private DifferentialDrivetrainSim xSim, ySim, rotationSim;
+  private DifferentialDriveKinematics xKinematics, yKinematics, rotKinematics;
   private double xDistance, yDistance, rotationDistance;
-  private double xVel, yVel, angularVel;
+  private double xVel, yVel, rotationVel, angularVel;
   private Pose2d swervePose;
+
+  private Encoder xEncoder, yEncoder, rotationEncoder;
+  private EncoderSim xSimEncoder, ySimEncoder, rotationSimEncoder;
+  private ADXRS450_Gyro gyro;
+  private ADXRS450_GyroSim gyroSim;
+
+  private SwerveModuleState[] m_inputSwerveStates = new SwerveModuleState[] {
+          new SwerveModuleState(),
+          new SwerveModuleState(),
+          new SwerveModuleState(),
+          new SwerveModuleState()
+  };
+  private SwerveModuleState[] targetStates = new SwerveModuleState[] {
+          new SwerveModuleState(),
+          new SwerveModuleState(),
+          new SwerveModuleState(),
+          new SwerveModuleState()
+  };
+
+  private ChassisSpeeds m_lastChassisSpeed = new ChassisSpeeds();
+  private double lastRotationSpeed;
+  private double m_lastTimestamp;
+  private double rotSetpoint,m_lastRotSetpoint, m_lastInputAngle;
+  private double xInputVoltage, yInputVoltage, rotInputVoltage;
+  private Rotation2d rotationHeading = new Rotation2d();
+
+  private boolean isFieldRelative;
 
   /**
    * Create a SimDrivetrain.
@@ -120,6 +159,7 @@ public class SimulateSwerveDrive {
         wheelRadiusMeters,
         measurementStdDevs
     );
+    xKinematics = new DifferentialDriveKinematics(robotWidth);
     ySim = new DifferentialDrivetrainSim(
         drivetrainPlant,
         driveMotor,
@@ -129,6 +169,7 @@ public class SimulateSwerveDrive {
         measurementStdDevs
     );
     ySim.setPose(new Pose2d(new Translation2d(), new Rotation2d(Units.degreesToRadians(90))));
+    yKinematics = new DifferentialDriveKinematics(robotLength);
     rotationSim = new DifferentialDrivetrainSim(
         drivetrainPlant,
         driveMotor,
@@ -137,13 +178,34 @@ public class SimulateSwerveDrive {
         wheelRadiusMeters,
         measurementStdDevs
     );
+    rotKinematics = new DifferentialDriveKinematics(robotWidth);
+
+    xEncoder = new Encoder(Constants.xEncoderPortA, Constants.xEncoderPortB);
+    yEncoder = new Encoder(Constants.yEncoderPortA, Constants.yEncoderPortB);
+    rotationEncoder = new Encoder(Constants.rotationEncoderPortA, Constants.rotationEncoderPortB);
+
+    xEncoder.setDistancePerPulse(Constants.ModuleConstants.kDriveEncoderDistancePerPulse);
+    yEncoder.setDistancePerPulse(Constants.ModuleConstants.kDriveEncoderDistancePerPulse);
+    rotationEncoder.setDistancePerPulse(Constants.ModuleConstants.kDriveEncoderDistancePerPulse);
+
+    xSimEncoder = new EncoderSim(xEncoder);
+    ySimEncoder = new EncoderSim(yEncoder);
+    rotationSimEncoder = new EncoderSim(rotationEncoder);
+
+    gyro = new ADXRS450_Gyro();
+    gyroSim = new ADXRS450_GyroSim(gyro);
+
   }
 
-  public void setInputs(double xVolts, double yVolts, double rotationVolts) {
+  private void setInputs(double xVolts, double yVolts, double rotationVolts) {
     // Assume positive volts ic CW, and negative volts are CCW
     xSim.setInputs(xVolts, xVolts);
     ySim.setInputs(yVolts, yVolts);
-    rotationSim.setInputs(rotationVolts, -rotationVolts);
+    rotationSim.setInputs(-rotationVolts, +rotationVolts);
+  }
+
+  public void setInputState(SwerveModuleState... inputSwerveStates) {
+    m_inputSwerveStates = inputSwerveStates;
   }
 
   /**
@@ -153,34 +215,49 @@ public class SimulateSwerveDrive {
    */
   @SuppressWarnings("LocalVariableName")
   public void update(double dtSeconds) {
-    swervePose = new Pose2d(xSim.getPose().getX(), ySim.getPose().getY(), rotationSim.getHeading()); // Keeps track of robot's position
-    Pose2d xPose = new Pose2d(swervePose.getTranslation(), new Rotation2d());
+    simulatedChassisOutputVelocity();
+    System.out.println("x volts: " + xInputVoltage);
+    System.out.println("y volts: " + yInputVoltage);
+    System.out.println("r volts: " + rotInputVoltage);
+
+    xSim.update(dtSeconds);
+//    xSim.setPose(new Pose2d(xDistance, yDistance, new Rotation2d(Math.PI / 2)));
     xDistance = (xSim.getLeftPositionMeters() + xSim.getRightPositionMeters()) / 2;
     xVel = (xSim.getLeftVelocityMetersPerSecond() + xSim.getRightVelocityMetersPerSecond()) / 2;
-    //xSim.setPose(xPose);
-    xSim.update(dtSeconds);
 
-    swervePose = new Pose2d(xSim.getPose().getX(), ySim.getPose().getY(), rotationSim.getHeading()); // Keeps track of robot's position
-    Pose2d yPose = new Pose2d(swervePose.getTranslation(), new Rotation2d(Units.degreesToRadians(90)));
+    ySim.update(dtSeconds);
+//    ySim.setPose(new Pose2d(xDistance, yDistance, new Rotation2d()));
     yDistance = (ySim.getLeftPositionMeters() + ySim.getRightPositionMeters()) / 2;
     yVel = (ySim.getLeftVelocityMetersPerSecond() + ySim.getRightVelocityMetersPerSecond()) / 2;
-    //ySim.setPose(yPose);
-    ySim.update(dtSeconds);
 
-    swervePose = new Pose2d(xSim.getPose().getX(), ySim.getPose().getY(), rotationSim.getHeading()); // Keeps track of robot's position
-    Pose2d rotationPose = swervePose;
-    rotationDistance = (rotationSim.getLeftPositionMeters() - rotationSim.getRightPositionMeters()) / 2;
-    angularVel = (rotationSim.getLeftVelocityMetersPerSecond() - rotationSim.getRightVelocityMetersPerSecond()) / 2;
-    //rotationSim.setPose(rotationPose);
-    rotationSim.update(dtSeconds);
+//    rotationSim.update(dtSeconds);
+//    rotationSim.setPose(new Pose2d(xDistance, yDistance, rotationHeading));
+    rotationHeading = rotationSim.getHeading();
+//    rotationDistance = -rotationSim.getLeftPositionMeters();
+//    rotationVel = -rotationSim.getLeftVelocityMetersPerSecond();
+    angularVel = rotationVel / robotWidth;
 
-    SmartDashboardTab.putNumber("SwerveDrive", "X distance", xDistance);
-    SmartDashboardTab.putNumber("SwerveDrive", "simulator x coordinate", xSim.getPose().getX());
+    System.out.println("X Pose: " + xSim.getPose());
+    System.out.println("Y Pose: " + ySim.getPose());
 
-    SmartDashboardTab.putNumber("SwerveDrive", "Y distance", yDistance);
-    SmartDashboardTab.putNumber("SwerveDrive", "simulator y coordinate", swervePose.getY());
+    System.out.println("Rot Distance: " + rotationDistance);
+    System.out.println("Rot Velocity: " + angularVel);
+    System.out.println("Rot Sim Heading: " + rotationSim.getHeading());
+    var turnRadians = rotationDistance / (robotWidth * Math.PI);
+    swervePose = new Pose2d(xDistance, yDistance, rotationHeading);
+    gyroSim.setAngle(-rotationHeading.getDegrees());
+//    swervePose = new Pose2d(xSim.getPose().getX(), ySim.getPose().getY(), rotationSim.getHeading()); // Keeps track of robot's position
+//    Pose2d xPose = new Pose2d(swervePose.getTranslation(), new Rotation2d());
+    //xSim.setPose(xPose);
 
-    SmartDashboardTab.putNumber("SwerveDrive", "x vel", xVel);
+//    swervePose = new Pose2d(xSim.getPose().getX(), ySim.getPose().getY(), rotationSim.getHeading()); // Keeps track of robot's position
+//    Pose2d yPose = new Pose2d(swervePose.getTranslation(), new Rotation2d(Units.degreesToRadians(90)));
+//    //ySim.setPose(yPose);
+//
+//    swervePose = new Pose2d(xSim.getPose().getX(), ySim.getPose().getY(), rotationSim.getHeading()); // Keeps track of robot's position
+//    Pose2d rotationPose = swervePose;
+//    //rotationSim.setPose(rotationPose);
+
   }
 
   /**
@@ -189,7 +266,11 @@ public class SimulateSwerveDrive {
    * <p>Note that this angle is counterclockwise-positive, while most gyros are clockwise positive.
    */
   public Rotation2d getHeading() {
-    return swervePose.getRotation();
+    return gyro.getRotation2d();
+  }
+
+  public double getAngle() {
+    return gyro.getAngle();
   }
 
   /** Returns the current pose. */
@@ -221,6 +302,17 @@ public class SimulateSwerveDrive {
       return angularVel;
   }
 
+  public double getRotationVelocityRadians() {
+    return angularVel;
+  }
+
+  public Rotation2d getRotationSetpoint() {
+    return new Rotation2d();
+  }
+
+  public void setFieldRelative(boolean fieldRelative) {
+    isFieldRelative = fieldRelative;
+  }
 
   /**
    * Get the drivetrain gearing.
@@ -260,8 +352,137 @@ public class SimulateSwerveDrive {
     ySim.setPose(new Pose2d(pose.getTranslation(), new Rotation2d(Units.degreesToRadians(90))));
     rotationSim.setPose(pose);
     swervePose = pose;
-//    xDistance = 0;
-//    yDistance = 0;
-//    rotationDistance = 0;
+    xDistance = pose.getX();
+    yDistance = pose.getY();
+    gyroSim.setAngle(-pose.getRotation().getDegrees());
+//    rotationDistance = pose.getRotation();
   }
+
+  private final PIDController m_xPIDController = new PIDController(Constants.ModuleConstants.kPModuleDriveController, 0, 0);
+  private final PIDController m_yPIDController = new PIDController(Constants.ModuleConstants.kPModuleDriveController, 0, 0);
+
+  private final ProfiledPIDController m_turningPIDController
+          = new ProfiledPIDController(Constants.ModuleConstants.kPModuleTurningController, 0, 0,
+          new TrapezoidProfile.Constraints(8 * Math.PI / 12, 8 * Math.PI / 12));
+
+  // Gains are for example purposes only - must be determined for your own robot!
+  private final SimpleMotorFeedforward m_xFeedforward = new SimpleMotorFeedforward(0.587, 2.3, 0.0917);
+  private final SimpleMotorFeedforward m_yFeedforward = new SimpleMotorFeedforward(0.587, 2.3, 0.0917);
+  private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
+
+  /*
+
+   */
+  private void simulatedChassisOutputVelocity() {
+    double timestamp = Timer.getFPGATimestamp();
+    double dt = timestamp - m_lastTimestamp;
+
+    for(int i = 0; i < 4; i++)
+      m_inputSwerveStates[i] = SwerveModuleState.optimize(m_inputSwerveStates[i], getHeading());
+
+
+    System.out.println("Input Angle: " + m_inputSwerveStates[0].angle.getDegrees());
+    var inputChassisSpeeds = Constants.DriveConstants.kDriveKinematics.toChassisSpeeds(m_inputSwerveStates);
+
+    System.out.println(inputChassisSpeeds);
+    double xSetpoint = inputChassisSpeeds.vxMetersPerSecond;
+    double ySetpoint = inputChassisSpeeds.vyMetersPerSecond;
+
+    double angleSum = m_inputSwerveStates[0].angle.getRadians() +
+                      m_inputSwerveStates[1].angle.getRadians() +
+                      m_inputSwerveStates[2].angle.getRadians() +
+                      m_inputSwerveStates[3].angle.getRadians();
+    double angleAvg = angleSum / 4.0;
+    var inputAngle = m_inputSwerveStates[0].angle.getDegrees();
+
+    rotSetpoint = getHeading().getRadians() + inputChassisSpeeds.omegaRadiansPerSecond;
+    rotSetpoint = rotSetpoint % (2 * Math.PI);
+
+    System.out.println("Input rotation Angle: " + Units.radiansToDegrees(inputChassisSpeeds.omegaRadiansPerSecond));
+
+//    if(Math.abs(m_lastInputAngle - inputAngle) < 0.004) {
+//      rotSetpoint = m_lastRotSetpoint;
+//      m_turningPIDController.setGoal(getHeading().getRadians());
+//    }
+
+//    double xFF = 0;
+//    double yFF = 0;
+//    double rotationFF = 0;
+    double xFF = m_xFeedforward.calculate(xSetpoint);
+    double yFF = m_yFeedforward.calculate(ySetpoint);
+    double rotationFF = m_turnFeedforward.calculate(rotSetpoint);
+//    double xFF = m_xFeedforward.calculate(xSetpoint, (xSetpoint - m_lastChassisSpeed.vxMetersPerSecond) / dt);
+//    double yFF = m_yFeedforward.calculate(ySetpoint, (ySetpoint - m_lastChassisSpeed.vyMetersPerSecond) / dt);
+//    double rotationFF = m_turnFeedforward.calculate(rotSetpoint, (rotSetpoint - m_lastChassisSpeed.omegaRadiansPerSecond) / dt);
+
+    xInputVoltage = xFF + m_xPIDController.calculate(getXVelocityMeters(), xSetpoint);
+    yInputVoltage = yFF + m_yPIDController.calculate(getYVelocityMeters(), ySetpoint);
+    rotInputVoltage = rotationFF + m_turningPIDController.calculate(getHeading().getRadians(), rotSetpoint);
+
+    System.out.println("Rotation Setpoint: " + Units.radiansToDegrees(rotSetpoint));
+    System.out.println("PID Error: " + m_turningPIDController.getPositionError());
+    System.out.println("Rotation Voltage: " + rotInputVoltage);
+
+    setInputs(xInputVoltage, yInputVoltage, rotInputVoltage);
+
+    m_lastTimestamp = timestamp;
+    m_lastChassisSpeed = inputChassisSpeeds;
+    m_lastRotSetpoint = rotSetpoint;
+    m_lastInputAngle = inputAngle;
+  }
+
+//  private void simulatedChassisOutputPosition() {
+//    double timestamp = Timer.getFPGATimestamp();
+//    double dt = timestamp - m_lastTimestamp;
+//
+//    System.out.println("Input State Angle 1: " + m_inputSwerveStates[0].angle);
+//    System.out.println("Input State Angle 2: " + m_inputSwerveStates[1].angle);
+//    System.out.println("Input State Angle 3: " + m_inputSwerveStates[2].angle);
+//    System.out.println("Input State Angle 4: " + m_inputSwerveStates[3].angle);
+//
+////    for(int i = 0; i < 4; i++)
+////      targetStates[i] = SwerveModuleState.optimize(m_inputSwerveStates[i], getHeading());
+//
+//    var inputChassisSpeeds = Constants.DriveConstants.kDriveKinematics.toChassisSpeeds(m_inputSwerveStates);
+//    System.out.println("Input Rad/s: " + inputChassisSpeeds.omegaRadiansPerSecond);
+//    double xSetpoint = inputChassisSpeeds.vxMetersPerSecond;
+//    double ySetpoint = inputChassisSpeeds.vyMetersPerSecond;
+//    rotSetpoint = getHeading().getRadians() + inputChassisSpeeds.omegaRadiansPerSecond * dt;
+////    rotSetpoint = rotSetpoint % (2 * Math.PI);
+//
+//    System.out.println("Heading Rad: " + getHeading().getRadians());
+//
+//    m_turningPIDController.enableContinuousInput(Math.PI, -Math.PI);
+////    double xFF = 0;
+////    double yFF = 0;
+//    double rotationFF = 0;
+////    double xFF = m_xFeedforward.calculate(xSetpoint);
+////    double yFF = m_yFeedforward.calculate(ySetpoint);
+////    double rotationFF = m_turnFeedforward.calculate(rotSetpoint);
+//    double xFF = m_xFeedforward.calculate(xSetpoint, (xSetpoint - m_lastChassisSpeed.vxMetersPerSecond) / dt);
+//    double yFF = m_yFeedforward.calculate(ySetpoint, (ySetpoint - m_lastChassisSpeed.vyMetersPerSecond) / dt);
+////    double rotationFF = m_turnFeedforward.calculate(inputChassisSpeeds.omegaRadiansPerSecond, (inputChassisSpeeds.omegaRadiansPerSecond - m_lastChassisSpeed.omegaRadiansPerSecond) / dt);
+//
+//    xInputVoltage = xFF + m_xPIDController.calculate(getXVelocityMeters(), xSetpoint);
+//    yInputVoltage = yFF + m_yPIDController.calculate(getYVelocityMeters(), ySetpoint);
+//    rotInputVoltage = rotationFF + m_turningPIDController.calculate(getHeading().getRadians(), rotSetpoint);
+//
+//
+//
+//    System.out.println("Sim Pose: " + getPose());
+////    System.out.println("X FF: " + xFF);
+////    System.out.println("X PID: " + (xInputVoltage - xFF));
+////    System.out.println("Setpoint X: " + xSetpoint);
+////    System.out.println("Setpoint Y: " + ySetpoint);
+//    System.out.println("Setpoint R: " + rotSetpoint);
+////    System.out.println("Input Volts X: " + xInputVoltage);
+////    System.out.println("Input Volts Y: " + yInputVoltage);
+//    System.out.println("Input Volts R: " + rotInputVoltage);
+//
+//    setInputs(xInputVoltage, yInputVoltage, rotInputVoltage);
+//
+//    m_lastTimestamp = timestamp;
+//    m_lastChassisSpeed = inputChassisSpeeds;
+//    m_lastRotSetpoint = rotSetpoint;
+//  }
 }

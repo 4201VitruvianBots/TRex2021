@@ -67,13 +67,13 @@ public class SwerveModule extends SubsystemBase {
           new TrapezoidProfile.Constraints(Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond, Constants.ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
 
   // Gains are for example purposes only - must be determined for your own robot!
-  private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
+  private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0.587, 2.3, 0.0917);
   private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
 
   private Encoder simulationTurnEncoder;
   private EncoderSim simulationTurnEncoderSim;
 
-  private SwerveModuleState simulatedSwerveState = new SwerveModuleState(0, new Rotation2d());
+  private SwerveModuleState swerveModuleState = new SwerveModuleState(0, new Rotation2d());
   private SwerveModuleState simulatedSwerveInput = new SwerveModuleState(0, new Rotation2d());
 
   private double timestamp, lastTimestamp;
@@ -164,7 +164,7 @@ public class SwerveModule extends SubsystemBase {
       return mTurningMotor.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
     }
     else {
-      return simulatedSwerveState.angle.getRadians();
+      return swerveModuleState.angle.getRadians();
       //return Units.degreesToRadians(simulationTurnEncoder.getDistance());
     }
   }
@@ -183,7 +183,7 @@ public class SwerveModule extends SubsystemBase {
     if (RobotBase.isReal()) {
       return mDriveMotor.getSelectedSensorVelocity() * Constants.ModuleConstants.kDriveEncoderDistancePerPulse * 10;
     } else {
-      return simulatedSwerveState.speedMetersPerSecond;
+      return swerveModuleState.speedMetersPerSecond;
     }
   }
 
@@ -197,11 +197,7 @@ public class SwerveModule extends SubsystemBase {
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
-    if (RobotBase.isReal()) {
-      return new SwerveModuleState(getVelocity(), new Rotation2d(getTurningRadians()));
-    } else {
-      return simulatedSwerveState;
-    }
+    return swerveModuleState;
   }
 
 
@@ -294,13 +290,18 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public void setSimulationInput(double desiredDriveOutput, double desiredTurnOutput) {
-    simulatedSwerveInput = new SwerveModuleState(
-            desiredDriveOutput * Constants.DriveConstants.kMaxSpeedMetersPerSecond,
-            new Rotation2d(desiredTurnOutput * Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond));
+    var velocity = desiredDriveOutput * Constants.DriveConstants.kMaxSpeedMetersPerSecond;
+    velocity = Math.abs(velocity) > Constants.DriveConstants.kMaxSpeedMetersPerSecond ?
+            Math.signum(velocity) * Constants.DriveConstants.kMaxSpeedMetersPerSecond : velocity;
+    var rotation = desiredTurnOutput * Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond;
+    rotation = Math.abs(rotation) > Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond  ?
+            Math.signum(rotation) * Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond : rotation;
+
+    simulatedSwerveInput = new SwerveModuleState(velocity, new Rotation2d(rotation));
   }
 
-  public void setModuleState(SwerveModuleState desiredState) {
-    simulatedSwerveState = desiredState;
+  public void updateModuleState(SwerveModuleState state) {
+    swerveModuleState = state;
   }
 
   public void setPercentOutput(double speed) {
@@ -328,5 +329,7 @@ public class SwerveModule extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     updateSmartDashboard();
+//    swerveModuleState = new SwerveModuleState(getVelocity(), new Rotation2d(Units.degreesToRadians(simulationTurnEncoder.getDistance())));
+    swerveModuleState = new SwerveModuleState(getVelocity(), getHeading());
   }
 }

@@ -110,10 +110,17 @@ public class RobotContainer {
   public void initializeSubsystems() {
     m_FieldSim = new FieldSim(m_swerveDrive, m_turret, m_shooter);
 
-    m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
-            () -> leftJoystick.getRawAxis(0), //left x
-            () -> leftJoystick.getRawAxis(1), //left y
-            () -> rightJoystick.getRawAxis(0))); //right x
+    if(RobotBase.isReal()) {
+      m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
+              () -> leftJoystick.getRawAxis(0), //left x
+              () -> leftJoystick.getRawAxis(1), //left y
+              () -> rightJoystick.getRawAxis(0))); //right x
+    } else {
+      m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
+              () -> testController.getRawAxis(0), //left x
+              () -> testController.getRawAxis(1), //left y
+              () -> testController.getRawAxis(2))); //right x
+    }
   }
 
   /**
@@ -163,7 +170,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
 //    return m_autoCommand;
         //return new WaitCommand(0);
-    return new DriveForwardDistance(m_swerveDrive, m_FieldSim, 3);
+    return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
 //    return new DriveForwardDistance(m_swerveDrive, m_FieldSim, 5);
   }
 

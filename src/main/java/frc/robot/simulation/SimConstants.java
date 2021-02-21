@@ -2,7 +2,11 @@ package frc.robot.simulation;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.trajectory.constraint.EllipticalRegionConstraint;
+import edu.wpi.first.wpilibj.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.util.Units;
+import frc.robot.Constants;
 
 public class SimConstants {
     public static final double fieldWidth = 15.980;
@@ -51,4 +55,25 @@ public class SimConstants {
 
     public static final Pose2d blueGoalPose = new Pose2d(0, 5.831, new Rotation2d());
     public static final Pose2d redGoalPose = new Pose2d(15.960367,2.373122, new Rotation2d());
+
+//    int numberOfCones = SimConstants.autoNavSlalomCones.length;
+//        for(int i = 0; i < numberOfCones; i++) {
+//        var constraint = new EllipticalRegionConstraint(
+//                SimConstants.autoNavSlalomCones[i],
+//                Units.inchesToMeters(30),
+//                Units.inchesToMeters(30),
+//                new Rotation2d(),
+//                new SwerveDriveKinematicsConstraint(Constants.DriveConstants.kDriveKinematics, 0)
+//        );
+//        config.addConstraint(constraint);
+//    }
+
+    public static final Translation2d[] autoNavSlalomCones = {
+            new Translation2d(3.088189,1.513965),
+            new Translation2d(3.818932,1.513965),
+            new Translation2d(4.549675,1.513965),
+            new Translation2d(5.313633,1.513965),
+            new Translation2d(6.044377,1.513965),
+            new Translation2d(7.550150,1.513965)
+    };
 }

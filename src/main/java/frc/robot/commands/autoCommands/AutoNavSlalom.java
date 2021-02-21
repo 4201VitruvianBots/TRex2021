@@ -8,13 +8,18 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.wpilibj.trajectory.constraint.EllipticalRegionConstraint;
+import edu.wpi.first.wpilibj.trajectory.constraint.SwerveDriveKinematicsConstraint;
+import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.simulation.FieldSim;
+import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.SwerveDrive;
 import frc.vitruvianlib.utils.TrajectoryUtils;
 
@@ -27,16 +32,16 @@ public class AutoNavSlalom extends SequentialCommandGroup {
         Pose2d[] waypoints = {
                 new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
                 new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(0))),
-//                new Pose2d(Units.inchesToMeters(120), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
-//                new Pose2d(Units.inchesToMeters(240), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
-//                new Pose2d(Units.inchesToMeters(270), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(0))),
-//                new Pose2d(Units.inchesToMeters(315), Units.inchesToMeters(34), new Rotation2d(Units.degreesToRadians(0))),
-//                new Pose2d(Units.inchesToMeters(315), Units.inchesToMeters(86), new Rotation2d(Units.degreesToRadians(0))),
-//                new Pose2d(Units.inchesToMeters(270), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(0))),
-//                new Pose2d(Units.inchesToMeters(240), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
-//                new Pose2d(Units.inchesToMeters(120), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
-//                new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(0))),
-//                new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(120), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(240), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(270), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(315), Units.inchesToMeters(34), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(315), Units.inchesToMeters(86), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(270), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(240), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(120), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
         };
         Pose2d startPosition = waypoints[0];
 
@@ -47,6 +52,7 @@ public class AutoNavSlalom extends SequentialCommandGroup {
                         // Add kinematics to ensure max speed is actually obeyed
                         .setKinematics(Constants.DriveConstants.kDriveKinematics);
         config.setReversed(false);
+
 
         addCommands(new SetOdometry(swerveDrive, fieldSim, startPosition),
                 new SetDriveNeutralMode(swerveDrive, true)

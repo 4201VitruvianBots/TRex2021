@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants;
@@ -49,13 +50,13 @@ public class DriveForwardDistance extends SequentialCommandGroup {
                 swerveDrive::setModuleStates,
 
                 swerveDrive
-
         );
         
                 addCommands(
                         new SetOdometry(swerveDrive, fieldSim, startPosition),
                         new SetDriveNeutralMode(swerveDrive, true),
-                        driveForwardCommand
+                        driveForwardCommand,
+                        new InstantCommand(() -> swerveDrive.drive(0,0,0, false))
                     );
         }
         
