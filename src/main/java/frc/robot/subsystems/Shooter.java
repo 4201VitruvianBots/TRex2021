@@ -126,6 +126,9 @@ public class Shooter extends SubsystemBase {
         return canShoot;
     }
 
+    /**
+     * updates the RPM's target value
+     */
     private void updateRPMSetpoint() {
         if (setpoint >= 0)
             shooterMotors[0].set(ControlMode.Velocity, RPMtoFalconUnits(setpoint));
@@ -133,18 +136,34 @@ public class Shooter extends SubsystemBase {
             setPower(0);
     }
 
+    /**
+     * positioning the TestRPM
+     */
     public void setTestRPM() {
         shooterMotors[0].set(ControlMode.Velocity, RPMtoFalconUnits(rpmOutput));
     }
 
+    /**
+     * gets the RPM's value
+     * @return the RPM's value
+     */
     public double getTestRPM() {
         return rpmOutput;
     }
 
+    /**
+     * gets the RPM's tolerance
+     * @return the RPM's tolerance
+     */
     public double getRPMTolerance() {
         return rpmTolerance;
     }
 
+    /**
+     * Checks if the encoder of the motor is at it's setpoint
+     * @param motorIndex The index of the measured motor
+     * @return closed-loop error value of the selected motor
+     */
     public boolean encoderAtSetpoint(int motorIndex) {
         return (Math.abs(shooterMotors[motorIndex].getClosedLoopError()) < 100.0);
     }
@@ -158,10 +177,20 @@ public class Shooter extends SubsystemBase {
         return falconUnitsToRPM(shooterMotors[motorIndex].getSelectedSensorVelocity());
     }
 
+    /**
+     * returns falcon's sensor units as RPM
+     * @param sensorUnits independent sensors
+     * @return falcon's RPM
+     */
     public double falconUnitsToRPM(double sensorUnits) {
         return (sensorUnits / 2048.0) * 600.0;
     }
 
+    /**
+     * retunrs RPM as falcon units
+     * @param RPM Revolutions per minute
+     * @return falcon's units
+     */
     public double RPMtoFalconUnits(double RPM) {
         return (RPM / 600.0) * 2048.0;
     }

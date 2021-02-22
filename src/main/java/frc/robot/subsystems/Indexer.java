@@ -61,24 +61,42 @@ public class Indexer extends SubsystemBase {
 
     // Self-explanatory commands
 
+    /**
+     * sets the output for the indexer
+     * @param output received data
+     */
     public void setIndexerOutput(double output) {
         master.set(output);
     }
 
+    /**
+     * gets the RPM
+     * @return RPM
+     */
     public double getRPM() {
         return encoder.getVelocity() * gearRatio;
     }
 
+    /**
+     * sets the RPM
+     * @param rpm revolutions per minute
+     */
     public void setRPM(double rpm) {
         double setpoint = rpm / gearRatio;
         SmartDashboard.putNumber("Indexer Setpoint", setpoint);
         pidController.setReference(setpoint, ControlType.kSmartVelocity);
     }
 
+    /**
+     * initializes the Shuffleboard
+     */
     private void initShuffleboard() {
         Shuffleboard.getTab("Indexer").addNumber("Carousel RPM", this::getRPM);
     }
 
+    /**
+     * updates the SmartDashboard
+     */
     private void updateSmartDashboard() {
         SmartDashboardTab.putNumber("Indexer", "Carousel RPM", this.getRPM());
         SmartDashboard.putNumber("kF", kF);
