@@ -122,17 +122,26 @@ public class Turret extends SubsystemBase {
         return initialHome;
     }
 
+    /**
+    *this function determines how fast the turret should rotate
+    *@return max rpm of turret motor
+    */
     public double getSetpoint() {
         return setpoint;
     }
 
     /**
     *this function finds the difference of the encoder reletave to the actual angle of the turret
+    *@return the difference between the angle of the turret based off of the encoder vs. its actual angle.
     */
     public double getError() {
         return 0 - getTurretAngle();
     }
 
+    /**
+    *this function prevents the turret from rotationg past a certain degree reletave to the drivetrain (main purpose is to prevent turret wires from tangling and getting damaged)
+    *@return i[0] < i[1] if not restricted, i[0] > i[1] if restricted.
+    */
     public boolean isRestricted() {
         boolean value = false;
         for (double[] i : restrictedMovement) {
@@ -145,6 +154,10 @@ public class Turret extends SubsystemBase {
         return value;
     }
 
+    /**
+    *this function declares at what percent the turret motor should run at
+    *@param output determines the precentage of power given to the motor
+    */
     public void setPercentOutput(double output) {
         turretMotor.set(output);
     }
@@ -166,6 +179,9 @@ public class Turret extends SubsystemBase {
         this.setpoint = setpoint;
     }
 
+    /**
+    *this function declares the speed at wich the turret can rotate at
+    */
     public void setClosedLoopPosition() {
         turretMotor.set(degreesToEncoderUnits(getSetpoint()));
     }
@@ -174,15 +190,26 @@ public class Turret extends SubsystemBase {
 //        turretMotor.set(ControlMode.MotionMagic, degreesToEncoderUnits(setpoint));
 //    }
 
+    /**
+    *this function uses the encoder to determine where the turret is facing
+    *@return number of encoder units the turret has rotated
+    */
     public int degreesToEncoderUnits(double degrees) {
         return (int) (degrees * (1.0 / gearRatio) * (encoderUnitsPerRotation / 360.0));
     }
 
+    /**
+    *this function uses the encoder to determine where the turret is facing
+    *@return number of Degrees the turret has rotated
+    */
     public double encoderUnitsToDegrees(double encoderUnits) {
         return encoderUnits * gearRatio * (360.0 / encoderUnitsPerRotation);
     }
 
-    // checks if the turret is pointing within the tolerance of the target
+    /**
+    *this function determines if the turret is ready to fire at the powerport.
+    *@return true if correctly aligned to shoot, false if not aligned.
+    */
     public boolean onTarget() {
         return Math.abs(pidController.getSmartMotionAllowedClosedLoopError(1)) < kErrorBand; //not sure if this is the correct slot
     }
