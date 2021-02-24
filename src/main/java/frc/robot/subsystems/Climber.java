@@ -63,6 +63,10 @@ climbPistons[0].set(state ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value
 climbPistons[1].set(state ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse); //sets values based on the ClimbPiston State
   }
 
+  /**
+   * checks boolean value for the climb state
+   * @return the climbstate
+   */
   public boolean getClimbState() {
     return climbState;
   }
@@ -77,6 +81,10 @@ climbPistons[1].set(state ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value
     climbMotors[0].set(ControlMode.PercentOutput, value);
   }
   
+  /**
+   * gets the climber's position
+   * @return the selected climber motor's sensor position
+   */
   public double getClimberPosition() {
 	  return climbMotors[0].getSelectedSensorPosition();
   }
