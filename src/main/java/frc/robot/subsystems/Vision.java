@@ -90,8 +90,8 @@ public class Vision extends SubsystemBase {
 		PortForwarder.add(5805, "10.42.1.11", 5805);
 
 		// Init vision NetworkTables
-		limelight = NetworkTableInstance.getDefault().getTable("limelight/Integrated_Webcam"); // Integrated_Webcam is placeholder until we can figure out what the robot's webcam name is
-		photonVision = NetworkTableInstance.getDefault().getTable("photonVision/Integrated_Webcam");
+		limelight = NetworkTableInstance.getDefault().getTable("limelight");
+		photonVision = NetworkTableInstance.getDefault().getTable("photonVision/Integrated_Webcam"); // Integrated_Webcam is placeholder until we can figure out what the robot's webcam name is
 		setPipeline(0);
 
 		//initShuffleboard();
