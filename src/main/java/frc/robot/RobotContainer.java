@@ -99,10 +99,15 @@ public class RobotContainer {
   }
 
   public void initializeSubsystems() {
+//    m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
+//            () -> leftJoystick.getRawAxis(0), //left x
+//            () -> leftJoystick.getRawAxis(1), //left y
+//            () -> rightJoystick.getRawAxis(0))); //right x
+
     m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
-            () -> leftJoystick.getRawAxis(0), //left x
-            () -> leftJoystick.getRawAxis(1), //left y
-            () -> rightJoystick.getRawAxis(0))); //right x
+            () -> testController.getRawAxis(0), //left x
+            () -> testController.getRawAxis(1), //left y
+            () -> testController.getRawAxis(2))); //right x
   }
 
   /**

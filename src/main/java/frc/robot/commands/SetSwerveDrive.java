@@ -42,7 +42,15 @@ public class SetSwerveDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_swerveDrive.drive(m_leftX.getAsDouble(),m_leftX.getAsDouble(),m_rightX.getAsDouble(),true);
+    double throttle = Math.abs(m_leftY.getAsDouble()) > 0.05 ? m_leftY.getAsDouble() : 0;
+    double strafe = Math.abs(m_leftX.getAsDouble()) > 0.05 ? m_leftX.getAsDouble() : 0;
+    double rotation = Math.abs(m_rightX.getAsDouble()) > 0.05 ? m_rightX.getAsDouble() : 0;
+
+    m_swerveDrive.drive(throttle,strafe,rotation,false);    // Forward/Back Trottle, Left/Right Strafe, Left/Right Turn
+//    if(RobotBase.isReal())
+//      m_swerveDrive.drive(m_leftY.getAsDouble(), m_leftX.getAsDouble(),m_rightX.getAsDouble(),false);
+//    else
+//      m_swerveDrive.drive(-m_leftY.getAsDouble(), m_leftX.getAsDouble(),m_rightX.getAsDouble(),false);
   }
 
   // Called once the command ends or is interrupted.

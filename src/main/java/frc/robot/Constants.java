@@ -26,20 +26,21 @@ public final class Constants {
     public static final int xBoxController = 2;
 
     // CAN ADDRESSES
-    public static final int frontRightDriveMotor = 0;
-    public static final int frontRightTurningMotor = 1;
-    public static final int frontLeftDriveMotor = 2;
-    public static final int frontLeftTurningMotor = 3;
-    public static final int backLeftDriveMotor = 4;
-    public static final int backLeftTurningMotor = 5;
-    public static final int backRightDriveMotor = 6;
-    public static final int backRightTurningMotor = 7;
+    public static final int frontLeftDriveMotor = 20;
+    public static final int frontLeftTurningMotor = 21;
+    public static final int frontRightDriveMotor = 22;
+    public static final int frontRightTurningMotor = 23;
+    public static final int backLeftDriveMotor = 24;
+    public static final int backLeftTurningMotor = 25;
+    public static final int backRightDriveMotor = 26;
+    public static final int backRightTurningMotor = 27;
 
     public static final class DriveConstants {
         public static final double kTrackWidth = 0.5;
         //Distance between centers of right and left wheels on robot. Meters?
-        public static final double kWheelBase = 0.7;
+        public static final double kWheelBase = 0.5;
         //Distance between front and back wheels on robot. Meters?
+
         public static final SwerveDriveKinematics kDriveKinematics =
                 new SwerveDriveKinematics(
                         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -52,34 +53,32 @@ public final class Constants {
         // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
         // These characterization values MUST be determined either experimentally or theoretically
         // for *your* robot's drive.
-        // The RobotPy Characterization Tool suite provides a convenient tool for obtaining these
+        // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
         // values for your robot.
-        public static final double ksVolts = 1;
-        public static final double kvVoltSecondsPerMeter = 0.8;
-        public static final double kaVoltSecondsSquaredPerMeter = 0.15;
+        public static final double ksVolts = 0.587;
+        public static final double kvVoltSecondsPerMeter = 2.3;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.0917;
 
         public static final double kMaxSpeedMetersPerSecond = 3;
     }
 
     public static final class ModuleConstants {
-        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
-        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
-
-        public static final int kDriveMotorGearRatio = 1;
-        public static final int kTurningMotorGearRatio = 1;
+        public static final double  kDriveMotorGearRatio = 8.16; //6.89 to 1
+        public static final double kTurningMotorGearRatio = 12.8; //12 to 1
         public static final int kEncoderCPR = 2048;
-        public static final double kWheelDiameterMeters = 0.15;
+        public static final double kWheelDiameterMeters = 0.10; //10.16 cm
+        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 4*2 * Math.PI/kTurningMotorGearRatio;
+        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 4*2 * Math.PI/kTurningMotorGearRatio;
+
         public static final double kDriveEncoderDistancePerPulse =
-                // Assumes the encoders are directly mounted on the wheel shafts
                 (kWheelDiameterMeters * Math.PI) / ((double) kEncoderCPR*kDriveMotorGearRatio);
 
         public static final double kTurningEncoderDistancePerPulse =
-                // Assumes the encoders are on a 1:1 reduction with the module shaft.
-                (2 * Math.PI) / (double) ((double) kEncoderCPR* kTurningMotorGearRatio);
+                (double) ((2.0 * Math.PI) / (kTurningMotorGearRatio * kEncoderCPR));
 
         public static final double kPModuleTurningController = 1;
 
-        public static final double kPModuleDriveController = 1;
+        public static final double kPModuleDriveController = 0.25;
 
     }
 
@@ -89,7 +88,7 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final double kMaxSpeedMetersPerSecond = 3;
+        public static final double kMaxSpeedMetersPerSecond = 4.25; //4.383024
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
         public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
@@ -98,12 +97,13 @@ public final class Constants {
         public static final double kPYController = 1;
         public static final double kPThetaController = 1;
 
-        //Constraint for the motion profiled robot angle controller
+        //Constraint for the motion profilied robot angle controller
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
                 new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond,
                         kMaxAngularSpeedRadiansPerSecondSquared);
 
     }
+
     public static int intakeMotor = 47;
     public static final int pcmOne = 11;
     public static final int intakePistonForward = 2; // 2
