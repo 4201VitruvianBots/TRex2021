@@ -43,14 +43,20 @@ public class SetClimberOutput extends CommandBase {
   public void initialize() {
   }
 
+  /**
+   * Finds direction based on the controller's axis
+   */
   @Override
   public void execute() {
     double input = Math.abs(m_controller.getRawAxis(5)) > 0.2 ? m_controller.getRawAxis(5) : 0;
     direction = input > 0 ? 1 : input < 0 ? -1 : 0;
+
+//  returns values of the climb state
     if(m_climber.getClimbState()) {
       SmartDashboardTab.putNumber("Climber", "Direction", direction);
       SmartDashboardTab.putBoolean("Climber", "currentDirection", currentDirection);
 
+//    repositions in it's current direction
       if (direction != 0) {
         timestamp = Timer.getFPGATimestamp();
         if (direction == 1 && !currentDirection) {
@@ -78,6 +84,9 @@ public class SetClimberOutput extends CommandBase {
     }
   }
 
+  /**
+   * releases the climber
+   */
   private void climberReleaseSequence() {
     SmartDashboardTab.putString("Climber", "SetClimberOutput", "Releasing");
     m_climber.setClimbPistons(true);
@@ -96,6 +105,9 @@ public class SetClimberOutput extends CommandBase {
     }
   }
 
+  /**
+   * retracts the climber
+   */
   private void climberRetractSequence() {
     SmartDashboardTab.putString("Climber", "SetClimberOutput", "Retracting");
     m_climber.setClimbPistons(false);
