@@ -31,14 +31,14 @@ public final class Constants {
     public static final int xBoxController = 2;
 
     // CAN ADDRESSES
-    public static final int frontRightDriveMotor = 0;
-    public static final int frontRightTurningMotor = 1;
-    public static final int frontLeftDriveMotor = 2;
-    public static final int frontLeftTurningMotor = 3;
-    public static final int backLeftDriveMotor = 4;
-    public static final int backLeftTurningMotor = 5;
-    public static final int backRightDriveMotor = 6;
-    public static final int backRightTurningMotor = 7;
+    public static final int frontLeftDriveMotor = 20;
+    public static final int frontLeftTurningMotor = 21;
+    public static final int frontRightDriveMotor = 22;
+    public static final int frontRightTurningMotor = 23;
+    public static final int backLeftDriveMotor = 24;
+    public static final int backLeftTurningMotor = 25;
+    public static final int backRightDriveMotor = 26;
+    public static final int backRightTurningMotor = 27;
 
     public static final double freeMotorSpeedRPS = 638.0 / 6.0;
 
@@ -63,9 +63,9 @@ public final class Constants {
         // for *your* robot's drive.
         // The RobotPy Characterization Tool suite provides a convenient tool for obtaining these
         // values for your robot.
-        public static final double ksVolts = 1;
-        public static final double kvVoltSecondsPerMeter = 0.8;
-        public static final double kaVoltSecondsSquaredPerMeter = 0.15;
+        public static final double ksVolts = 0.587;
+        public static final double kvVoltSecondsPerMeter = 2.3;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.0917;
 
         public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(14);
 
@@ -79,11 +79,11 @@ public final class Constants {
 
     public static final class ModuleConstants {
 
-        public static final double kDriveMotorGearRatio = 6.89;
-        public static final int kTurningMotorGearRatio = 12;
+        public static final double kDriveMotorGearRatio = 8.16;
+        public static final double kTurningMotorGearRatio = 12.8;
 
-        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI / (kTurningMotorGearRatio * freeMotorSpeedRPS);
-        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
+        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 4 * 2 * Math.PI / (kTurningMotorGearRatio * freeMotorSpeedRPS);
+        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 4 * 2 * Math.PI;
 
         public static final int kEncoderCPR = 2048;
         public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
@@ -93,12 +93,15 @@ public final class Constants {
 
         public static final double kTurningEncoderDistancePerPulse =
                 // Assumes the encoders are on a 1:1 reduction with the module shaft.
-                (2 * Math.PI) / (double) ((double) kEncoderCPR* kTurningMotorGearRatio);
+                (2.0 * Math.PI) / (kEncoderCPR* kTurningMotorGearRatio);
 
         public static final double kPModuleTurningController = 1;
 
-        public static final double kPModuleDriveController = 1.57;
+//        public static final double kPModuleDriveController = 1.57;
+        public static final double kPModuleDriveController = 0.25;
 
+        // This is the diameter of the wheel module itself (Not the wheel, the rotation gear)
+        public static final double kWheelModuleDiameter = 0.1;
     }
 
     public static final class OIConstants {

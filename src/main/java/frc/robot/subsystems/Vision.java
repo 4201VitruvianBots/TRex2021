@@ -71,7 +71,7 @@ public class Vision extends SubsystemBase {
 		
 		m_swerveDrive = swerveDrive;
 		m_turret = turret;
-		if (RobotBase.isReal()) {
+		if (RobotBase.isReal() && false) {
 			// Driver cam setup
 //		camera = CameraServer.getInstance().startAutomaticCapture();
 			camera = CameraServer.getInstance().startAutomaticCapture("intake", "/dev/video0");

@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.commands.VitruvianSwerveControllerCommand;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.SwerveDrive;
@@ -71,7 +72,7 @@ public class AutoNavSlalom extends SequentialCommandGroup {
                         waypoints[i + 1],
                         config);
                 //var command = TrajectoryUtils.generateRamseteCommand(swerveDrive, trajectory);
-                SwerveControllerCommand command = new SwerveControllerCommand(
+                VitruvianSwerveControllerCommand command = new VitruvianSwerveControllerCommand(
                         trajectory,
                         swerveDrive::getPose,
                         Constants.DriveConstants.kDriveKinematics,
