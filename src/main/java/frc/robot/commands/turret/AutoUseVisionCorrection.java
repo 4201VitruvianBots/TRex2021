@@ -61,16 +61,22 @@ public class AutoUseVisionCorrection extends CommandBase {
                         turning = true;
                     }
                 } else {
+                    /**
+                     * Stops turning when the turret is aligned on the target
+                     */
                     if (m_turret.onTarget())
                         turning = false;
                 }
+            /**
+             * Sets the turrent's angle if vision doesn't have a valid target
+             */
             } else if (!m_vision.getValidTarget()) {
                 usingVisionSetpoint = false;
                 setpoint = m_turret.getTurretAngle();
             }
 
             m_turret.setRobotCentricSetpoint(setpoint);
-//                m_turret.setFieldCentricSetpoint(setpoint);
+//          m_turret.setFieldCentricSetpoint(setpoint);
         }
     }
 
