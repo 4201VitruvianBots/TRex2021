@@ -14,6 +14,7 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -54,6 +55,7 @@ public class Shooter extends SubsystemBase {
     private boolean timerStart;
     private double timeStamp;
     private boolean canShoot;
+    public double gearRatio = 1.5;
 
     public Shooter(Vision vision, PowerDistributionPanel pdp) {
         // setup shooterMotors
@@ -137,6 +139,9 @@ public class Shooter extends SubsystemBase {
         return falconUnitsToRPM(shooterMotors[motorIndex].getSelectedSensorVelocity());
     }
 
+    public double getRotations(int motorIndex) {
+        return (shooterMotors[motorIndex].getSelectedSensorPosition() / 2048.0) * gearRatio;
+    }
     public double falconUnitsToRPM(double sensorUnits) {
         return (sensorUnits / 2048.0) * 600.0;
     }
@@ -148,27 +153,29 @@ public class Shooter extends SubsystemBase {
     // Smart Dashboard settings
 
     private void initShuffleboard() {
-
-        SmartDashboardTab.putNumber("Shooter", "RPM Output", rpmOutput);
-        SmartDashboardTab.putNumber("Shooter", "Flywheel kF", kF);
-        SmartDashboardTab.putNumber("Shooter", "Flywheel kP", kP);
-        SmartDashboardTab.putNumber("Shooter", "Flywheel kI", kI);
-        SmartDashboardTab.putNumber("Shooter", "Flywheel kD", kD);
-        SmartDashboardTab.putNumber("Shooter", "Flywheel kI_Zone", kI_Zone);
-        SmartDashboardTab.putNumber("Shooter", "Flywheel kAllowableError", kAllowableError);
-        SmartDashboardTab.putNumber("Shooter", "Flywheel RPM Tolerance", rpmTolerance);
+        SmartDashboard.putNumber("Flywheel Setpoint", setpoint);
+//        SmartDashboardTab.putNumber("Shooter", "RPM Output", rpmOutput);
+//        SmartDashboardTab.putNumber("Shooter", "Flywheel kF", kF);
+//        SmartDashboardTab.putNumber("Shooter", "Flywheel kP", kP);
+//        SmartDashboardTab.putNumber("Shooter", "Flywheel kI", kI);
+//        SmartDashboardTab.putNumber("Shooter", "Flywheel kD", kD);
+//        SmartDashboardTab.putNumber("Shooter", "Flywheel kI_Zone", kI_Zone);
+//        SmartDashboardTab.putNumber("Shooter", "Flywheel kAllowableError", kAllowableError);
+//        SmartDashboardTab.putNumber("Shooter", "Flywheel RPM Tolerance", rpmTolerance);
     }
 
     private void updateShuffleboard() {
-        SmartDashboard.putNumber("RPM", falconUnitsToRPM(shooterMotors[0].getSelectedSensorVelocity()));
+        SmartDashboard.putNumber("Flywheel RPM", setpoint);
+        SmartDashboard.putNumber("Motor Velocity", shooterMotors[0].getSelectedSensorVelocity());
+        setRPM(SmartDashboard.getNumber("Flywheel Setpoint", 0));
 
-        SmartDashboardTab.putNumber("Shooter", "RPM Primary", getRPM(0));
-        SmartDashboardTab.putNumber("Shooter", "RPM Secondary", getRPM(1));
-        SmartDashboardTab.putNumber("Shooter", "Setpoint", setpoint);
-        SmartDashboardTab.putNumber("Shooter", "Power", shooterMotors[0].getMotorOutputPercent());
-        SmartDashboardTab.putNumber("Shooter", "Error", getSetpoint() - getRPM(0));
-
-        SmartDashboardTab.putBoolean("DriveTrain", "CanShoot", canShoot());
+//        SmartDashboardTab.putNumber("Shooter", "RPM Primary", getRPM(0));
+//        SmartDashboardTab.putNumber("Shooter", "RPM Secondary", getRPM(1));
+//        SmartDashboardTab.putNumber("Shooter", "Setpoint", setpoint);
+//        SmartDashboardTab.putNumber("Shooter", "Power", shooterMotors[0].getMotorOutputPercent());
+//        SmartDashboardTab.putNumber("Shooter", "Error", getSetpoint() - getRPM(0));
+//
+//        SmartDashboardTab.putBoolean("DriveTrain", "CanShoot", canShoot());
     }
 
     public void updatePIDValues() {
@@ -190,7 +197,7 @@ public class Shooter extends SubsystemBase {
         updateRPMSetpoint();
 //        updatePidRPM();
         updateShuffleboard();
-        updatePIDValues();
+//        updatePIDValues();
 
         if ((Math.abs(getSetpoint() - getRPM(0)) < getRPMTolerance()) && m_vision.hasTarget() &&
                 (Math.abs(m_vision.getTargetX()) < 1) && !timerStart) {

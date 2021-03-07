@@ -233,6 +233,6 @@ public class Turret extends SubsystemBase {
             if (getTurretHome())
                 initialHome = true;
 
-        updateSmartdashboard();
+//        updateSmartdashboard();
     }
 }

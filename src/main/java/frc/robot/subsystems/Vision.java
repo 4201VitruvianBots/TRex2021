@@ -73,11 +73,11 @@ public class Vision extends SubsystemBase {
 
 		// Driver cam setup
 //		camera = CameraServer.getInstance().startAutomaticCapture();
-		camera = CameraServer.getInstance().startAutomaticCapture("intake", "/dev/video0");
-	    camera.setConnectionStrategy(VideoSource.ConnectionStrategy.kKeepOpen);
-	    camera.setExposureManual(25);
-	    camera.setResolution(320, 240);
-	    camera.setPixelFormat(VideoMode.PixelFormat.kMJPEG);
+//		camera = CameraServer.getInstance().startAutomaticCapture("intake", "/dev/video0");
+//	    camera.setConnectionStrategy(VideoSource.ConnectionStrategy.kKeepOpen);
+//	    camera.setExposureManual(25);
+//	    camera.setResolution(320, 240);
+//	    camera.setPixelFormat(VideoMode.PixelFormat.kMJPEG);
 
 		//CameraServer.getInstance().addAxisCamera("opensight", "opensight.local");
 

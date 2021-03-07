@@ -24,10 +24,7 @@ import frc.robot.commands.autoCommands.DriveStraight;
 import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.intake.ControlledIntake;
 import frc.robot.commands.intake.ToggleIntakePistons;
-import frc.robot.subsystems.Indexer;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.Uptake;
+import frc.robot.subsystems.*;
 import frc.vitruvianlib.utils.JoystickWrapper;
 import frc.vitruvianlib.utils.XBoxTrigger;
 
@@ -50,6 +47,9 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   private final Uptake m_uptake = new Uptake();
   private final SwerveDrive m_swerveDrive = new SwerveDrive(pdp);
+  private final Turret m_turret = new Turret(m_swerveDrive);
+  private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
+  private final Shooter m_shooter = new Shooter(m_vision, pdp);
 
 
   private enum CommandSelector {
