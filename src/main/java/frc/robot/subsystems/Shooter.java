@@ -32,14 +32,14 @@ public class Shooter extends SubsystemBase {
      */
 
     // PID loop constants
-    private final double kF = 0.0523;  // 0.054      //  Gree: 0.0475;
-    private final double kP = 0.6;      //  0.4       //  0.00047
+    private final double kF = 0.618;  // 0.054      //  Gree: 0.0475;
+    private final double kP = 7.25e-9;      //  0.4       //  0.00047
     private final double kI = 0.0;                    //  0.0000287
     private final double kD = 0.0;
 
-    private final double kS = 0.155;
-    private final double kV = 0.111;
-    private final double kA = 0.02;
+    private final double kS = 0.618;
+    private final double kV = 0.0708;
+    private final double kA = 0.0239;
     // shooter motors
     private final TalonFX[] shooterMotors = {
             new TalonFX(Constants.flywheelMotorA),
@@ -96,7 +96,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setRPM(double setpoint) {
-        this.setpoint = setpoint;
+        this.setpoint = RPMtoFalconUnits(setpoint);
     }
 
     public double getSetpoint() {
@@ -109,7 +109,7 @@ public class Shooter extends SubsystemBase {
 
     private void updateRPMSetpoint() {
         if (setpoint >= 0)
-            shooterMotors[0].set(ControlMode.Velocity, RPMtoFalconUnits(setpoint));
+            shooterMotors[0].set(ControlMode.Velocity, setpoint);
         else
             setPower(0);
     }
@@ -143,17 +143,18 @@ public class Shooter extends SubsystemBase {
         return (shooterMotors[motorIndex].getSelectedSensorPosition() / 2048.0) * gearRatio;
     }
     public double falconUnitsToRPM(double sensorUnits) {
-        return (sensorUnits / 2048.0) * 600.0;
+        return (sensorUnits / 2048.0) * 60.0 * gearRatio;
     }
 
     public double RPMtoFalconUnits(double RPM) {
-        return (RPM / 600.0) * 2048.0;
+        return (RPM / 600.0) * 2048.0 / gearRatio;
     }
 
     // Smart Dashboard settings
 
     private void initShuffleboard() {
         SmartDashboard.putNumber("Flywheel Setpoint", setpoint);
+        SmartDashboard.putNumber("Flywheel Encoder Units Setpoint", setpoint);
 //        SmartDashboardTab.putNumber("Shooter", "RPM Output", rpmOutput);
 //        SmartDashboardTab.putNumber("Shooter", "Flywheel kF", kF);
 //        SmartDashboardTab.putNumber("Shooter", "Flywheel kP", kP);
@@ -165,9 +166,10 @@ public class Shooter extends SubsystemBase {
     }
 
     private void updateShuffleboard() {
-        SmartDashboard.putNumber("Flywheel RPM", setpoint);
+        SmartDashboard.putNumber("Flywheel RPM", getRPM(0));
         SmartDashboard.putNumber("Motor Velocity", shooterMotors[0].getSelectedSensorVelocity());
         setRPM(SmartDashboard.getNumber("Flywheel Setpoint", 0));
+//        setpoint = SmartDashboard.getNumber("Flywheel Encoder Units Setpoint", 0);
 
 //        SmartDashboardTab.putNumber("Shooter", "RPM Primary", getRPM(0));
 //        SmartDashboardTab.putNumber("Shooter", "RPM Secondary", getRPM(1));
