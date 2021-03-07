@@ -143,6 +143,7 @@ public class Shooter extends SubsystemBase {
         return (shooterMotors[motorIndex].getSelectedSensorPosition() / 2048.0) * gearRatio;
     }
     public double falconUnitsToRPM(double sensorUnits) {
+        // This has to be in seconds?
         return (sensorUnits / 2048.0) * 60.0 * gearRatio;
     }
 

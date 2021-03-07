@@ -13,9 +13,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ControlType;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -39,6 +37,9 @@ public class Indexer extends SubsystemBase {
     private double kP = 0.000001;
     private double kI = 80;
     private double kD = 0.0001;
+
+    private boolean m_isActive;
+    private double output;
 
     public Indexer() {
         // Motor and PID controller setup
@@ -76,15 +77,19 @@ public class Indexer extends SubsystemBase {
     }
 
     private void initShuffleboard() {
-        Shuffleboard.getTab("Indexer").addNumber("Carousel RPM", this::getRPM);
+//        Shuffleboard.getTab("Indexer").addNumber("Carousel RPM", this::getRPM);
+        SmartDashboard.putNumber("Carosel Output", output);
+
     }
 
     private void updateSmartDashboard() {
-        SmartDashboardTab.putNumber("Indexer", "Carousel RPM", this.getRPM());
-        SmartDashboard.putNumber("kF", kF);
-        SmartDashboard.putNumber("kP", kP);
-        SmartDashboard.putNumber("kI", kI);
-        SmartDashboard.putNumber("kD", kD);
+//        SmartDashboardTab.putNumber("Indexer", "Carousel RPM", this.getRPM());
+//        SmartDashboard.putNumber("kF", kF);
+//        SmartDashboard.putNumber("kP", kP);
+//        SmartDashboard.putNumber("kI", kI);
+//        SmartDashboard.putNumber("kD", kD);
+
+        output = SmartDashboard.getNumber("Carousel Output", 0);
     }
 
 //    private void updatePIDValues() {
@@ -99,10 +104,18 @@ public class Indexer extends SubsystemBase {
 //        pidController.setD(kD);
 //    }
 
+    public void setActive(boolean isActive) {
+        m_isActive = isActive;
+    }
+
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
         updateSmartDashboard();
+        if(m_isActive)
+            setIndexerOutput(output);
+        else
+            setIndexerOutput(0);
         //updatePIDValues();
     }
 }

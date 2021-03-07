@@ -1,8 +1,12 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -25,8 +29,11 @@ public class Intake extends SubsystemBase {
     private double gearRatio = 1.0 / 3.0;
     private boolean intaking = false;
 
+    private boolean m_isActive;
+    private double m_output = 0.6;
+
     // Intake motor setup
-    private CANSparkMax intakeMotor =  new CANSparkMax(Constants.intakeMotor, MotorType.kBrushless);
+    private TalonFX intakeMotor =  new TalonFX(Constants.intakeMotor);
 //  private CANEncoder intakeEncoder = intakeMotor.getEncoder();
 //  private CANPIDController canPidController = intakeMotor.getPIDController();
 
@@ -35,8 +42,8 @@ public class Intake extends SubsystemBase {
     public Intake() {
         // Configure motors
 
-        intakeMotor.restoreFactoryDefaults();
-        intakeMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        intakeMotor.configFactoryDefault();
+        intakeMotor.setNeutralMode(NeutralMode.Brake);
         intakeMotor.setInverted(false);
 
 //    canPidController.setFF(kFF);
@@ -47,6 +54,8 @@ public class Intake extends SubsystemBase {
 //    canPidController.setSmartMotionMaxVelocity(maxVel, 0);
 //    canPidController.setSmartMotionMaxAccel(maxAccel, 0);
 //    canPidController.setSmartMotionAllowedClosedLoopError(allowableError, 0);
+
+        SmartDashboard.putNumber("Intake Output", m_output);
     }
 
     // Self-explanatory functions
@@ -67,7 +76,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void setIntakePercentOutput(double value){
-        intakeMotor.set(value);
+        intakeMotor.set(ControlMode.PercentOutput, value);
     }
 
 //  public double getRPM(){
@@ -83,12 +92,22 @@ public class Intake extends SubsystemBase {
 //    canPidController.setReference(setpoint, ControlType.kSmartVelocity);
 //  }
 
+    public void setActive(boolean isActive) {
+        m_isActive = isActive;
+    }
+
     private void updateSmartDashboard() {
+        m_output = SmartDashboard.getNumber("Intake Output", 0);
         SmartDashboardTab.putBoolean("Intake", "Intake State", getIntakingState());
         SmartDashboardTab.putBoolean("Intake", "Pistons", getIntakePistonExtendStatus());
     }
     @Override
     public void periodic() {
         updateSmartDashboard();
+
+        if(m_isActive)
+            setIntakePercentOutput(m_output);
+        else
+            setIntakePercentOutput(0);
     }
 }

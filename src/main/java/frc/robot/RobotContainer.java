@@ -21,7 +21,9 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.SetSwerveDrive;
 import frc.robot.commands.autoCommands.DriveStraight;
+import frc.robot.commands.indexer.ActivateTestIntake;
 import frc.robot.commands.indexer.FeedAll;
+import frc.robot.commands.indexer.SetKickerOutput;
 import frc.robot.commands.intake.ControlledIntake;
 import frc.robot.commands.intake.ToggleIntakePistons;
 import frc.robot.subsystems.*;
@@ -117,31 +119,35 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    if(RobotBase.isReal()) {
-      leftJoystick.invertRawAxis(1, true);
-      rightJoystick.invertRawAxis(0, true);
-      xBoxController.invertRawAxis(1, true);
-      xBoxController.invertRawAxis(5, true);
-      for (int i = 0; i < leftButtons.length; i++)
-        leftButtons[i] = new JoystickButton(leftJoystick, (i + 1));
-      for (int i = 0; i < rightButtons.length; i++)
-        rightButtons[i] = new JoystickButton(rightJoystick, (i + 1));
-      for (int i = 0; i < xBoxButtons.length; i++)
-        xBoxButtons[i] = new JoystickButton(xBoxController, (i + 1));
-      for (int i = 0; i < xBoxPOVButtons.length; i++)
-        xBoxPOVButtons[i] = new POVButton(xBoxController, (i * 45));
-      xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
-      xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
-    }else{
-      testController.invertRawAxis(1, true);
-      testController.invertRawAxis(5, true);
-      for (int i = 0; i < testButtons.length; i++)
-        testButtons[i] = new JoystickButton(testController, (i + 1));
+//    if(RobotBase.isReal()) {
+//      leftJoystick.invertRawAxis(1, true);
+//      rightJoystick.invertRawAxis(0, true);
+//      xBoxController.invertRawAxis(1, true);
+//      xBoxController.invertRawAxis(5, true);
+//      for (int i = 0; i < leftButtons.length; i++)
+//        leftButtons[i] = new JoystickButton(leftJoystick, (i + 1));
+//      for (int i = 0; i < rightButtons.length; i++)
+//        rightButtons[i] = new JoystickButton(rightJoystick, (i + 1));
+//      for (int i = 0; i < xBoxButtons.length; i++)
+//        xBoxButtons[i] = new JoystickButton(xBoxController, (i + 1));
+//      for (int i = 0; i < xBoxPOVButtons.length; i++)
+//        xBoxPOVButtons[i] = new POVButton(xBoxController, (i * 45));
+//      xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
+//      xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
+//    }else{
+    testController.invertRawAxis(1, true);
+    testController.invertRawAxis(5, true);
+    for (int i = 0; i < testButtons.length; i++)
+      testButtons[i] = new JoystickButton(testController, (i + 1));
 
-      testButtons[1].whileHeld(new FeedAll(m_indexer, m_uptake));
-      testButtons[9].whenPressed(new ToggleIntakePistons(m_intake));
-      testButtons[6].whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
-    }
+    testButtons[1].whileHeld(new ActivateTestIntake(m_intake, m_indexer));
+    testButtons[2].whileHeld(new SetKickerOutput(m_uptake, 1));
+    testButtons[1].whileHeld(new FeedAll(m_indexer, m_uptake));
+    testButtons[1].whileHeld(new FeedAll(m_indexer, m_uptake));
+
+//    testButtons[9].whenPressed(new ToggleIntakePistons(m_intake));
+//    testButtons[6].whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
+//    }
   }
 
   /**

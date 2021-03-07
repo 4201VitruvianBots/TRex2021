@@ -104,27 +104,25 @@ public final class Constants {
 
     }
 
-    public static int intakeMotor = 47;
-    public static final int pcmOne = 11;
-    public static final int intakePistonForward = 2; // 2
-    public static final int intakePistonReverse = 3; // 3
     public static enum IntakeStates {
         INTAKE_EMPTY, INTAKE_ONE_BALL, INTAKE_FOUR_BALLS, INTAKE_FIVE_BALLS
     }
+    public static final int intakeMotor = 30;
+    public static final int indexerMotor = 31;
+    public static final int uptakeMotor = 32;
     public static final int flywheelMotorA = 40;
     public static final int flywheelMotorB = 41;
-    public static final int turretEncoder = 61;
-    public static final int turretMotor = 60;
-    public static final int turretHomeSensor = 30;
     public static final int climbMotorA = 50;
     public static final int climbMotorB = 51;
-    public static final int climbPistonAForward = 31;
-    public static final int climbPistonAReverse = 32;
-    public static final int climbPistonBForward = 33;
-    public static final int climbPistonBReverse = 34;
-    public static final int indexerMotor = 35;
-    public static final int uptakeMotor = 36;
+    public static final int turretMotor = 60;
+    public static final int turretEncoder = 61;
+    public static final int turretHomeSensor = 30;
 
-    // Undetermined IDs
-    public static final int carouselMotor = 4201;
+    public static final int pcmOne = 11;
+    public static final int intakePistonForward = 0; // 2
+    public static final int intakePistonReverse = 1; // 3
+    public static final int climbPistonAForward = 2;
+    public static final int climbPistonAReverse = 3;
+    public static final int climbPistonBForward = 4;
+    public static final int climbPistonBReverse = 5;
 }
