@@ -251,7 +251,6 @@ public class Vision extends SubsystemBase {
 		return data[highestIndex]; // Final distance in feet
 	}
 
-
 	public double getPowercellX(){
 	 	return photonVision.getEntry("targetPixelsX").getDouble(0);
 	}
