@@ -13,6 +13,7 @@ import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -71,14 +72,15 @@ public class Vision extends SubsystemBase {
 		m_swerveDrive = swerveDrive;
 		m_turret = turret;
 
-		// Driver cam setup
+		if (RobotBase.isReal() && false) {
+			// Driver cam setup
 //		camera = CameraServer.getInstance().startAutomaticCapture();
 //		camera = CameraServer.getInstance().startAutomaticCapture("intake", "/dev/video0");
 //	    camera.setConnectionStrategy(VideoSource.ConnectionStrategy.kKeepOpen);
 //	    camera.setExposureManual(25);
 //	    camera.setResolution(320, 240);
 //	    camera.setPixelFormat(VideoMode.PixelFormat.kMJPEG);
-
+		}
 		//CameraServer.getInstance().addAxisCamera("opensight", "opensight.local");
 
 	    // TODO: What port does opensight use?

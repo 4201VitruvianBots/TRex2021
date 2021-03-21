@@ -15,12 +15,9 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.kinematics.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -39,6 +36,10 @@ public class SwerveDrive extends SubsystemBase {
     private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(Constants.DriveConstants.kDriveKinematics, getRotation());
 
     PowerDistributionPanel m_pdp;
+
+    private double m_trajectoryTime;
+    private Trajectory currentTrajectory;
+
     /**
      * Just like a graph's quadrants
      * 0 is Front Left
@@ -67,6 +68,18 @@ public class SwerveDrive extends SubsystemBase {
         m_pdp = pdp;
 
         SmartDashboardTab.putData("SwerveDrive","swerveDriveSubsystem", this);
+        if (RobotBase.isSimulation()) {
+            simulateSwerveDrive = new SimulateSwerveDrive(
+                    Constants.DriveConstants.kDrivetrainPlant,
+                    Constants.DriveConstants.kDriveGearbox,
+                    Constants.ModuleConstants.kDriveMotorGearRatio,
+                    Constants.DriveConstants.kTrackWidth,
+                    Constants.DriveConstants.kWheelBase,
+                    Constants.ModuleConstants.kWheelDiameterMeters / 2.0,
+                    null
+            );
+            simulateSwerveDrive.setSwerveModules(mSwerveModules);
+        }
     }
 
     /**
@@ -183,6 +196,11 @@ public class SwerveDrive extends SubsystemBase {
         mSwerveModules[3].setDesiredState(swerveModuleStates[3]);
     }
 
+    public void testModule(double throttle, double turn, int...modulesNumbers) {
+        for(int i =0; i < modulesNumbers.length; i++)
+            mSwerveModules[modulesNumbers[i]].setTestOutputs(throttle, turn);
+    }
+
     /**
      * Sets the swerve ModuleStates.
      *
@@ -283,19 +301,23 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     private void updateSmartDashboard() {
-        SmartDashboardTab.putNumber("SwerveDrive","Angle",getRawGyroAngle());
+        SmartDashboardTab.putNumber("SwerveDrive","Chassis Angle",getRawGyroAngle());
         for(int i = 0; i < mSwerveModules.length; i++) {
             SmartDashboardTab.putNumber("SwerveDrive", "Swerve Module " + i + " Angle", mSwerveModules[i].getState().angle.getDegrees());
             SmartDashboardTab.putNumber("SwerveDrive", "Swerve Module " + i + " Speed", mSwerveModules[i].getState().speedMetersPerSecond);
         }
 
-//    SmartDashboardTab.putNumber("SwerveDrive","Front Left Angle",mSwerveModules[0].getTurnAngle());
-//    SmartDashboardTab.putNumber("SwerveDrive","Back Left Angle",mSwerveModules[1].getTurnAngle());
-//    SmartDashboardTab.putNumber("SwerveDrive","Front Right Angle",mSwerveModules[2].getTurnAngle());
-//    SmartDashboardTab.putNumber("SwerveDrive","Back Right Angle",mSwerveModules[3].getTurnAngle());
+
+//        SmartDashboardTab.putNumber("SwerveDrive","Front Left Angle",mSwerveModules[0].getTurnAngle());
+//        SmartDashboardTab.putNumber("SwerveDrive","Back Left Angle",mSwerveModules[1].getTurnAngle());
+//        SmartDashboardTab.putNumber("SwerveDrive","Front Right Angle",mSwerveModules[2].getTurnAngle());
+//        SmartDashboardTab.putNumber("SwerveDrive","Back Right Angle",mSwerveModules[3].getTurnAngle());
 //
-//    SmartDashboardTab.putNumber("SwerveDrive","navXDebug",navXDebug);
-//    SmartDashboardTab.putNumber("SwerveDrive","State",mSwerveModules[0].getState().angle.getDegrees());
+//        SmartDashboardTab.putNumber("SwerveDrive","navXDebug",navXDebug);
+//        SmartDashboardTab.putNumber("SwerveDrive","State",mSwerveModules[0].getState().angle.getDegrees());
+
+        SmartDashboardTab.putNumber("SwerveDrive", "X coordinate", getPose().getX());
+        SmartDashboardTab.putNumber("SwerveDrive", "Y coordinate", getPose().getY());
 //    SmartDashboardTab.putNumber("SwerveDrive","Front Right Speed",mSwerveModules[0].getState().speedMetersPerSecond);
 //    SmartDashboardTab.putNumber("SwerveDrive","Front Left Speed",mSwerveModules[1].getState().speedMetersPerSecond);
 //    SmartDashboardTab.putNumber("SwerveDrive","Back Left Speed",mSwerveModules[2].getState().speedMetersPerSecond);
@@ -304,9 +326,51 @@ public class SwerveDrive extends SubsystemBase {
 
     @Override
     public void periodic() {
+        sampleTrajectory();
         updateOdometry();
         updateSmartDashboard();
 
         // This method will be called once per scheduler run
+    }
+
+    public Rotation2d [] getModuleHeadings() {
+        Rotation2d [] modulePositions = {
+            mSwerveModules[0].getHeading(),
+            mSwerveModules[1].getHeading(),
+            mSwerveModules[2].getHeading(),
+            mSwerveModules[3].getHeading()
+        };
+        return modulePositions;
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        simulateSwerveDrive.setFieldRelative(isFieldOriented);
+//        simulateSwerveDrive.setInputState(simulationSwerveModuleStates);
+        simulateSwerveDrive.update(0.02);
+        for (int i = 0; i < 4; i++) {
+            mSwerveModules[i].setTurnEncoderSimAngle(simulationSwerveModuleStates[i].angle.getDegrees());
+            mSwerveModules[i].setTurnEncoderSimRate(simulationSwerveModuleStates[i].speedMetersPerSecond);
+        }
+    }
+
+    private void sampleTrajectory() {
+        if(DriverStation.getInstance().isAutonomous()) {
+            try {
+                var currentTrajectoryState = currentTrajectory.sample(m_trajectoryTime);
+                System.out.println("TrajectoryTime: " + m_trajectoryTime);
+                System.out.println("TrajectoryPose: " + currentTrajectoryState.poseMeters);
+            } catch (Exception e) {
+
+            }
+        }
+
+    }
+
+    public void setTrajectoryTime(double trajectoryTime) {
+        m_trajectoryTime = trajectoryTime;
+    }
+    public void setCurrentTrajectory(Trajectory trajectory) {
+        currentTrajectory = trajectory;
     }
 }

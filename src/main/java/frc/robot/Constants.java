@@ -74,12 +74,16 @@ public final class Constants {
                 (kWheelDiameterMeters * Math.PI) / ((double) kEncoderCPR*kDriveMotorGearRatio);
 
         public static final double kTurningEncoderDistancePerPulse =
-                (double) ((2.0 * Math.PI) / (kTurningMotorGearRatio * kEncoderCPR));
+                // Assumes the encoders are on a 1:1 reduction with the module shaft.
+                (2.0 * Math.PI) / (kEncoderCPR* kTurningMotorGearRatio);
 
         public static final double kPModuleTurningController = 1;
 
+//        public static final double kPModuleDriveController = 1.57;
         public static final double kPModuleDriveController = 0.25;
 
+        // This is the diameter of the wheel module itself (Not the wheel, the rotation gear)
+        public static final double kWheelModuleDiameter = 0.1;
     }
 
     public static final class OIConstants {

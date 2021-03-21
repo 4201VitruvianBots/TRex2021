@@ -50,8 +50,8 @@ public class SwerveModule extends SubsystemBase {
   private static final long STALL_TIMEOUT = 2000;
   private long mStallTimeBegin = Long.MAX_VALUE;
 
-  private double turnOutput;
-  private double driveOutput;
+  private double m_turnOutput;
+  private double m_driveOutput;
 
   private static final double kWheelRadius = 0.0508;
   private static final int kEncoderResolution = 4096;
@@ -65,6 +65,16 @@ public class SwerveModule extends SubsystemBase {
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0.587, 2.3, 0.0917);
   private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
+
+  private Encoder simulationTurnEncoder;
+  private EncoderSim simulationTurnEncoderSim;
+
+  private SwerveModuleState swerveModuleState = new SwerveModuleState(0, new Rotation2d());
+  private SwerveModuleState simulatedSwerveInput = new SwerveModuleState(0, new Rotation2d());
+
+  private double timestamp, lastTimestamp;
+
+  private SwerveModuleState m_desiredState = new SwerveModuleState();
 
   public SwerveModule(int moduleNumber, TalonFX TurningMotor, TalonFX driveMotor, double zeroOffset, boolean invertTurn, boolean invertThrottle) {
     mModuleNumber = moduleNumber;
@@ -153,57 +163,14 @@ public class SwerveModule extends SubsystemBase {
   public double getTargetAngle() {
     return mLastTargetAngle;
   }
-
-
   /**
-   * Sets the target angle of the module.
+   * The last angle setpoint of the module.
    *
-   * @param targetAngle desired direction of travel for the module.
-   *
-   * @return The angle setpoint of the module.
-   * It also inverts the driveMotor if setpoint +- 180 = targetAngle
+   * @return The last angle setpoint of the module.
    */
-  public double setTargetAngle(double targetAngle) {
-    mLastTargetAngle = targetAngle;
-
-    targetAngle %= 360; //makes 0 to 360
-    targetAngle += mZeroOffset;
-
-    double currentAngle = getTurnAngle();
-    double currentAngleMod = currentAngle % 360;
-    if (currentAngleMod < 0)
-      currentAngleMod += 360;
-
-    double error = currentAngle - targetAngle;
-
-    if(error > 90 || error < -90){
-      if (error > 90)
-        targetAngle += 180;
-      else if (error < -90)
-        targetAngle -= 180;
-      mDriveMotor.setInverted(!mInverted);
-    } else {
-      mDriveMotor.setInverted(!mInverted);
-    }
-
-    targetAngle += currentAngle - currentAngleMod;
-
-    double currentError = error;
-    if (Math.abs(currentError - mLastError) < 7.5 &&
-            Math.abs(currentAngle - targetAngle) > 5) {
-      if (mStallTimeBegin == Long.MAX_VALUE) mStallTimeBegin = System.currentTimeMillis();
-      if (System.currentTimeMillis() - mStallTimeBegin > STALL_TIMEOUT) {
-        throw new MotorStallException(String.format("Angle motor on swerve module '%d' has stalled.", mModuleNumber));
-      }
-    } else {
-      mStallTimeBegin = Long.MAX_VALUE;
-    }
-    mLastError = currentError;
-
-    mTargetAngle = targetAngle;
-    return targetAngle;
+  public Rotation2d getTargetHeading() {
+    return m_desiredState.angle;
   }
-
 
   /**
    * Sets the desired state for the module.
@@ -211,24 +178,33 @@ public class SwerveModule extends SubsystemBase {
    * @param state Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState state) {
+    m_desiredState = SwerveModuleState.optimize(state, new Rotation2d(getTurningRadians()));
     SwerveModuleState outputState = SwerveModuleState.optimize(state, new Rotation2d(getTurningRadians()));
 
     // Calculate the drive output from the drive PID controller.
-    driveOutput = m_drivePIDController.calculate(
+    m_driveOutput = m_drivePIDController.calculate(
             getVelocity(), outputState.speedMetersPerSecond);
 
     double driveFeedforward = m_driveFeedforward.calculate(state.speedMetersPerSecond);
 
     // Calculate the turning motor output from the turning PID controller.
-    turnOutput = m_turningPIDController.calculate(getTurningRadians(), outputState.angle.getRadians());
+    m_turnOutput = m_turningPIDController.calculate(getTurningRadians(), outputState.angle.getRadians());
 
     double turnFeedforward =
             m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
 //    driveOutput=0;
 //    System.out.println("Turn PID Output: " + turnOutput);
-    mDriveMotor.set(ControlMode.PercentOutput,(driveOutput));
-    mTurningMotor.set(ControlMode.PercentOutput,(turnOutput));
+//    m_driveOutput = Math.signum(m_driveOutput) * Math.min(Math.abs(m_driveOutput), 0.1);
+//    m_turnOutput = Math.signum(m_turnOutput) * Math.min(Math.abs(m_turnOutput), 0.4);
+
+    System.out.println("Turn Setpoint " + mModuleNumber+ ": " +m_desiredState.angle.getDegrees());
+    System.out.println("Turn Position " + mModuleNumber+ ": " +getTurnAngle());
+    System.out.println("Turn Output " + mModuleNumber+ ": " +m_turnOutput);
+    mDriveMotor.set(ControlMode.PercentOutput,(m_driveOutput));
+    mTurningMotor.set(ControlMode.PercentOutput, m_turnOutput);
+
+    setSimulationInput(m_driveOutput, m_turnOutput);
   }
 
   public void setPercentOutput(double speed) {
