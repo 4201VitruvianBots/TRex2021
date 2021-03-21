@@ -22,8 +22,9 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.SetSwerveDrive;
 import frc.robot.commands.autoCommands.DriveStraight;
 import frc.robot.commands.indexer.FeedAll;
-import frc.robot.commands.intake.ControlledIntake;
-import frc.robot.commands.intake.ToggleIntakePistons;
+import frc.robot.commands.indexer.SetCaroselOutput;
+import frc.robot.commands.indexer.SetKickerOutput;
+import frc.robot.commands.intake.*;
 import frc.robot.subsystems.*;
 import frc.vitruvianlib.utils.JoystickWrapper;
 import frc.vitruvianlib.utils.XBoxTrigger;
@@ -138,9 +139,14 @@ public class RobotContainer {
       for (int i = 0; i < testButtons.length; i++)
         testButtons[i] = new JoystickButton(testController, (i + 1));
 
-      testButtons[1].whileHeld(new FeedAll(m_indexer, m_uptake));
-      testButtons[9].whenPressed(new ToggleIntakePistons(m_intake));
-      testButtons[6].whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
+      // Intake (PS4 X button)
+      testButtons[1].whenPressed(new SetIntakePiston(m_intake, true));
+      testButtons[1].whileHeld(new SetIntake(m_intake, 0.6));
+      testButtons[1].whileHeld(new SetCaroselOutput(m_indexer, 0.6));
+
+      // Deploy Retract Intake (PS4 Left Shoulder/Trigger)
+      testButtons[5].whenPressed(new SetIntakePiston(m_intake, true));
+      testButtons[7].whenPressed(new SetIntakePiston(m_intake, false));
     }
   }
 
