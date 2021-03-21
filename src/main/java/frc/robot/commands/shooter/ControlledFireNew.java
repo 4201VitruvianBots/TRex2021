@@ -60,10 +60,10 @@ public class ControlledFireNew extends CommandBase {
         if(timestamp != 0)
             if(timerStart && Timer.getFPGATimestamp() - timestamp > 0.5) {
                 m_indexer.setIndexerOutput(1);
-                m_indexer.setKickerOutput(1);
+//                m_indexer.setKickerOutput(1);
             } else {
                 m_indexer.setIndexerOutput(0);
-                m_indexer.setKickerOutput(0);
+//                m_indexer.setKickerOutput(0);
             }
 
         if (timerStart && (lastRPM - m_shooter.getRPM(0)) > significantRPMDrop) {
@@ -78,7 +78,7 @@ public class ControlledFireNew extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         m_indexer.setIndexerOutput(0);
-        m_indexer.setKickerOutput(0);
+//        m_indexer.setKickerOutput(0);
         m_shooter.setPower(0);
     }
 

@@ -66,6 +66,11 @@ public final class Constants {
         public static final double kvVoltSecondsPerMeter = 2.3;
         public static final double kaVoltSecondsSquaredPerMeter = 0.0917;
 
+        public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(14);
+
+        public static final double kvVoltSecondsPerRadian = 3.41; // originally 1.5
+        public static final double kaVoltSecondsSquaredPerRadian = 0.111; // originally 0.3
+
         public static final LinearSystem<N2, N2, N2> kDrivetrainPlant =
                 LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
                         kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
@@ -140,4 +145,12 @@ public final class Constants {
 
     // Undetermined IDs
     public static final int carouselMotor = 4201;
+
+    public static final int xEncoderPortA = 0;
+    public static final int xEncoderPortB = 1;
+    public static final int yEncoderPortA = 2;
+    public static final int yEncoderPortB = 3;
+    public static final int rotationEncoderPortA = 4;
+    public static final int rotationEncoderPortB = 5;
+
 }

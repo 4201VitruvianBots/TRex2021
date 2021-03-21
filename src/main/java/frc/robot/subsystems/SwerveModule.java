@@ -14,8 +14,10 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Units;
@@ -230,11 +232,19 @@ public class SwerveModule extends SubsystemBase {
 
     System.out.println("Turn Setpoint " + mModuleNumber+ ": " +m_desiredState.angle.getDegrees());
     System.out.println("Turn Position " + mModuleNumber+ ": " +getTurnAngle());
-    System.out.println("Turn Output " + mModuleNumber+ ": " +m_turnOutput);
+    System.out.println("Turn Output " + mModuleNumber+ ": " + m_turnOutput);
     mDriveMotor.set(ControlMode.PercentOutput,(m_driveOutput));
     mTurningMotor.set(ControlMode.PercentOutput, m_turnOutput);
 
-    setSimulationInput(m_driveOutput, m_turnOutput);
+//    setSimulationInput(m_driveOutput, m_turnOutput);
+  }
+
+  public double getDriveOutput() {
+    return m_driveOutput;
+  }
+
+  public double getTurnOutput() {
+    return m_turnOutput;
   }
 
   public void setPercentOutput(double speed) {
@@ -256,7 +266,7 @@ public class SwerveModule extends SubsystemBase {
 
 
   private void updateSmartDashboard() {
-    SmartDashboardTab.putNumber("SwerveDrive","Turning PID " + mModuleNumber, turnOutput);
+//    SmartDashboardTab.putNumber("SwerveDrive","Turning PID " + mModuleNumber, turnOutput);
   }
 
   @Override

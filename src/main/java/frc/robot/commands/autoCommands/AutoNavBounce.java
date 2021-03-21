@@ -68,8 +68,8 @@ public class AutoNavBounce extends SequentialCommandGroup {
                         swerveDrive::getPose,
                         Constants.DriveConstants.kDriveKinematics,
                         //Position controllers
-                        new PIDController(Constants.AutoConstants.kPXController, Constants.AutoConstants.kIXController, Constants.AutoConstants.kDXController),
-                        new PIDController(Constants.AutoConstants.kPYController, Constants.AutoConstants.kIYController, Constants.AutoConstants.kDYController),
+                        new PIDController(Constants.AutoConstants.kPXController, 0,0),
+                        new PIDController(Constants.AutoConstants.kPYController, 0,0),
                         new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
                         Constants.AutoConstants.kThetaControllerConstraints),
 

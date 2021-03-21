@@ -10,9 +10,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.*;
@@ -21,6 +19,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.simulation.SimulateSwerveDrive;
 
 public class SwerveDrive extends SubsystemBase {
 
@@ -34,6 +33,8 @@ public class SwerveDrive extends SubsystemBase {
     private int navXDebug = 0;
 
     private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(Constants.DriveConstants.kDriveKinematics, getRotation());
+
+    private SimulateSwerveDrive simulateSwerveDrive;
 
     PowerDistributionPanel m_pdp;
 
@@ -196,9 +197,10 @@ public class SwerveDrive extends SubsystemBase {
         mSwerveModules[3].setDesiredState(swerveModuleStates[3]);
     }
 
-    public void testModule(double throttle, double turn, int...modulesNumbers) {
-        for(int i =0; i < modulesNumbers.length; i++)
-            mSwerveModules[modulesNumbers[i]].setTestOutputs(throttle, turn);
+    public void setSwerveDriveNeutralMode(boolean mode) {
+        for(int i = 0; i < mSwerveModules.length; i++) {
+            mSwerveModules[i].setBrakeMode(mode);
+        }
     }
 
     /**
@@ -348,10 +350,10 @@ public class SwerveDrive extends SubsystemBase {
         simulateSwerveDrive.setFieldRelative(isFieldOriented);
 //        simulateSwerveDrive.setInputState(simulationSwerveModuleStates);
         simulateSwerveDrive.update(0.02);
-        for (int i = 0; i < 4; i++) {
-            mSwerveModules[i].setTurnEncoderSimAngle(simulationSwerveModuleStates[i].angle.getDegrees());
-            mSwerveModules[i].setTurnEncoderSimRate(simulationSwerveModuleStates[i].speedMetersPerSecond);
-        }
+//        for (int i = 0; i < 4; i++) {
+//            mSwerveModules[i].setTurnEncoderSimAngle(simulationSwerveModuleStates[i].angle.getDegrees());
+//            mSwerveModules[i].setTurnEncoderSimRate(simulationSwerveModuleStates[i].speedMetersPerSecond);
+//        }
     }
 
     private void sampleTrajectory() {
@@ -373,4 +375,6 @@ public class SwerveDrive extends SubsystemBase {
     public void setCurrentTrajectory(Trajectory trajectory) {
         currentTrajectory = trajectory;
     }
+
+
 }

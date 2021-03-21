@@ -21,6 +21,7 @@ import frc.robot.commands.autoCommands.*;
 import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.intake.ControlledIntake;
 import frc.robot.commands.intake.ToggleIntakePistons;
+import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.*;
 import frc.vitruvianlib.utils.JoystickWrapper;
 import frc.vitruvianlib.utils.XBoxTrigger;
@@ -48,6 +49,7 @@ public class RobotContainer {
   private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
   private final Shooter m_shooter = new Shooter(m_vision, pdp);
 
+  private FieldSim m_FieldSim;
 
   private enum CommandSelector {
     DRIVE_STRAIGHT
@@ -106,6 +108,8 @@ public class RobotContainer {
   }
 
   public void initializeSubsystems() {
+    m_FieldSim = new FieldSim(m_swerveDrive, m_turret, m_shooter);
+
 //    m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
 //            () -> leftJoystick.getRawAxis(0), //left x
 //            () -> leftJoystick.getRawAxis(1), //left y
