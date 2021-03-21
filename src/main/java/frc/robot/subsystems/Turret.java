@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.simulation.SimConstants;
 
 /*
 Subsystem for controlling the turret
@@ -234,5 +235,31 @@ public class Turret extends SubsystemBase {
                 initialHome = true;
 
 //        updateSmartdashboard();
+    }
+
+    public double getTurretSimAngle(){
+        return getTurretAngle() + 180;
+    }
+
+    public Pose2d getTurretSimPose() {
+        return new Pose2d(m_swerveDrive.getPose().getX(),
+                m_swerveDrive.getPose().getY(),
+                new Rotation2d(Math.toRadians(getTurretSimAngle())));
+    }
+
+
+    @Override
+    public void simulationPeriodic() {
+    }
+
+    public double getIdealTargetDistance() {
+        return Math.sqrt(Math.pow(SimConstants.blueGoalPose.getY() - getTurretSimPose().getY(), 2) + Math.pow(SimConstants.blueGoalPose.getX() - getTurretSimPose().getX(), 2));
+    }
+
+    public double getIdealTurretAngle() {
+
+        double targetRadians = Math.atan2(SimConstants.blueGoalPose.getY() - getTurretSimPose().getY(), SimConstants.blueGoalPose.getX() - getTurretSimPose().getX());
+
+        return Math.toDegrees(targetRadians);
     }
 }

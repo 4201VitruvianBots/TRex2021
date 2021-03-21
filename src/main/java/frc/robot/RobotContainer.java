@@ -7,10 +7,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.SetSwerveDrive;
-import frc.robot.commands.autoCommands.DriveStraight;
+import frc.robot.commands.autoCommands.*;
 import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.intake.ControlledIntake;
 import frc.robot.commands.intake.ToggleIntakePistons;
@@ -71,6 +68,8 @@ public class RobotContainer {
   public Button[] xBoxPOVButtons = new Button[8];
   public Button xBoxLeftTrigger, xBoxRightTrigger;
 
+  private static boolean init = false;
+
 
 
   /**
@@ -96,6 +95,14 @@ public class RobotContainer {
     initializeSubsystems();
     // Configure the button bindings
     configureButtonBindings();
+  }
+
+  public static boolean getInitializationState() {
+    return init;
+  }
+
+  public static void setInitializationState(boolean state) {
+    init = state;
   }
 
   public void initializeSubsystems() {
@@ -163,10 +170,60 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
 //    return m_autoCommand;
-        return new WaitCommand(0);
+        //return new WaitCommand(0);
+    return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
+//    return new DriveForwardDistance(m_swerveDrive, m_FieldSim, 5);
+  }
+
+  public void disabledInit() {
+    setInitializationState(true);
+    m_swerveDrive.setSwerveDriveNeutralMode(true);
+  }
+
+  public void robotPeriodic() {
+
+  }
+
+  public void teleOpInit() {
+    if(RobotBase.isReal()) {
+      m_swerveDrive.resetEncoders();
+      m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
+      m_swerveDrive.setSwerveDriveNeutralMode(false);
+    } else {
+      m_swerveDrive.resetEncoders();
+      m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
+    }
+  }
+
+  public void teleOpPeriodic() {
+
+  }
+
+  public void autonomousInit() {
+    if (RobotBase.isReal()) {
+      m_swerveDrive.resetEncoders();
+      m_swerveDrive.resetOdometry(m_swerveDrive.getPose(), m_FieldSim.getRobotPose().getRotation());
+    } else {
+      m_FieldSim.initSim();
+      m_swerveDrive.resetEncoders();
+      m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
+    }
+  }
+
+  public void autonomousPeriodic() {
   }
 
   public void initializeLogTopics() {
-//    m_controls.initLogging();
+    //m_controls.initLogging();
+  }
+
+  public void simulationInit() {
+    m_FieldSim.initSim();
+    //m_driveTrain.setSimPose(new Pose2d(5,5, new Rotation2d()));
+  }
+
+  public void simulationPeriodic() {
+    if(!RobotState.isTest())
+      m_FieldSim.simulationPeriodic();
   }
 }

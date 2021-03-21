@@ -9,7 +9,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.system.LinearSystem;
+import edu.wpi.first.wpilibj.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.util.Units;
+import edu.wpi.first.wpiutil.math.numbers.N2;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -36,7 +41,7 @@ public final class Constants {
     public static final int backRightTurningMotor = 27;
 
     public static final class DriveConstants {
-        public static final double kTrackWidth = 0.5;
+        public static final double kTrackWidth = Units.inchesToMeters(30);
         //Distance between centers of right and left wheels on robot. Meters?
         public static final double kWheelBase = 0.5;
         //Distance between front and back wheels on robot. Meters?
@@ -50,6 +55,8 @@ public final class Constants {
 
         public static final boolean kGyroReversed = false;
 
+        public static final DCMotor kDriveGearbox = DCMotor.getFalcon500(2);
+
         // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
         // These characterization values MUST be determined either experimentally or theoretically
         // for *your* robot's drive.
@@ -59,7 +66,9 @@ public final class Constants {
         public static final double kvVoltSecondsPerMeter = 2.3;
         public static final double kaVoltSecondsSquaredPerMeter = 0.0917;
 
-        public static final double kMaxSpeedMetersPerSecond = 3;
+        public static final LinearSystem<N2, N2, N2> kDrivetrainPlant =
+                LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
+                        kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
     }
 
     public static final class ModuleConstants {
@@ -97,8 +106,8 @@ public final class Constants {
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
         public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-        public static final double kPXController = 1;
-        public static final double kPYController = 1;
+        public static final double kPXController = 12;
+        public static final double kPYController = 12;
         public static final double kPThetaController = 1;
 
         //Constraint for the motion profilied robot angle controller

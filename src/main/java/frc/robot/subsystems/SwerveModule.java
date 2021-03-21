@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -39,7 +40,6 @@ public class SwerveModule extends SubsystemBase {
 
   int kCruiseVelocity = 14000;
   int kMotionAcceleration = kCruiseVelocity * 10;
-
 
   private double kS = 0.19;
   private double kV = 2.23;
@@ -111,6 +111,22 @@ public class SwerveModule extends SubsystemBase {
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
+    switch(moduleNumber) {
+      case 3:
+        simulationTurnEncoder = new Encoder(15,14);
+        break;
+      case 2:
+        simulationTurnEncoder = new Encoder(13,12);
+        break;
+      case 1:
+        simulationTurnEncoder = new Encoder(11,10);
+        break;
+      case 0:
+        simulationTurnEncoder = new Encoder(9,8);
+        break;
+    }
+    simulationTurnEncoder.setDistancePerPulse(1);
+    simulationTurnEncoderSim = new EncoderSim(simulationTurnEncoder);
   }
 
   /**
@@ -121,7 +137,21 @@ public class SwerveModule extends SubsystemBase {
     mDriveMotor.setSelectedSensorPosition(0);
   }
 
+  public Rotation2d getHeading() {
+    return new Rotation2d(getTurningRadians());
+  }
 
+  public EncoderSim getEncoderSim() {
+    return simulationTurnEncoderSim;
+  }
+
+  public void setTurnEncoderSimAngle(double angle) {
+    simulationTurnEncoderSim.setDistance(angle);
+  }
+
+  public void setTurnEncoderSimRate(double rate) {
+    simulationTurnEncoderSim.setRate(rate);
+  }
   /**
    * Returns the current angle of the module.
    *
@@ -209,6 +239,11 @@ public class SwerveModule extends SubsystemBase {
 
   public void setPercentOutput(double speed) {
     mDriveMotor.set(ControlMode.PercentOutput, speed);
+  }
+
+  public void setBrakeMode(boolean mode) { // True is brake, false is coast
+    mDriveMotor.setNeutralMode(mode ? NeutralMode.Brake : NeutralMode.Coast);
+    mTurningMotor.setNeutralMode(NeutralMode.Brake);
   }
 
   public TalonFX getTurningMotor() {

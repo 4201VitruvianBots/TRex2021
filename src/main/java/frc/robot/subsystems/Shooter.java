@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.util.Units;
 import frc.robot.Constants;
 
 /*
@@ -148,6 +149,16 @@ public class Shooter extends SubsystemBase {
 
     public double RPMtoFalconUnits(double RPM) {
         return (RPM / 600.0) * 2048.0 / gearRatio;
+    }
+
+    private void calculateIdealRPM() {
+        double targetDistance = Units.feetToMeters(m_vision.getTargetDistance());
+        double shootSpeed = targetDistance * Math.sqrt(0.5 * Constants.g / (targetDistance * Math.tan(Constants.verticalShooterAngle) - Constants.verticalTargetDistance)) / Math.cos(Constants.verticalShooterAngle);
+        idealRPM = shootSpeed * metersPerSecondToRPM;
+    }
+
+    public void setIdealRPM() {
+        setpoint = idealRPM;
     }
 
     // Smart Dashboard settings
