@@ -43,7 +43,7 @@ public final class Constants {
     public static final class DriveConstants {
         public static final double kTrackWidth = Units.inchesToMeters(30);
         //Distance between centers of right and left wheels on robot. Meters?
-        public static final double kWheelBase = 0.5;
+        public static final double kWheelBase = Units.inchesToMeters(30);
         //Distance between front and back wheels on robot. Meters?
 
         public static final SwerveDriveKinematics kDriveKinematics =
@@ -98,6 +98,17 @@ public final class Constants {
 
         // This is the diameter of the wheel module itself (Not the wheel, the rotation gear)
         public static final double kWheelModuleDiameter = 0.1;
+
+
+        public static final double kvVoltSecondsPerMeter = 1.47;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.0348;
+
+        public static final double kvVoltSecondsPerRadian = 1.47; // originally 1.5
+        public static final double kaVoltSecondsSquaredPerRadian = 0.0348; // originally 0.3
+
+        public static final LinearSystem<N2, N2, N2> kModulePlant =
+                LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
+                        kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
     }
 
     public static final class OIConstants {
@@ -111,8 +122,8 @@ public final class Constants {
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
         public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-        public static final double kPXController = 12;
-        public static final double kPYController = 12;
+        public static final double kPXController = 1;
+        public static final double kPYController = 1;
         public static final double kPThetaController = 1;
 
         //Constraint for the motion profilied robot angle controller

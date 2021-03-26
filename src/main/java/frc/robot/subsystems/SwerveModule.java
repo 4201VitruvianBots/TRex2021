@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -72,11 +73,12 @@ public class SwerveModule extends SubsystemBase {
   private EncoderSim simulationTurnEncoderSim;
 
   private SwerveModuleState swerveModuleState = new SwerveModuleState(0, new Rotation2d());
-  private SwerveModuleState simulatedSwerveInput = new SwerveModuleState(0, new Rotation2d());
+  private SwerveModuleState simulatedSwerveState = new SwerveModuleState(0, new Rotation2d());
 
   private double timestamp, lastTimestamp;
 
   private SwerveModuleState m_desiredState = new SwerveModuleState();
+  private SwerveModuleState m_rawDesiredState = new SwerveModuleState();
 
   public SwerveModule(int moduleNumber, TalonFX TurningMotor, TalonFX driveMotor, double zeroOffset, boolean invertTurn, boolean invertThrottle) {
     mModuleNumber = moduleNumber;
@@ -129,6 +131,8 @@ public class SwerveModule extends SubsystemBase {
     }
     simulationTurnEncoder.setDistancePerPulse(1);
     simulationTurnEncoderSim = new EncoderSim(simulationTurnEncoder);
+
+    simulationTurnEncoderSim = new EncoderSim(simulationTurnEncoder);
   }
 
   /**
@@ -160,7 +164,10 @@ public class SwerveModule extends SubsystemBase {
    * @return The current angle of the module in radians.
    */
   public double getTurningRadians() {
-    return mTurningMotor.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
+    if(RobotBase.isReal())
+      return mTurningMotor.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
+    else
+      return simulatedSwerveState.angle.getRadians();
   }
 
   public double getTurnAngle() {
@@ -174,7 +181,10 @@ public class SwerveModule extends SubsystemBase {
    * @return The current velocity of the module.
    */
   public double getVelocity() {
-    return mDriveMotor.getSelectedSensorVelocity() * Constants.ModuleConstants.kDriveEncoderDistancePerPulse * 10;
+    if(RobotBase.isReal())
+      return mDriveMotor.getSelectedSensorVelocity() * Constants.ModuleConstants.kDriveEncoderDistancePerPulse * 10;
+    else
+      return simulatedSwerveState.speedMetersPerSecond;
   }
 
   /**
@@ -183,9 +193,15 @@ public class SwerveModule extends SubsystemBase {
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
-    return new SwerveModuleState(getVelocity(), new Rotation2d(getTurningRadians()));
+    if(RobotBase.isReal())
+      return new SwerveModuleState(getVelocity(), new Rotation2d(getTurningRadians()));
+    else
+      return simulatedSwerveState;
   }
 
+  public void setSimulatedState(SwerveModuleState state) {
+    simulatedSwerveState = state;
+  }
 
   /**
    * The last angle setpoint of the module.
@@ -210,7 +226,7 @@ public class SwerveModule extends SubsystemBase {
    * @param state Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState state) {
-    m_desiredState = SwerveModuleState.optimize(state, new Rotation2d(getTurningRadians()));
+    m_rawDesiredState = state;
     SwerveModuleState outputState = SwerveModuleState.optimize(state, new Rotation2d(getTurningRadians()));
 
     // Calculate the drive output from the drive PID controller.
@@ -231,9 +247,9 @@ public class SwerveModule extends SubsystemBase {
 //    m_turnOutput = Math.signum(m_turnOutput) * Math.min(Math.abs(m_turnOutput), 0.4);
 
     System.out.println("Turn Setpoint " + mModuleNumber+ ": " +m_desiredState.angle.getDegrees());
-    System.out.println("Turn Position " + mModuleNumber+ ": " +getTurnAngle());
+    System.out.println("Turn Position " + mModuleNumber+ ": " + getTurnAngle());
     System.out.println("Turn Output " + mModuleNumber+ ": " + m_turnOutput);
-    mDriveMotor.set(ControlMode.PercentOutput,(m_driveOutput));
+    mDriveMotor.set(ControlMode.PercentOutput, m_driveOutput);
     mTurningMotor.set(ControlMode.PercentOutput, m_turnOutput);
 
 //    setSimulationInput(m_driveOutput, m_turnOutput);
@@ -245,6 +261,10 @@ public class SwerveModule extends SubsystemBase {
 
   public double getTurnOutput() {
     return m_turnOutput;
+  }
+
+  public SwerveModuleState getRawDesiredState() {
+    return m_rawDesiredState;
   }
 
   public void setPercentOutput(double speed) {

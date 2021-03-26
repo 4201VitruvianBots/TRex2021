@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.simulation.SimulateSwerveDrive;
+import frc.robot.simulation.SwerveModuleSim;
 
 public class SwerveDrive extends SubsystemBase {
 
@@ -35,6 +36,7 @@ public class SwerveDrive extends SubsystemBase {
     private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(Constants.DriveConstants.kDriveKinematics, getRotation());
 
     private SimulateSwerveDrive simulateSwerveDrive;
+    private SwerveModuleSim swerveModuleSim;
 
     PowerDistributionPanel m_pdp;
 
@@ -70,16 +72,17 @@ public class SwerveDrive extends SubsystemBase {
 
         SmartDashboardTab.putData("SwerveDrive","swerveDriveSubsystem", this);
         if (RobotBase.isSimulation()) {
-            simulateSwerveDrive = new SimulateSwerveDrive(
-                    Constants.DriveConstants.kDrivetrainPlant,
-                    Constants.DriveConstants.kDriveGearbox,
-                    Constants.ModuleConstants.kDriveMotorGearRatio,
-                    Constants.DriveConstants.kTrackWidth,
-                    Constants.DriveConstants.kWheelBase,
-                    Constants.ModuleConstants.kWheelDiameterMeters / 2.0,
-                    null
-            );
-            simulateSwerveDrive.setSwerveModules(mSwerveModules);
+            swerveModuleSim = new SwerveModuleSim(Constants.DriveConstants.kDriveKinematics, mSwerveModules);
+//            simulateSwerveDrive = new SimulateSwerveDrive(
+//                    Constants.DriveConstants.kDrivetrainPlant,
+//                    Constants.DriveConstants.kDriveGearbox,
+//                    Constants.ModuleConstants.kDriveMotorGearRatio,
+//                    Constants.DriveConstants.kTrackWidth,
+//                    Constants.DriveConstants.kWheelBase,
+//                    Constants.ModuleConstants.kWheelDiameterMeters / 2.0,
+//                    null
+//            );
+//            simulateSwerveDrive.setSwerveModules(mSwerveModules);
         }
     }
 
@@ -293,13 +296,32 @@ public class SwerveDrive extends SubsystemBase {
      * Updates the field relative position of the robot.
      */
     public void updateOdometry() {
-        m_odometry.update(
-                getRotation(),
-                mSwerveModules[0].getState(),
-                mSwerveModules[1].getState(),
-                mSwerveModules[2].getState(),
-                mSwerveModules[3].getState()
-        );
+            for(int i = 0; i < mSwerveModules.length; i++)
+                System.out.println(mSwerveModules[i].getState());
+//        if(RobotBase.isReal()) {
+            m_odometry.update(
+                    getRotation(),
+                    mSwerveModules[0].getState(),
+                    mSwerveModules[1].getState(),
+                    mSwerveModules[2].getState(),
+                    mSwerveModules[3].getState()
+            );
+//        } else {
+//            double xSpeed = simulateSwerveDrive.getXVelocityMeters();
+//            double ySpeed = simulateSwerveDrive.getYVelocityMeters();
+//            double rotSpeed = simulateSwerveDrive.getRotationVelocityMeters();
+//            var swerveModuleStates = Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(
+//                    true ? ChassisSpeeds.fromFieldRelativeSpeeds(
+//                            xSpeed, ySpeed, rotSpeed, getRotation())
+//                            : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed));
+//            m_odometry.update(
+//                    getRotation(),
+//                    swerveModuleStates[0],
+//                    swerveModuleStates[1],
+//                    swerveModuleStates[2],
+//                    swerveModuleStates[3]
+//            );
+//        }
     }
 
     private void updateSmartDashboard() {
@@ -347,9 +369,10 @@ public class SwerveDrive extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        simulateSwerveDrive.setFieldRelative(isFieldOriented);
+        swerveModuleSim.update(0.02);
+//        simulateSwerveDrive.setFieldRelative(isFieldOriented);
 //        simulateSwerveDrive.setInputState(simulationSwerveModuleStates);
-        simulateSwerveDrive.update(0.02);
+//        simulateSwerveDrive.update(0.02);
 //        for (int i = 0; i < 4; i++) {
 //            mSwerveModules[i].setTurnEncoderSimAngle(simulationSwerveModuleStates[i].angle.getDegrees());
 //            mSwerveModules[i].setTurnEncoderSimRate(simulationSwerveModuleStates[i].speedMetersPerSecond);

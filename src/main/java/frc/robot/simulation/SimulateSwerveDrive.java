@@ -237,8 +237,11 @@ public class SimulateSwerveDrive {
     System.out.println("y volts: " + yInputVoltage);
     System.out.println("r volts: " + rotInputVoltage);
 
+    xSim.setInputs(xInputVoltage, xInputVoltage);
     xSim.update(dtSeconds);
 //    xSim.setPose(new Pose2d(xDistance, yDistance, new Rotation2d(Math.PI / 2)));
+    System.out.println("X L: " + xSim.getLeftPositionMeters());
+    System.out.println("X R: " + xSim.getRightPositionMeters());
     xDistance = (xSim.getLeftPositionMeters() + xSim.getRightPositionMeters()) / 2;
     xVel = (xSim.getLeftVelocityMetersPerSecond() + xSim.getRightVelocityMetersPerSecond()) / 2;
 
@@ -509,7 +512,7 @@ public class SimulateSwerveDrive {
       yInputVoltage /= voltageMagnitude;
     }
 
-    setInputs(xInputVoltage, yInputVoltage, rotInputVoltage);
+//    setInputs(xInputVoltage, yInputVoltage, rotInputVoltage);
 
     m_lastTimestamp = timestamp;
     m_lastChassisSpeed = inputChassisSpeeds;
