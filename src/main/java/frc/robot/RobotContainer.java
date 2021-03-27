@@ -182,6 +182,7 @@ public class RobotContainer {
   public void disabledInit() {
     setInitializationState(true);
     m_swerveDrive.setSwerveDriveNeutralMode(true);
+    m_FieldSim.disabledInit();
   }
 
   public void robotPeriodic() {

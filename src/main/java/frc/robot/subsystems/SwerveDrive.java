@@ -22,6 +22,8 @@ import frc.robot.RobotContainer;
 import frc.robot.simulation.SimulateSwerveDrive;
 import frc.robot.simulation.SwerveModuleSim;
 
+import java.util.Arrays;
+
 public class SwerveDrive extends SubsystemBase {
 
     public static final double kMaxSpeed = 3.0; // 3 meters per second
@@ -65,6 +67,7 @@ public class SwerveDrive extends SubsystemBase {
 
     public void resetOdometry(Pose2d pose, Rotation2d rotation) {
         m_odometry.resetPosition(pose, rotation);
+        swerveModuleSim.setPosesFromChassis(pose);
     }
 
     public SwerveDrive(PowerDistributionPanel pdp) {
@@ -234,63 +237,17 @@ public class SwerveDrive extends SubsystemBase {
     public DifferentialDriveWheelSpeeds getSpeeds() {
         return new DifferentialDriveWheelSpeeds(mSwerveModules[0].getVelocity(), mSwerveModules[1].getVelocity());
     }
+    public void setSimPoses(Pose2d robotPose, Rotation2d[] headings){
+        for(int i = 0; i < mSwerveModules.length; i++) {
+            mSwerveModules[i].setSimulatedState(new SwerveModuleState(0, headings[i]));
+        }
 
-//  public void holonomicDrive(double forward, double strafe, double rotationSpeed) {
-//    forward *= throttle; //because if they are both 1, then max output is sqrt(2), which is more than 1.
-//    strafe *= throttle;
-//    //todo: rotationSpeed += PIDOutput //this PID calculates the speed needed to turn to a setpoint based off of a button input. Probably from the D-PAD
-//    rotationSpeed *= turningThrottle; //I'll also have to check to make sure this isn't too high.
-//    if (isFieldOriented) { //checks to see if it's field oriented
-//      double angleRad = Math.toRadians(getRawGyroAngle());
-//      double temp = forward * Math.cos(angleRad) + strafe * Math.sin(angleRad); //calculates new forward
-//      strafe = -forward * Math.sin(angleRad) + strafe * Math.cos(angleRad); //calculates new strafe
-//      forward = temp;
-//    }
-//
-//    double a = strafe - rotationSpeed * (WHEELBASE / 2); //calculations from document
-//    double b = strafe + rotationSpeed * (WHEELBASE / 2);
-//    double c = forward - rotationSpeed * (TRACKWIDTH / 2);
-//    double d = forward + rotationSpeed * (TRACKWIDTH / 2);
-//
-//    double[] angles = new double[]{ //calculates the angle needed for each module
-//            Math.atan2(b, c) * 180 / Math.PI,
-//            Math.atan2(b, d) * 180 / Math.PI,
-//            Math.atan2(a, d) * 180 / Math.PI,
-//            Math.atan2(a, c) * 180 / Math.PI
-//    };
-//
-//    double[] speeds = new double[]{ //calculates the speed needed for each module
-//            Math.sqrt(b * b + c * c),
-//            Math.sqrt(b * b + d * d),
-//            Math.sqrt(a * a + d * d),
-//            Math.sqrt(a * a + c * c)
-//    };
-//
-//    double max = speeds[0];
-//
-//    for (double speed : speeds) {
-//      if (speed > max) {
-//        max = speed; //looks for the max
-//      }
-//    }
-//
-//    if(max > 1) { //this makes sure that no speed is greater than 1.
-//      for (int i = 0; i < 4; i++){
-//        speeds[i] /= max; //if one is, scale them all down by the max.
-//      }
-//    }
-//
-//    for (int i = 0; i < 4; i++) {
-//      if (Math.abs(forward) > 0.05 ||
-//              Math.abs(strafe) > 0.05 ||
-//              Math.abs(rotationSpeed) > 0.05) {
-//        mSwerveModules[i].setTargetAngle(angles[i] + 180); //to get it within 0 to 360. It was in -180 to 180
-//      } else {
-//        mSwerveModules[i].setTargetAngle(mSwerveModules[i].getTargetAngle());
-//      }
-//      mSwerveModules[i].setPercentOutput(speeds[i]);
-//    }
-//  }
+        swerveModuleSim.setPosesFromChassis(robotPose, headings);
+    }
+
+    public Pose2d[] getSimPoses(){
+        return swerveModuleSim.getSimPoses();
+    }
 
     /**
      * Updates the field relative position of the robot.

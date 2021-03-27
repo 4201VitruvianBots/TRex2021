@@ -81,8 +81,8 @@ public final class Constants {
         public static final double kTurningMotorGearRatio = 12.8; //12 to 1
         public static final int kEncoderCPR = 2048;
         public static final double kWheelDiameterMeters = 0.10; //10.16 cm
-        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 4*2 * Math.PI/kTurningMotorGearRatio;
-        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 4*2 * Math.PI/kTurningMotorGearRatio;
+        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 8*2 * Math.PI/kTurningMotorGearRatio;
+        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 8*2 * Math.PI/kTurningMotorGearRatio;
 
         public static final double kDriveEncoderDistancePerPulse =
                 (kWheelDiameterMeters * Math.PI) / ((double) kEncoderCPR*kDriveMotorGearRatio);
@@ -91,7 +91,7 @@ public final class Constants {
                 // Assumes the encoders are on a 1:1 reduction with the module shaft.
                 (2.0 * Math.PI) / (kEncoderCPR* kTurningMotorGearRatio);
 
-        public static final double kPModuleTurningController = 1;
+        public static final double kPModuleTurningController = 1.1;
 
 //        public static final double kPModuleDriveController = 1.57;
         public static final double kPModuleDriveController = 0.25;

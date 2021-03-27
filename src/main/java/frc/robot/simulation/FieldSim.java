@@ -7,12 +7,15 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.util.Units;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.Turret;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import static frc.robot.Constants.DriveConstants.kTrackWidth;
 import static frc.robot.Constants.DriveConstants.kWheelBase;
 
@@ -42,6 +45,10 @@ public class FieldSim {
             m_powercells[i] = new Powercell(String.format("PowerCell_" + String.format("%02d", i) ));
 
         m_field2d = new Field2d();
+    }
+
+    public Field2d getField2d() {
+        return m_field2d;
     }
 
     public void initSim() {
@@ -75,7 +82,7 @@ public class FieldSim {
         m_autoStartTime = Timer.getFPGATimestamp();
     }
 
-    private void updateIntakePoses() {
+    private void updateModulePoses() {
         /* Intake Points:
            ^: Front of the robot
               -------
@@ -98,30 +105,7 @@ public class FieldSim {
             Translation2d updatedPositions = ModuleLocations[i].rotateBy(robotPose.getRotation()).plus(robotPose.getTranslation());
             SwerveModulePose[i] = new Pose2d(updatedPositions,m_swerveDrive.getSwerveModule(i).getHeading());
         }
-
-       /* double robotX = robotPose.getX();
-        double robotY = robotPose.getY();
-        double cos = robotPose.getRotation().getCos();
-        double sin = robotPose.getRotation().getSin();
-
-        double deltaXa = (robotX - SimConstants.robotLength / 2.0 - SimConstants.intakeLength) - robotX;
-        double deltaXb = (robotX - SimConstants.robotLength / 2.0) - robotX;
-        double deltaYa = (robotY + SimConstants.robotWidth / 2.0 ) - robotY;
-        double deltaYb = (robotY - SimConstants.robotWidth / 2.0 ) - robotY;
-
-        intakePose[0] = new Pose2d(cos * deltaXa - sin * deltaYa + robotX,
-                sin * deltaXa + cos * deltaYa + robotY,
-                new Rotation2d());
-        intakePose[1] = new Pose2d(cos * deltaXa - sin * deltaYb + robotX,
-                sin * deltaXa + cos * deltaYb + robotY,
-                new Rotation2d());
-        intakePose[2] = new Pose2d(cos * deltaXb - sin * deltaYb + robotX,
-                sin * deltaXb + cos * deltaYb + robotY,
-                new Rotation2d());
-        intakePose[3] = new Pose2d(cos * deltaXb - sin * deltaYa + robotX,
-                sin * deltaXb + cos * deltaYa + robotY,
-                new Rotation2d());
-    */}
+    }
 
     private boolean isBallInIntakeZone(Pose2d ballPose){
         return false;
@@ -166,6 +150,9 @@ public class FieldSim {
     /*  Sometimes, the auto paths ran will eject the robot out of bounds. This will reset the robot state so you can
         re-run the auto without restarting the sim
      */
+    public void disabledInit() {
+        m_swerveDrive.setSimPoses(m_field2d.getRobotPose(), Arrays.stream(m_swerveDrive.getSimPoses()).map(Pose2d::getRotation).toArray(Rotation2d[]::new));
+    }
 
     public void simulationPeriodic() {
 //        var robotPose = m_field2d.getRobotPose();
@@ -179,17 +166,21 @@ public class FieldSim {
         m_field2d.getObject("Turret").setPose(new Pose2d(m_swerveDrive.getPose().getTranslation(),
                 new Rotation2d(Math.toRadians(getIdealTurretAngle()))));
 
-        updateIntakePoses();
+        updateModulePoses();
 
-        m_field2d.getObject("SwerveModulePositions FL").setPose(SwerveModulePose[0]);
-        m_field2d.getObject("SwerveModulePositions FR").setPose(SwerveModulePose[1]);
-        m_field2d.getObject("SwerveModulePositions BL").setPose(SwerveModulePose[2]);
-        m_field2d.getObject("SwerveModulePositions BR").setPose(SwerveModulePose[3]);
+        m_field2d.getObject("SwerveModulePositions").setPoses(Arrays.stream(SwerveModulePose)
+                                                                    .collect(Collectors.toList()));
+
+        m_field2d.getObject("SimSwerveModulePositions").setPoses(Arrays.stream(m_swerveDrive.getSimPoses())
+                                                                    .collect(Collectors.toList()));
 
         for(Powercell p:m_powercells) {
             updateBallState(p);
-            m_field2d.getObject(p.getName()).setPose(p.getBallPose());
         }
+
+
+        m_field2d.getObject("PowerCells").setPoses(Arrays.stream(m_powercells).map(Powercell::getBallPose)
+                                                                .collect(Collectors.toList()));
 
         SmartDashboard.putData("Field2d", m_field2d);
     }
