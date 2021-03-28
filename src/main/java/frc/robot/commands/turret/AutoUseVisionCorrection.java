@@ -13,7 +13,7 @@ import frc.robot.subsystems.Turret;
 import frc.robot.subsystems.Vision;
 
 /**
- * An example command that uses an example subsystem.
+ * Creating subsystems, timer, setpoint.
  */
 public class AutoUseVisionCorrection extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
@@ -24,22 +24,28 @@ public class AutoUseVisionCorrection extends CommandBase {
     private double startTime;
 
     /**
-     * Creates a new ExampleCommand.
+     * Creating commands
      */
     public AutoUseVisionCorrection(Turret turretSubsystem, Vision visionSubsystem) {
         m_turret = turretSubsystem;
         m_vision = visionSubsystem;
-        // Use addRequirements() here to declare subsystem dependencies.
+        /**
+         * adds specified requirements to the turret subsystem
+         */
         addRequirements(turretSubsystem);
     }
 
-    // Called when the command is initially scheduled.
+    /**
+     * starts a timer
+     */
     @Override
     public void initialize() {
         startTime = Timer.getFPGATimestamp();
     }
 
-    // Called every time the scheduler runs while the command is scheduled.
+    /**
+     * Called every time the scheduler runs while the command is scheduled.
+     */
     @Override
     public void execute() {
         if (m_turret.getControlMode() == 1) {
@@ -80,12 +86,16 @@ public class AutoUseVisionCorrection extends CommandBase {
         }
     }
 
-    // Called once the command ends or is interrupted.
+    /**
+     * called when the command ends or interrupted
+     */
     @Override
     public void end(boolean interrupted) {
     }
 
-    // Returns true when the command should end.
+    /**
+     * returns true when the command should end
+     */
     @Override
     public boolean isFinished() {
         return (Math.abs(m_vision.getTargetX()) <= 3);
