@@ -10,13 +10,15 @@ package frc.robot.commands.indexer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 
-/**
- * An example command that uses an example subsystem.
- */
+
 public class ManualSpin extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Indexer m_indexer;
 
+    /**
+    * turn on the indexer when manual indexing is required (i.e if the indexer is jammed).
+    *@param indexer determines the precentage at which the indexer motor runs at when manual indexing is needed (.6).
+    */
   public ManualSpin(Indexer indexer) {
     m_indexer = indexer;
     // Use addRequirements() here to declare subsystem dependencies.

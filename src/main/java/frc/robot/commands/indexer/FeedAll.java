@@ -12,9 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Uptake;
 
-/**
- * turn on the indexer and the uptake for a certain amount of time
- */
+
 public class FeedAll extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Indexer m_indexer;
@@ -24,6 +22,11 @@ public class FeedAll extends CommandBase {
 
     private double startTime;
 
+    /**
+    * turn on the indexer and the uptake for a certain amount of time.
+    *@param indexer determines the precentage at which the indexer motor runs at (.6).
+    *@param uptake determines the precentage at which the uptake motor runs at (1).
+    */
     public FeedAll(Indexer indexer, Uptake uptake) {
         this.m_indexer = indexer;
         this.m_uptake = uptake;

@@ -10,13 +10,15 @@ package frc.robot.commands.indexer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 
-/**
- * An example command that uses an example subsystem.
- */
+
 public class IntakeSpin extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Indexer m_indexer;
 
+    /**
+    * turn on the indexer when intaking powercells.
+    *@param indexer determines the precentage at which the indexer motor runs at while the robot is intaking powercells (.6).
+    */
   public IntakeSpin(Indexer indexer) {
     this.m_indexer = indexer;
     // Use addRequirements() here to declare subsystem dependencies.

@@ -10,19 +10,16 @@ package frc.robot.commands.climber;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber;
 
-/**
- * An example command that uses an example subsystem.
- */
+
 public class SetClimbMode extends CommandBase {
   //@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Climber m_climber;
   private boolean m_mode;
 
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
+  /** 
+    * This function determines if the climber is active or not.
+    * @param climber Activates or deactivates the climber.
+    */
   public SetClimbMode(Climber climber, boolean mode) {
     m_climber = climber;
     m_mode = mode;
