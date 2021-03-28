@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Turret;
 
 /**
- * An example command that uses an example subsystem.
+ * Creating the turret subsystem, and number modes.
  */
 public class SetTurretControlMode extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
@@ -19,39 +19,52 @@ public class SetTurretControlMode extends CommandBase {
     private final int m_mode;
 
     /**
-     * Creates a new ExampleCommand.
+     * Creating commands
      *
      * @param subsystem The subsystem used by this command.
      */
     public SetTurretControlMode(Turret subsystem, int mode) {
         m_turret = subsystem;
         m_mode = mode;
-        // Use addRequirements() here to declare subsystem dependencies.
+        /**
+         * adds specified requirements to the turret subsystem
+         */
         addRequirements(subsystem);
     }
 
-    // Called when the command is initially scheduled.
+    /**
+     * Called when the command is initially scheduled.
+     */
     @Override
     public void initialize() {
         m_turret.setControlMode(m_mode);
     }
 
-    // Called every time the scheduler runs while the command is scheduled.
+    /**
+     * Called every time the scheduler runs while the command is scheduled.
+     */
     @Override
     public void execute() {
     }
 
-    // Called once the command ends or is interrupted.
+    /**
+     * Called once the command ends or is interrupted.
+     */
     @Override
     public void end(boolean interrupted) {
     }
 
-    // Returns true when the command should end.
+    /**
+     * Returns true when the command should end.
+     */
     @Override
     public boolean isFinished() {
         return true;
     }
 
+    /**
+     * Returns true when the command is disabled
+     */
     @Override
     public boolean runsWhenDisabled() {
         return true;

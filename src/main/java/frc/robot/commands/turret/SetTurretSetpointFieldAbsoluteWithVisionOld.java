@@ -16,7 +16,7 @@ import frc.robot.subsystems.Vision;
 import java.util.function.DoubleSupplier;
 
 /**
- * An example command that uses an example subsystem.
+ * Creating subsystems, booleans, and values.
  */
 public class SetTurretSetpointFieldAbsoluteWithVisionOld extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
@@ -34,9 +34,7 @@ public class SetTurretSetpointFieldAbsoluteWithVisionOld extends CommandBase {
   boolean movedJoystick = false;
 
   /**
-   * Creates a new ExampleCommand.
-   *
-   *
+   * Creating commands
    */
   public SetTurretSetpointFieldAbsoluteWithVisionOld(Turret turretSubsystem, SwerveDrive swerveDriveSubsystem, Vision visionSybsystem, DoubleSupplier xInput, DoubleSupplier yInput) {
     m_turret = turretSubsystem;
@@ -44,18 +42,27 @@ public class SetTurretSetpointFieldAbsoluteWithVisionOld extends CommandBase {
     m_vision = visionSybsystem;
     m_xInput = xInput;
     m_yInput = yInput;
-    // Use addRequirements() here to declare subsystem dependencies.
+    /**
+    * adds specified requirements to the turret subsystem
+    */
     addRequirements(turretSubsystem);
-//    addRequirements(driveTrainSubsystem);
+    /**
+    * adds specified requirements to the vision subsystem
+    */
     addRequirements(visionSybsystem);
   }
   private boolean direction, directionTripped;
-  // Called when the command is initially scheduled.
+ 
+  /**
+   * Called when the command is initially scheduled.
+   */
   @Override
   public void initialize() {
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
+  /**
+   * Called every time the scheduler runs while the command is scheduled.
+   */
   @Override
   public void execute() {
     if(m_turret.getControlMode() == 1) {
@@ -128,12 +135,16 @@ public class SetTurretSetpointFieldAbsoluteWithVisionOld extends CommandBase {
     }
   }
 
-  // Called once the command ends or is interrupted.
+  /**
+   * Called once the command ends or is interrupted.
+   */
   @Override
   public void end(boolean interrupted) {
   }
 
-  // Returns true when the command should end.
+  /**
+   * Returns true when the command should end.
+   */
   @Override
   public boolean isFinished() {
     return false;
