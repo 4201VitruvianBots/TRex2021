@@ -12,9 +12,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Turret;
 import frc.robot.subsystems.Vision;
 
-/**
- * Creating subsystems, timer, setpoint.
- */
 public class AutoUseVisionCorrection extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Turret m_turret;
@@ -24,7 +21,7 @@ public class AutoUseVisionCorrection extends CommandBase {
     private double startTime;
 
     /**
-     * Creating commands
+     * Setting the angles for the Turret Subsystem and the Vision Subsystem
      */
     public AutoUseVisionCorrection(Turret turretSubsystem, Vision visionSubsystem) {
         m_turret = turretSubsystem;

@@ -12,16 +12,13 @@ import frc.robot.subsystems.Turret;
 
 import java.util.function.DoubleSupplier;
 
-/**
- * Creating the turret subsystem, and the x-axis value.
- */
 public class SetTurretManualOutput extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Turret m_turret;
     double xValue;
 
     /**
-     * Creating commands
+     * Setting the percent output of the Turret Subsystem and setting the xvalue by the x-input.
      *
      * @param subsystem The subsystem used by this command.
      */

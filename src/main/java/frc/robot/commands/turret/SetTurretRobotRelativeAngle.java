@@ -4,9 +4,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Turret;
 
-/**
- * Creating the turret subsystem, timer, and setpoint value.
- */
 public class SetTurretRobotRelativeAngle extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Turret m_turret;
@@ -14,7 +11,7 @@ public class SetTurretRobotRelativeAngle extends CommandBase {
     private double startTime;
 
     /**
-     * Creating commands.
+     * Setting the Turret Subsystem's angle by the Setpoint.
      *
      * @param subsystem The subsystem used by this command.
      */

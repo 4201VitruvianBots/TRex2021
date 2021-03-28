@@ -10,15 +10,12 @@ package frc.robot.commands.turret;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Turret;
 
-/**
- * Creating the turret subsystem.
- */
 public class ZeroTurretEncoder extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Turret m_turret;
 
     /**
-     * Creating commands.
+     * Setting the Turret Subsystem's encoders.
      *
      * @param subsystem The subsystem used by this command.
      */

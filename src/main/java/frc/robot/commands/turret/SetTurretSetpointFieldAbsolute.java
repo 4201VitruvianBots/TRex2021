@@ -12,9 +12,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.*;
 
-/**
- * Creating subsystems, joystick, and values.
- */
 public class SetTurretSetpointFieldAbsolute extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Turret m_turret;
@@ -29,7 +26,7 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
     boolean turning, usingVisionSetpoint;
 
     /**
-     * Creating commands.
+     * Setting the Turret Subsystem's setpoint on the field
      */
     public SetTurretSetpointFieldAbsolute(Turret turretSubsystem, SwerveDrive swerveDriveSubsystem, Vision visionSubsystem,
                                           Shooter shooter, Climber climber, Joystick controller) {

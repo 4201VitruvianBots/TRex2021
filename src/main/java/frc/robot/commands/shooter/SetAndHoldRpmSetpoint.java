@@ -11,32 +11,34 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Vision;
 
-/**
- * An example command that uses an example subsystem.
- */
 public class SetAndHoldRpmSetpoint extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Shooter m_shooter;
   private final Vision m_vision;
   private double m_RPM;
   /**
-   * Creates a new ExampleCommand.
-   *
+   * Sets the Shooter Subsystem's RPM.
    */
   public SetAndHoldRpmSetpoint(Shooter shooter, Vision vision, double RPM) {
-    // Use addRequirements() here to declare subsystem dependencies.
+    /**
+     * Use addRequirements() here to declare subsystem dependencies.
+     */
     m_shooter = shooter;
     m_RPM = RPM;
     m_vision = vision;
 //  addRequirements(shooter);
   }
 
-  // Called when the command is initially scheduled.
+  /**
+   * Called when the command is initially scheduled.
+   */
   @Override
   public void initialize() {
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
+  /**
+   * Called every time the scheduler runs while the command is scheduled.
+   */
   @Override
   public void execute() {
     m_vision.ledsOn();
@@ -44,12 +46,16 @@ public class SetAndHoldRpmSetpoint extends CommandBase {
     m_shooter.setRPM(m_RPM);
   }
 
-  // Called once the command ends or is interrupted.
+  /**
+   * Called once the command ends or is interrupted.
+   */
   @Override
   public void end(boolean interrupted) {
   }
 
-  // Returns true when the command should end.
+  /**
+   * Returns true when the command should end.
+   */
   @Override
   public boolean isFinished() {
     return true;

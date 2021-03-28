@@ -11,33 +11,36 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Vision;
 
-/**
- * An example command that uses an example subsystem.
- */
 public class DefaultFlywheelRPM extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Shooter m_shooter;
   private final Vision m_vision;
   private double time;
   private boolean printed = false;
+  
   /**
-   * Creates a new ExampleCommand.
-   *
+   * Sets the RPM for the Flywheel
    */
   public DefaultFlywheelRPM(Shooter shooter, Vision vision) {
-    // Use addRequirements() here to declare subsystem dependencies.
+    /**
+     * Use addRequirements() here to declare subsystem dependencies.
+     */
     m_shooter = shooter;
     m_vision = vision;
     addRequirements(shooter);
   }
 
-  // Called when the command is initially scheduled.
+  /**
+   * Called when the command is initially scheduled.
+   */
   @Override
   public void initialize() {
 
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
+  /**
+   * Called every time the scheduler runs while the command is scheduled.
+   */
   @Override
   public void execute() {
     if(m_vision.getValidTarget())
@@ -46,12 +49,16 @@ public class DefaultFlywheelRPM extends CommandBase {
       m_shooter.setRPM(0);
   }
 
-  // Called once the command ends or is interrupted.
+  /**
+   * Called once the command ends or is interrupted.
+   */
   @Override
   public void end(boolean interrupted) {
   }
 
-  // Returns true when the command should end.
+  /**
+   * Returns true when the command should end.
+   */
   @Override
   public boolean isFinished() {
     return (false);

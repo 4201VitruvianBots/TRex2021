@@ -14,9 +14,6 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Uptake;
 
-/**
- * An example command that uses an example subsystem.
- */
 public class TestShooter extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Shooter m_shooter;
@@ -27,23 +24,35 @@ public class TestShooter extends CommandBase {
   private boolean timerStart;
   private boolean printed = false;
 
-
+  /**
+   * Setting the power to the Shooter Subsystem.
+   * @param shooter setting the shooter's power
+   * @param indexer setting the indexer's power
+   * @param intake setting the intake's power
+   * @param uptake setting the uptake's power
+   */
   public TestShooter(Shooter shooter, Indexer indexer, Intake intake, Uptake uptake) {
-    // Use addRequirements() here to declare subsystem dependencies.
     m_shooter = shooter;
     m_indexer = indexer;
     m_intake = intake;
     m_uptake = uptake;
+    /**
+     * Use addRequirements() here to declare subsystem dependencies.
+     */
     addRequirements(shooter);
     addRequirements(indexer);
   }
 
-  // Called when the command is initially scheduled.
+  /**
+   * Called when the command is initially scheduled.
+   */
   @Override
   public void initialize() {
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
+  /**
+   * Called every time the scheduler runs while the command is scheduled.
+   */
   @Override
   public void execute() {
     m_shooter.setTestRPM();
@@ -82,7 +91,9 @@ public class TestShooter extends CommandBase {
     }
   }
 
-  // Called once the command ends or is interrupted.
+  /**
+   * Called once the command ends or is interrupted.
+   */
   @Override
   public void end(boolean interrupted) {
     m_intake.setIntakePercentOutput(0);
@@ -91,7 +102,9 @@ public class TestShooter extends CommandBase {
     m_shooter.setPower(0);
   }
 
-  // Returns true when the command should end.
+  /**
+   * Returns true when the command should end.
+   */
   @Override
   public boolean isFinished() {
     return (false);

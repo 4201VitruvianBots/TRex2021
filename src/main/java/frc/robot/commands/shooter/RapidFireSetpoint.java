@@ -13,9 +13,6 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
-/**
- * An example command that uses an example subsystem.
- */
 public class RapidFireSetpoint extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Shooter m_shooter;
@@ -25,12 +22,14 @@ public class RapidFireSetpoint extends CommandBase {
   private boolean timerStart;
 
   /**
-   * Creates a new ExampleCommand.
+   * Sets the power for the Shooter Subsystem
    *
    * @param RobotContainer.m_shooter The subsystem used by this command.
    */
   public RapidFireSetpoint(Shooter shooter, Indexer indexer, Intake intake) {
-    // Use addRequirements() here to declare subsystem dependencies.
+    /**
+     * Use addRequirements() here to declare subsystem dependencies.
+     */
     m_shooter = shooter;
     m_indexer = indexer;
     m_intake = intake;
@@ -39,13 +38,17 @@ public class RapidFireSetpoint extends CommandBase {
     addRequirements(intake);
   }
 
-  // Called when the command is initially scheduled.
+  /**
+   * Called when the command is initially scheduled.
+   */
   @Override
   public void initialize() {
     startTime = Timer.getFPGATimestamp();
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
+  /**
+   * Called every time the scheduler runs while the command is scheduled.
+   */
   @Override
   public void execute() {
 
@@ -55,7 +58,9 @@ public class RapidFireSetpoint extends CommandBase {
     }
   }
 
-  // Called once the command ends or is interrupted.
+  /**
+   * Called once the command ends or is interrupted.
+   */
   @Override
   public void end(boolean interrupted) {
     m_intake.setIntakePercentOutput(0);
@@ -63,7 +68,9 @@ public class RapidFireSetpoint extends CommandBase {
     m_shooter.setPower(0);
   }
 
-  // Returns true when the command should end.
+  /**
+   * Returns true when the command should end.
+   */
   @Override
   public boolean isFinished() {
     return (false);

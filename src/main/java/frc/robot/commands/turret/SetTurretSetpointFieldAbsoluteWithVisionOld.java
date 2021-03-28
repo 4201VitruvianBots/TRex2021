@@ -15,9 +15,6 @@ import frc.robot.subsystems.Vision;
 
 import java.util.function.DoubleSupplier;
 
-/**
- * Creating subsystems, booleans, and values.
- */
 public class SetTurretSetpointFieldAbsoluteWithVisionOld extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Turret m_turret;
@@ -34,7 +31,7 @@ public class SetTurretSetpointFieldAbsoluteWithVisionOld extends CommandBase {
   boolean movedJoystick = false;
 
   /**
-   * Creating commands
+   * Setting the Turret Subsystem's setpoint on the field
    */
   public SetTurretSetpointFieldAbsoluteWithVisionOld(Turret turretSubsystem, SwerveDrive swerveDriveSubsystem, Vision visionSybsystem, DoubleSupplier xInput, DoubleSupplier yInput) {
     m_turret = turretSubsystem;
