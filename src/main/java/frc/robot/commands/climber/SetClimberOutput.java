@@ -14,9 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber;
 
-/**
- * An example command that uses an example subsystem.
- */
+
 public class SetClimberOutput extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Climber m_climber;
@@ -26,11 +24,12 @@ public class SetClimberOutput extends CommandBase {
   private boolean movable, switchDirection;
   private double timestamp;
   private int direction;
-  /*
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
+  
+  /** 
+   * This function activates the climber motors and allows the joystick to control its height.
+   * @param climber activates the climber motors.
+   * @param controller determines if the climbing motors should retract or extend the climber.
+  */
   public SetClimberOutput(Climber climber, Joystick controller) {
     m_climber = climber;
     m_controller = controller;
@@ -85,7 +84,7 @@ public class SetClimberOutput extends CommandBase {
   }
 
   /**
-   * releases the climber
+   * releases the climber.
    */
   private void climberReleaseSequence() {
     SmartDashboardTab.putString("Climber", "SetClimberOutput", "Releasing");
@@ -106,7 +105,7 @@ public class SetClimberOutput extends CommandBase {
   }
 
   /**
-   * retracts the climber
+   * retracts the climber.
    */
   private void climberRetractSequence() {
     SmartDashboardTab.putString("Climber", "SetClimberOutput", "Retracting");

@@ -11,19 +11,16 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber;
 
-/**
- * An example command that uses an example subsystem.
- */
+
 public class ExtendClimber extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Climber m_climber;
   private double timestamp;
 
-  /*
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
+  /** 
+   * This function activates the climber piston and extends it.
+   * @param climber extends the climber piston.
+  */
   public ExtendClimber(Climber climber) {
     m_climber = climber;
     // Use addRequirements() here to declare subsystem dependencies.

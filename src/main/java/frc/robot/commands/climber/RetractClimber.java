@@ -10,18 +10,16 @@ package frc.robot.commands.climber;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber;
 
-/**
- * An example command that uses an example subsystem.
- */
+
 public class RetractClimber extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Climber m_climber;
 
-  /*
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
+
+    /** 
+    * This function activates the climber piston and retracts it.
+    * @param climber retracts the climber piston.
+    */
   public RetractClimber(Climber climber) {
     m_climber = climber;
     // Use addRequirements() here to declare subsystem dependencies.
