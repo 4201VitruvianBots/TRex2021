@@ -32,10 +32,10 @@ import static frc.robot.Constants.DriveConstants.kWheelBase;
 
 public class SwerveModuleSim {
     private Translation2d[] swervePositions = {
-            new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)
+        new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+        new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+        new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+        new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)
     };
 
     private SwerveDriveKinematics m_kinematics;
@@ -45,13 +45,26 @@ public class SwerveModuleSim {
     private FlywheelSim m_turnTest;
     private FlywheelSim[] m_testModules;
 
-    private double turnFudge = -.2;
-    private double outputFudge = 1.9;
+    private double turnFudge = 0.125;
+    private double outputFudge = 3.5;
     private double[] turnRadians = {0,0,0,0};
 
     public SwerveModuleSim(SwerveDriveKinematics kinematics, SwerveModule[] swerveModules){
         m_kinematics = kinematics;
         m_swerveModules = swerveModules;
+
+        double ksVolts = 0.587;
+        double kvVoltSecondsPerMeter = 2.3;
+        double kaVoltSecondsSquaredPerMeter = 0.0917;
+
+        double kMaxSpeedMetersPerSecond = Units.feetToMeters(14);
+
+        double kvVoltSecondsPerRadian = 6.41; // originally 1.5
+        double kaVoltSecondsSquaredPerRadian = 0.111; // originally 0.3
+
+        LinearSystem<N2, N2, N2> kSwerveModulePlant =
+                LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
+                        kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
 
         // TODO: Make this more general
         m_simulatedModules = new DifferentialDrivetrainSim[m_swerveModules.length];
@@ -78,21 +91,12 @@ public class SwerveModuleSim {
                     null
             );
         }
-        double kvVoltSecondsPerMeter = 1.47;
-        double kaVoltSecondsSquaredPerMeter = 0.0348;
-        var test = LinearSystemId.identifyVelocitySystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter);
-
-        m_turnTest = new FlywheelSim(
-                test,
-                DCMotor.getFalcon500(1),
-                Constants.ModuleConstants.kTurningMotorGearRatio,
-                null);
     }
 
     public void update(double dt) {
         for(int i = 0; i < m_swerveModules.length; i++) {
-            double leftInput = m_swerveModules[i].getDriveOutput() + (m_swerveModules[i].getTurnOutput() * turnFudge);
-            double rightInput = m_swerveModules[i].getDriveOutput() - (m_swerveModules[i].getTurnOutput() * turnFudge);
+            double leftInput = m_swerveModules[i].getDriveOutput() - (m_swerveModules[i].getTurnOutput() * turnFudge);
+            double rightInput = m_swerveModules[i].getDriveOutput() + (m_swerveModules[i].getTurnOutput() * turnFudge);
 
             // Normalize the wheel speeds
             double maxMagnitude = Math.max(Math.abs(leftInput), Math.abs(rightInput));
@@ -123,10 +127,8 @@ public class SwerveModuleSim {
 
 //            var updatedModuleState = new SwerveModuleState(moduleVelocity, m_simulatedModules[i].getHeading());
             var updatedModuleState = new SwerveModuleState(moduleVelocity, m_simulatedModules[i].getHeading());
-            System.out.println("H:" + m_simulatedModules[i].getHeading());
             m_swerveModules[i].setSimulatedState(updatedModuleState);
         }
-        System.out.println();
     }
 
     public Pose2d[] getSimPoses(){
@@ -159,5 +161,13 @@ public class SwerveModuleSim {
         for(int i = 0; i < m_simulatedModules.length; i++) {
             m_simulatedModules[i].setPose(m_simulatedModules[i].getPose());
         }
+    }
+
+    public Rotation2d getChassisHeading() {
+        double headingRadians = 0;
+        for(int i = 0; i < m_simulatedModules.length; i++) {
+            headingRadians += m_simulatedModules[i].getHeading().unaryMinus().getRadians();
+        }
+        return new Rotation2d(headingRadians / 4);
     }
 }

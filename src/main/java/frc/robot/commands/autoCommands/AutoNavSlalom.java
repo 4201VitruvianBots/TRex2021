@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConst
 import edu.wpi.first.wpilibj.trajectory.constraint.EllipticalRegionConstraint;
 import edu.wpi.first.wpilibj.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj.util.Units;
@@ -95,6 +96,6 @@ public class AutoNavSlalom extends SequentialCommandGroup {
         }
         fieldSim.getField2d().getObject("trajectory").setPoses(trajectoryStates);
 
-        addCommands(new WaitCommand(0).andThen(() -> swerveDrive.drive(0, 0, 0, false)));// Run path following command, then stop at the end.
+        addCommands(new InstantCommand(() -> swerveDrive.drive(0, 0, 0, false), swerveDrive));// Run path following command, then stop at the end.
     }
 }

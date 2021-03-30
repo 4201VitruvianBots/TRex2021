@@ -48,8 +48,6 @@ public class SwerveModule extends SubsystemBase {
   private double kV = 2.23;
   private double kA = 0.0289;
 
-  private double mLastError = 0, mLastTargetAngle = 0, mTargetAngle, mVelocity = 0;
-
   private static final long STALL_TIMEOUT = 2000;
   private long mStallTimeBegin = Long.MAX_VALUE;
 
@@ -208,14 +206,6 @@ public class SwerveModule extends SubsystemBase {
    *
    * @return The last angle setpoint of the module.
    */
-  public double getTargetAngle() {
-    return mLastTargetAngle;
-  }
-  /**
-   * The last angle setpoint of the module.
-   *
-   * @return The last angle setpoint of the module.
-   */
   public Rotation2d getTargetHeading() {
     return m_desiredState.angle;
   }
@@ -226,7 +216,7 @@ public class SwerveModule extends SubsystemBase {
    * @param state Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState state) {
-    m_rawDesiredState = state;
+    m_desiredState = state;
     SwerveModuleState outputState = SwerveModuleState.optimize(state, new Rotation2d(getTurningRadians()));
 
     // Calculate the drive output from the drive PID controller.
@@ -246,9 +236,6 @@ public class SwerveModule extends SubsystemBase {
 //    m_driveOutput = Math.signum(m_driveOutput) * Math.min(Math.abs(m_driveOutput), 0.1);
 //    m_turnOutput = Math.signum(m_turnOutput) * Math.min(Math.abs(m_turnOutput), 0.4);
 
-    System.out.println("Turn Setpoint " + mModuleNumber+ ": " +m_desiredState.angle.getDegrees());
-    System.out.println("Turn Position " + mModuleNumber+ ": " + getTurnAngle());
-    System.out.println("Turn Output " + mModuleNumber+ ": " + m_turnOutput);
     mDriveMotor.set(ControlMode.PercentOutput, m_driveOutput);
     mTurningMotor.set(ControlMode.PercentOutput, m_turnOutput);
 
