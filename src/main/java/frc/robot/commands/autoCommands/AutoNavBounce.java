@@ -17,7 +17,9 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.vitruvianlib.utils.TrajectoryUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 //import frc.vitruvianlib.utils.TrajectoryUtils;
 
@@ -25,16 +27,15 @@ public class AutoNavBounce extends SequentialCommandGroup {
     public AutoNavBounce(SwerveDrive swerveDrive, FieldSim fieldSim) {
         Pose2d[] waypoints = {
                 new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(105), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(150), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(180), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(90))),
+                new Pose2d(Units.inchesToMeters(150), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(-180))),
+                new Pose2d(Units.inchesToMeters(180), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(-90))),
                 new Pose2d(Units.inchesToMeters(210), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
                 new Pose2d(Units.inchesToMeters(255), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(270), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(330), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(270), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(90))),
+                new Pose2d(Units.inchesToMeters(330), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(-180)))
         };
-        boolean[] pathIsReversed = {false, true, true, true, false, false, false, true};
+        boolean[] pathIsReversed = {false, true, true, false, false, false, true};
         Pose2d startPosition = waypoints[0];
 
         // Create config for trajectory
@@ -54,6 +55,7 @@ public class AutoNavBounce extends SequentialCommandGroup {
         double[] endVelocities = {0, config.getMaxVelocity(), config.getMaxVelocity(), 0, config.getMaxVelocity(), 
                 config.getMaxVelocity(), 0, 0};
 
+        var trajectoryStates = new ArrayList<Pose2d>();
         for (int i = 0; i < waypoints.length - 1; i++) {
                 config.setStartVelocity(startVelocities[i]);
                 config.setEndVelocity(endVelocities[i]);
@@ -62,7 +64,11 @@ public class AutoNavBounce extends SequentialCommandGroup {
                         List.of(),
                         waypoints[i + 1],
                         config);
-                //var command = TrajectoryUtils.generateRamseteCommand(swerveDrive, trajectory);
+
+                trajectoryStates.addAll(trajectory.getStates().stream()
+                        .map(state -> state.poseMeters)
+                        .collect(Collectors.toList()));
+
                 SwerveControllerCommand command = new SwerveControllerCommand(
                         trajectory,
                         swerveDrive::getPose,
@@ -79,6 +85,7 @@ public class AutoNavBounce extends SequentialCommandGroup {
                 );
                 addCommands(command);
         }
+        fieldSim.getField2d().getObject("trajectory").setPoses(trajectoryStates);
 
         addCommands(new WaitCommand(0).andThen(() -> swerveDrive.drive(0, 0, 0, false)));// Run path following command, then stop at the end.
     }

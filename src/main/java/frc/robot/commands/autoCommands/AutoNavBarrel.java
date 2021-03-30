@@ -18,7 +18,9 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.vitruvianlib.utils.TrajectoryUtils;
 
 import java.awt.image.PackedColorModel;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 //import frc.vitruvianlib.utils.TrajectoryUtils;
 
@@ -27,17 +29,17 @@ public class AutoNavBarrel extends SequentialCommandGroup {
         Pose2d[] waypoints = {
                 new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
                 new Pose2d(Units.inchesToMeters(150), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(176), Units.inchesToMeters(45), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(124), Units.inchesToMeters(45), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(150), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(175), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(-90))),
+                new Pose2d(Units.inchesToMeters(150), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(-180))),
+                new Pose2d(Units.inchesToMeters(125), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(90))),
                 new Pose2d(Units.inchesToMeters(240), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(266), Units.inchesToMeters(135), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(214), Units.inchesToMeters(135), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(240), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(265), Units.inchesToMeters(135), new Rotation2d(Units.degreesToRadians(90))),
+                new Pose2d(Units.inchesToMeters(240), Units.inchesToMeters(165), new Rotation2d(Units.degreesToRadians(180))),
+                new Pose2d(Units.inchesToMeters(215), Units.inchesToMeters(135), new Rotation2d(Units.degreesToRadians(-90))),
                 new Pose2d(Units.inchesToMeters(285), Units.inchesToMeters(34), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(330), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(285), Units.inchesToMeters(86), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(330), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(90))),
+                new Pose2d(Units.inchesToMeters(300), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(-180))),
+                new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(-180))),
         
         };
         Pose2d startPosition = waypoints[0];
@@ -54,6 +56,7 @@ public class AutoNavBarrel extends SequentialCommandGroup {
                 new SetDriveNeutralMode(swerveDrive, true)
         );
 
+        var trajectoryStates = new ArrayList<Pose2d>();
         for (int i = 0; i < waypoints.length - 1; i++) {
                 if (i != 0) {
                         config.setEndVelocity(config.getMaxVelocity());
@@ -66,7 +69,11 @@ public class AutoNavBarrel extends SequentialCommandGroup {
                         List.of(),
                         waypoints[i + 1],
                         config);
-                //var command = TrajectoryUtils.generateRamseteCommand(swerveDrive, trajectory);
+
+                trajectoryStates.addAll(trajectory.getStates().stream()
+                        .map(state -> state.poseMeters)
+                        .collect(Collectors.toList()));
+
                 SwerveControllerCommand command = new SwerveControllerCommand(
                         trajectory,
                         swerveDrive::getPose,
@@ -83,6 +90,8 @@ public class AutoNavBarrel extends SequentialCommandGroup {
                 );
                 addCommands(command);
         }
+        fieldSim.getField2d().getObject("trajectory").setPoses(trajectoryStates);
+
         addCommands(new WaitCommand(0).andThen(() -> swerveDrive.drive(0, 0, 0, false)));// Run path following command, then stop at the end.
     }
 }
