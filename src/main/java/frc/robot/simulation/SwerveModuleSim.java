@@ -1,29 +1,21 @@
 package frc.robot.simulation;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Transform2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.util.Units;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
-import edu.wpi.first.wpiutil.math.numbers.N7;
 import frc.robot.Constants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.SwerveModule;
 
@@ -41,12 +33,23 @@ public class SwerveModuleSim {
     private SwerveDriveKinematics m_kinematics;
 
     private SwerveModule[] m_swerveModules;
+    private SwerveModuleState[] m_swerveModuleOutputStates = {
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState()
+    };
+    private double rotationSpeed;
+
     private DifferentialDrivetrainSim[] m_simulatedModules;
+    private DifferentialDrivetrainSim m_turnModel;
     private FlywheelSim m_turnTest;
     private FlywheelSim[] m_testModules;
 
-    private double turnFudge = 0.125;
-    private double outputFudge = 3.5;
+    private double moduleTurnFudge = .2; //0.125
+    // drive(rot) / turnChassisSpeed.omegaRadiansPerSecond when chassisTurnFudge = 1
+    private double chassisTurnFudge = 0.425165478278166;
+    private double outputFudge = 1.9;   // 3.5
     private double[] turnRadians = {0,0,0,0};
 
     public SwerveModuleSim(SwerveDriveKinematics kinematics, SwerveModule[] swerveModules){
@@ -56,8 +59,6 @@ public class SwerveModuleSim {
         double ksVolts = 0.587;
         double kvVoltSecondsPerMeter = 2.3;
         double kaVoltSecondsSquaredPerMeter = 0.0917;
-
-        double kMaxSpeedMetersPerSecond = Units.feetToMeters(14);
 
         double kvVoltSecondsPerRadian = 6.41; // originally 1.5
         double kaVoltSecondsSquaredPerRadian = 0.111; // originally 0.3
@@ -79,6 +80,15 @@ public class SwerveModuleSim {
             );
             m_simulatedModules[i].setPose(new Pose2d(swervePositions[i], new Rotation2d()));
         }
+        m_turnModel = new DifferentialDrivetrainSim(
+                DriveConstants.kDrivetrainPlant,
+                DCMotor.getFalcon500(2),
+                Constants.ModuleConstants.kDriveMotorGearRatio,
+                kTrackWidth,
+                Constants.ModuleConstants.kWheelDiameterMeters / 2.0,
+                null
+        );
+
         var throttleModel = LinearSystemId.identifyVelocitySystem(DriveConstants.kvVoltSecondsPerMeter,
                 DriveConstants.kaVoltSecondsSquaredPerMeter);
 
@@ -95,8 +105,8 @@ public class SwerveModuleSim {
 
     public void update(double dt) {
         for(int i = 0; i < m_swerveModules.length; i++) {
-            double leftInput = m_swerveModules[i].getDriveOutput() - (m_swerveModules[i].getTurnOutput() * turnFudge);
-            double rightInput = m_swerveModules[i].getDriveOutput() + (m_swerveModules[i].getTurnOutput() * turnFudge);
+            double leftInput = m_swerveModules[i].getDriveOutput() - (m_swerveModules[i].getTurnOutput() * moduleTurnFudge);
+            double rightInput = m_swerveModules[i].getDriveOutput() + (m_swerveModules[i].getTurnOutput() * moduleTurnFudge);
 
             // Normalize the wheel speeds
             double maxMagnitude = Math.max(Math.abs(leftInput), Math.abs(rightInput));
@@ -126,18 +136,33 @@ public class SwerveModuleSim {
 //            turnRadians[i] += (m_turnTest.getAngularVelocityRadPerSec() * dt);
 
 //            var updatedModuleState = new SwerveModuleState(moduleVelocity, m_simulatedModules[i].getHeading());
-            var updatedModuleState = new SwerveModuleState(moduleVelocity, m_simulatedModules[i].getHeading());
-            m_swerveModules[i].setSimulatedState(updatedModuleState);
+            m_swerveModuleOutputStates[i] = new SwerveModuleState(moduleVelocity, m_simulatedModules[i].getHeading());
+            m_swerveModules[i].setSimulatedState(m_swerveModuleOutputStates[i]);
         }
+        var chassisSpeed = m_kinematics.toChassisSpeeds(m_swerveModuleOutputStates);
+
+        System.out.print("Rotation Speed: " + rotationSpeed);
+        double turnInputVoltage = rotationSpeed / Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond * RobotController.getBatteryVoltage() * chassisTurnFudge;
+        m_turnModel.setInputs(turnInputVoltage, -turnInputVoltage);
+        var turnChassis = new DifferentialDriveKinematics(kTrackWidth);
+        var turnChassiSpeed = turnChassis.toChassisSpeeds(new DifferentialDriveWheelSpeeds(m_turnModel.getLeftVelocityMetersPerSecond(),
+                        m_turnModel.getRightVelocityMetersPerSecond()));
+        System.out.print("\t" + turnChassiSpeed.omegaRadiansPerSecond);
+        System.out.println();
+        m_turnModel.update(dt);
     }
 
     public Pose2d[] getSimPoses(){
         return new Pose2d[] {
-                m_simulatedModules[0].getPose(),
-                m_simulatedModules[1].getPose(),
-                m_simulatedModules[2].getPose(),
-                m_simulatedModules[3].getPose()
+            m_simulatedModules[0].getPose(),
+            m_simulatedModules[1].getPose(),
+            m_simulatedModules[2].getPose(),
+            m_simulatedModules[3].getPose()
         };
+    }
+
+    public void setInputRotationSpeed(double inputRotationSpeed) {
+        rotationSpeed = inputRotationSpeed;
     }
 
     public void setPosesFromChassis(Pose2d robotPose){
@@ -164,10 +189,6 @@ public class SwerveModuleSim {
     }
 
     public Rotation2d getChassisHeading() {
-        double headingRadians = 0;
-        for(int i = 0; i < m_simulatedModules.length; i++) {
-            headingRadians += m_simulatedModules[i].getHeading().unaryMinus().getRadians();
-        }
-        return new Rotation2d(headingRadians / 4);
+        return m_turnModel.getHeading();
     }
 }

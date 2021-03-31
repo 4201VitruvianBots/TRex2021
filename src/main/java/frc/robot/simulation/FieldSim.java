@@ -1,5 +1,7 @@
 package frc.robot.simulation;
 
+import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -164,7 +166,8 @@ public class FieldSim {
 //                robotPose.getY() < 0 || robotPose.getY() > SimConstants.fieldHieght)
 //            resetRobotPose(new Pose2d(SimConstants.fieldWidth / 2.0 ,SimConstants.fieldHieght / 2.0 , new Rotation2d(0)));
 
-        m_field2d.setRobotPose(m_swerveDrive.getPose());
+        var simulatedPose = new Pose2d(m_swerveDrive.getPose().getTranslation(), m_swerveDrive.getSimulatedHeading());
+        m_field2d.setRobotPose(simulatedPose);
 
         m_field2d.getObject("Turret").setPose(new Pose2d(m_swerveDrive.getPose().getTranslation(),
                 new Rotation2d(Math.toRadians(getIdealTurretAngle()))));

@@ -59,6 +59,7 @@ public class AutoNavSlalom extends SequentialCommandGroup {
                 new SetDriveNeutralMode(swerveDrive, true)
         );
 
+        swerveDrive.setHeadingToTargetPosition(new Pose2d(8,8,new Rotation2d()));
         var trajectoryStates = new ArrayList<Pose2d>();
         for (int i = 0; i < waypoints.length - 1; i++) {
                 if (i != 0) {
@@ -77,7 +78,7 @@ public class AutoNavSlalom extends SequentialCommandGroup {
                                 .map(state -> state.poseMeters)
                                 .collect(Collectors.toList()));
 
-                //var command = TrajectoryUtils.generateRamseteCommand(swerveDrive, trajectory);
+//                var command = TrajectoryUtils.generateRamseteCommand(swerveDrive, trajectory);
                 SwerveControllerCommand command = new SwerveControllerCommand(
                         trajectory,
                         swerveDrive::getPose,
@@ -86,7 +87,8 @@ public class AutoNavSlalom extends SequentialCommandGroup {
                         new PIDController(Constants.AutoConstants.kPXController, 0,0),
                         new PIDController(Constants.AutoConstants.kPYController, 0,0),
                         new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
-                        Constants.AutoConstants.kThetaControllerConstraints),
+                            Constants.AutoConstants.kThetaControllerConstraints),
+                        swerveDrive::getHeadingTarget,
 
                         swerveDrive::setModuleStates,
 
