@@ -139,17 +139,15 @@ public class SwerveModuleSim {
             m_swerveModuleOutputStates[i] = new SwerveModuleState(moduleVelocity, m_simulatedModules[i].getHeading());
             m_swerveModules[i].setSimulatedState(m_swerveModuleOutputStates[i]);
         }
-        var chassisSpeed = m_kinematics.toChassisSpeeds(m_swerveModuleOutputStates);
 
-        System.out.print("Rotation Speed: " + rotationSpeed);
         double turnInputVoltage = rotationSpeed / Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond * RobotController.getBatteryVoltage() * chassisTurnFudge;
-        m_turnModel.setInputs(turnInputVoltage, -turnInputVoltage);
-        var turnChassis = new DifferentialDriveKinematics(kTrackWidth);
-        var turnChassiSpeed = turnChassis.toChassisSpeeds(new DifferentialDriveWheelSpeeds(m_turnModel.getLeftVelocityMetersPerSecond(),
-                        m_turnModel.getRightVelocityMetersPerSecond()));
-        System.out.print("\t" + turnChassiSpeed.omegaRadiansPerSecond);
-        System.out.println();
+        System.out.println("Turn Input Voltage: " + turnInputVoltage);
+        m_turnModel.setInputs(-turnInputVoltage, turnInputVoltage);
         m_turnModel.update(dt);
+        var turnChassis = new DifferentialDriveKinematics(kTrackWidth);
+        System.out.println("Turn Model Heading: " + m_turnModel.getHeading());
+//        var turnChassiSpeed = turnChassis.toChassisSpeeds(new DifferentialDriveWheelSpeeds(m_turnModel.getLeftVelocityMetersPerSecond(),
+//                        m_turnModel.getRightVelocityMetersPerSecond()));
     }
 
     public Pose2d[] getSimPoses(){

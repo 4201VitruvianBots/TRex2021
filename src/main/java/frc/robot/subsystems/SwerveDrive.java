@@ -204,6 +204,9 @@ public class SwerveDrive extends SubsystemBase {
      * @param desiredStates The desired SwerveModule states.
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
+        var chassisSpeed = kDriveKinematics.toChassisSpeeds(desiredStates);
+        inputRotationSpeed =  chassisSpeed.omegaRadiansPerSecond;
+        System.out.println("Chassis Rotation: " + chassisSpeed.omegaRadiansPerSecond);
         SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, Constants.DriveConstants.kMaxSpeedMetersPerSecond);
         // mSwerveModules[0].setDesiredState(desiredStates[0]);
         // mSwerveModules[2].setDesiredState(desiredStates[1]);
@@ -324,10 +327,8 @@ public class SwerveDrive extends SubsystemBase {
         swerveModuleSim.update(0.02);
 
         SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
-        System.out.println("Sim Heading: " + swerveModuleSim.getChassisHeading());
         angle.set(Math.IEEEremainder(-swerveModuleSim.getChassisHeading().getDegrees(), 360));
-        System.out.println("NavX Heading: " + getHeading());
-        System.out.println("Pose " + getPose());
+
         // NavX expects clockwise positive, but sim outputs clockwise negative
 //        simulateSwerveDrive.setFieldRelative(isFieldOriented);
 //        simulateSwerveDrive.setInputState(simulationSwerveModuleStates);
