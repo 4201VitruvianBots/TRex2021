@@ -15,18 +15,18 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.*;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.simulation.SwerveModuleSim;
 
-import static frc.robot.Constants.DriveConstants.kDriveKinematics;
+import static frc.robot.Constants.DriveConstants.*;
 
 public class SwerveDrive extends SubsystemBase {
 
     public static final double kMaxSpeed = Constants.DriveConstants.kMaxSpeedMetersPerSecond; // 3 meters per second
-    public static final double kMaxAngularSpeed = Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond; // 3 meters per second
+    public static final double kMaxAngularSpeed = kMaxChassisRotationSpeed; // 3 meters per second
 
     private boolean isFieldOriented;
     private final double throttle = 0.8;
@@ -35,9 +35,6 @@ public class SwerveDrive extends SubsystemBase {
     private int navXDebug = 0;
 
     private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(kDriveKinematics, getRotation());
-
-    private SwerveModuleSim swerveModuleSim;
-    private double inputRotationSpeed;
 
     PowerDistributionPanel m_pdp;
 
@@ -55,11 +52,33 @@ public class SwerveDrive extends SubsystemBase {
      * 3 is Back Right
      */
     private SwerveModule[] mSwerveModules = new SwerveModule[] {
-            new SwerveModule(0, new TalonFX(Constants.frontLeftTurningMotor), new TalonFX(Constants.frontLeftDriveMotor), 0, true, false),
-            new SwerveModule(1, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), 0, true, false), //true
-            new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), 0, true, false),
-            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), 0, true, true) //true
+        new SwerveModule(0, new TalonFX(Constants.frontLeftTurningMotor), new TalonFX(Constants.frontLeftDriveMotor), 0, true, false),
+        new SwerveModule(1, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), 0, true, false), //true
+        new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), 0, true, false),
+        new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), 0, true, true) //true
     };
+
+    private DifferentialDrivetrainSim swerveChassisSim = new DifferentialDrivetrainSim(
+        Constants.DriveConstants.kDrivetrainPlant,
+        Constants.DriveConstants.kDriveGearbox,
+        Constants.ModuleConstants.kDriveMotorGearRatio,
+        Constants.DriveConstants.kTrackWidth,
+        Constants.ModuleConstants.kWheelDiameterMeters / 2.0,
+        null
+    );
+
+    private SwerveModuleState[] inputStates = {
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState()
+    };
+
+    private double inputRotationSpeed;
+    private double inputRotationFudge = 0.850330956556336;
+
+    private double inputTurnInversion;
+    private double lastInputSign;
 
     private AHRS mNavX = new AHRS(SerialPort.Port.kMXP);
     int navXSim = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
@@ -69,17 +88,7 @@ public class SwerveDrive extends SubsystemBase {
 
         SmartDashboardTab.putData("SwerveDrive","swerveDriveSubsystem", this);
         if (RobotBase.isSimulation()) {
-            swerveModuleSim = new SwerveModuleSim(kDriveKinematics, mSwerveModules);
-//            simulateSwerveDrive = new SimulateSwerveDrive(
-//                    Constants.DriveConstants.kDrivetrainPlant,
-//                    Constants.DriveConstants.kDriveGearbox,
-//                    Constants.ModuleConstants.kDriveMotorGearRatio,
-//                    Constants.DriveConstants.kTrackWidth,
-//                    Constants.DriveConstants.kWheelBase,
-//                    Constants.ModuleConstants.kWheelDiameterMeters / 2.0,
-//                    null
-//            );
-//            simulateSwerveDrive.setSwerveModules(mSwerveModules);
+
         }
     }
 
@@ -99,7 +108,14 @@ public class SwerveDrive extends SubsystemBase {
      */
     public Rotation2d getRotation() {
         // Negating the angle because WPILib gyros are CW positive.
-        return Rotation2d.fromDegrees(getHeading());
+        if(RobotBase.isReal())
+            return Rotation2d.fromDegrees(getHeading());
+        else
+            try {
+                return swerveChassisSim.getHeading();
+            } catch (Exception e) {
+                return new Rotation2d();
+            }
     }
 
     /**
@@ -123,9 +139,6 @@ public class SwerveDrive extends SubsystemBase {
             System.out.println("Cannot Get NavX Heading");
             return 0;
         }
-    }
-    public Rotation2d getSimulatedHeading() {
-        return swerveModuleSim.getChassisHeading();
     }
 
     /**
@@ -158,6 +171,10 @@ public class SwerveDrive extends SubsystemBase {
         return m_odometry.getPoseMeters();
     }
 
+    public Pose2d getSimulatedChassisPose() {
+        return swerveChassisSim.getPose();
+    }
+
     /**
      * Method to drive the robot using joystick info.
      *
@@ -173,17 +190,19 @@ public class SwerveDrive extends SubsystemBase {
         rot *= kMaxAngularSpeed;
         inputRotationSpeed = rot;
 
+        System.out.println("Input Rotation: " + rot);
         var swerveModuleStates = kDriveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         xSpeed, ySpeed, rot, getRotation())
                         : new ChassisSpeeds(xSpeed, ySpeed, rot)
         ); //from 2910's code
         SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
+        inputStates = swerveModuleStates;
 
-        // I'm not exactly sure why this needs to be inverted in teleop, but not auto?
-        if(RobotBase.isSimulation())
-            for(int i = 0; i < mSwerveModules.length; i++)
-                swerveModuleStates[i].angle = swerveModuleStates[i].angle.unaryMinus();
+//        // I'm not exactly sure why this needs to be inverted in teleop, but not auto?
+//        if(RobotBase.isSimulation())
+//            for(int i = 0; i < mSwerveModules.length; i++)
+//                swerveModuleStates[i].angle = swerveModuleStates[i].angle.unaryMinus();
 
 
         mSwerveModules[0].setDesiredState(swerveModuleStates[0]);
@@ -204,38 +223,13 @@ public class SwerveDrive extends SubsystemBase {
      * @param desiredStates The desired SwerveModule states.
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        var chassisSpeed = kDriveKinematics.toChassisSpeeds(desiredStates);
-        inputRotationSpeed =  chassisSpeed.omegaRadiansPerSecond;
-        System.out.println("Chassis Rotation: " + chassisSpeed.omegaRadiansPerSecond);
+        inputRotationSpeed = kDriveKinematics.toChassisSpeeds(desiredStates).omegaRadiansPerSecond;
         SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, Constants.DriveConstants.kMaxSpeedMetersPerSecond);
-        // mSwerveModules[0].setDesiredState(desiredStates[0]);
-        // mSwerveModules[2].setDesiredState(desiredStates[1]);
-        // mSwerveModules[1].setDesiredState(desiredStates[2]);
-        // mSwerveModules[3].setDesiredState(desiredStates[3]);
+        inputStates = desiredStates;
         mSwerveModules[0].setDesiredState(desiredStates[0]);
         mSwerveModules[1].setDesiredState(desiredStates[1]);
         mSwerveModules[2].setDesiredState(desiredStates[2]);
         mSwerveModules[3].setDesiredState(desiredStates[3]);
-    }
-
-    public void setVoltageOutput(double leftVoltage, double rightVoltage) {
-        double batteryVoltage = RobotController.getBatteryVoltage();
-        mSwerveModules[0].setPercentOutput(leftVoltage / batteryVoltage);
-        mSwerveModules[2].setPercentOutput(leftVoltage / batteryVoltage);
-        mSwerveModules[1].setPercentOutput(rightVoltage / batteryVoltage);
-        mSwerveModules[3].setPercentOutput(rightVoltage / batteryVoltage);
-    }
-
-    public void setSimPoses(Pose2d robotPose, Rotation2d[] headings){
-        for(int i = 0; i < mSwerveModules.length; i++) {
-            mSwerveModules[i].setSimulatedState(new SwerveModuleState(0, headings[i]));
-        }
-
-        swerveModuleSim.setPosesFromChassis(robotPose, headings);
-    }
-
-    public Pose2d[] getSimPoses(){
-        return swerveModuleSim.getSimPoses();
     }
 
     public void setHeadingToTargetHeading(Rotation2d targetHeading) {
@@ -256,17 +250,28 @@ public class SwerveDrive extends SubsystemBase {
      */
     public void updateOdometry() {
         m_odometry.update(
-                getRotation(),
-                mSwerveModules[0].getState(),
-                mSwerveModules[1].getState(),
-                mSwerveModules[2].getState(),
-                mSwerveModules[3].getState()
+            getRotation(),
+            mSwerveModules[0].getState(),
+            mSwerveModules[1].getState(),
+            mSwerveModules[2].getState(),
+            mSwerveModules[3].getState()
         );
+        for (int i = 0; i < mSwerveModules.length; i++) {
+            var modulePositionFromChassis = modulePositions[i].rotateBy(getRotation()).plus(getPose().getTranslation());
+            mSwerveModules[i].setPose(new Pose2d(modulePositionFromChassis,
+                mSwerveModules[i].getHeading()));
+        }
+//        simChassisOdometry.update(getHeading(), )
     }
 
     public void resetOdometry(Pose2d pose, Rotation2d rotation) {
         m_odometry.resetPosition(pose, rotation);
-        swerveModuleSim.setPosesFromChassis(pose);
+        swerveChassisSim.setPose(pose);
+
+        for(int i = 0; i < mSwerveModules.length; i++) {
+            mSwerveModules[i].setPose(pose);
+            mSwerveModules[i].resetEncoders();
+        }
     }
 
     private void updateSmartDashboard() {
@@ -310,33 +315,39 @@ public class SwerveDrive extends SubsystemBase {
         // This method will be called once per scheduler run
     }
 
-    public Rotation2d [] getModuleHeadings() {
-        Rotation2d [] modulePositions = {
-            mSwerveModules[0].getHeading(),
-            mSwerveModules[1].getHeading(),
-            mSwerveModules[2].getHeading(),
-            mSwerveModules[3].getHeading()
+    public Pose2d[] getModulePoses() {
+        Pose2d[] modulePoses = {
+            mSwerveModules[0].getPose(),
+            mSwerveModules[1].getPose(),
+            mSwerveModules[2].getPose(),
+            mSwerveModules[3].getPose()
         };
-        return modulePositions;
+        return modulePoses;
     }
 
     @Override
     public void simulationPeriodic() {
+        double simChassisInputVoltage = (inputRotationSpeed / kMaxAngularSpeed) * RobotController.getBatteryVoltage() / 2 * inputRotationFudge;
 
-        swerveModuleSim.setInputRotationSpeed(inputRotationSpeed);
-        swerveModuleSim.update(0.02);
+
+        // If the input angle flips, you must rotate the chassis the other way
+        double currentInputSign = Math.signum(inputStates[0].angle.getRadians());
+        if(lastInputSign != currentInputSign){
+            inputTurnInversion = -inputTurnInversion;
+        }
+        lastInputSign = currentInputSign;
+        simChassisInputVoltage *= inputTurnInversion;
+
+        System.out.println("Swerve Optimized Heading: " + inputStates[0]);
+        System.out.println("Sim Turn Model input: " + simChassisInputVoltage);
+
+
+
+        swerveChassisSim.setInputs(simChassisInputVoltage, -simChassisInputVoltage);
+        swerveChassisSim.update(0.02);
 
         SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
-        angle.set(Math.IEEEremainder(-swerveModuleSim.getChassisHeading().getDegrees(), 360));
-
-        // NavX expects clockwise positive, but sim outputs clockwise negative
-//        simulateSwerveDrive.setFieldRelative(isFieldOriented);
-//        simulateSwerveDrive.setInputState(simulationSwerveModuleStates);
-//        simulateSwerveDrive.update(0.02);
-//        for (int i = 0; i < 4; i++) {
-//            mSwerveModules[i].setTurnEncoderSimAngle(simulationSwerveModuleStates[i].angle.getDegrees());
-//            mSwerveModules[i].setTurnEncoderSimRate(simulationSwerveModuleStates[i].speedMetersPerSecond);
-//        }
+        angle.set(Math.IEEEremainder(-swerveChassisSim.getHeading().getDegrees(), 360));
     }
 
     private void sampleTrajectory() {

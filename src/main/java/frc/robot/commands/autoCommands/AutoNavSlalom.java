@@ -88,7 +88,7 @@ public class AutoNavSlalom extends SequentialCommandGroup {
                         new PIDController(Constants.AutoConstants.kPYController, 0,0),
                         new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
                             Constants.AutoConstants.kThetaControllerConstraints),
-//                        swerveDrive::getHeadingTarget,
+                        swerveDrive::getHeadingTarget,
 
                         swerveDrive::setModuleStates,
 

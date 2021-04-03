@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Units;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.Turret;
 
 import java.util.ArrayList;
@@ -29,12 +30,6 @@ public class FieldSim {
     private final Powercell[] m_powercells = new Powercell[17];
 
     private int ballCount;
-    private Pose2d[] SwerveModulePose = {
-            new Pose2d(),
-            new Pose2d(),
-            new Pose2d(),
-            new Pose2d()
-    };
 
     private double m_autoStartTime;
 
@@ -99,17 +94,17 @@ public class FieldSim {
          */
 
         // Look up rotating a point about another point in 2D space for the math explanation
-        Pose2d robotPose = m_swerveDrive.getPose();
-        Translation2d [] ModuleLocations = {
-            new Translation2d(kWheelBase/2, kTrackWidth/2),
-            new Translation2d(kWheelBase/2, -kTrackWidth/2),
-            new Translation2d(-kWheelBase/2, kTrackWidth/2),
-            new Translation2d(-kWheelBase/2, -kTrackWidth/2)
-        };
-        for (int i = 0; i < ModuleLocations.length; i++) {
-            Translation2d updatedPositions = ModuleLocations[i].rotateBy(robotPose.getRotation()).plus(robotPose.getTranslation());
-            SwerveModulePose[i] = new Pose2d(updatedPositions,m_swerveDrive.getSwerveModule(i).getHeading().plus(m_swerveDrive.getRotation()));
-        }
+//        Pose2d robotPose = m_swerveDrive.getPose();
+//        Translation2d [] ModuleLocations = {
+//            new Translation2d(kWheelBase/2, kTrackWidth/2),
+//            new Translation2d(kWheelBase/2, -kTrackWidth/2),
+//            new Translation2d(-kWheelBase/2, kTrackWidth/2),
+//            new Translation2d(-kWheelBase/2, -kTrackWidth/2)
+//        };
+//        for (int i = 0; i < ModuleLocations.length; i++) {
+//            Translation2d updatedPositions = ModuleLocations[i].rotateBy(robotPose.getRotation()).plus(robotPose.getTranslation());
+//            SwerveModulePose[i] = new Pose2d(updatedPositions,m_swerveDrive.getSwerveModule(i).getHeading().plus(m_swerveDrive.getRotation()));
+//        }
     }
 
     private boolean isBallInIntakeZone(Pose2d ballPose){
@@ -156,7 +151,7 @@ public class FieldSim {
         re-run the auto without restarting the sim
      */
     public void disabledInit() {
-        m_swerveDrive.setSimPoses(m_field2d.getRobotPose(), Arrays.stream(m_swerveDrive.getSimPoses()).map(Pose2d::getRotation).toArray(Rotation2d[]::new));
+//        m_swerveDrive.resetOdometry(m_field2d.getRobotPose(), Arrays.stream(m_swerveDrive.getSimPoses()).map(Pose2d::getRotation).toArray(Rotation2d[]::new));
     }
 
     public void simulationPeriodic() {
@@ -166,19 +161,14 @@ public class FieldSim {
 //                robotPose.getY() < 0 || robotPose.getY() > SimConstants.fieldHieght)
 //            resetRobotPose(new Pose2d(SimConstants.fieldWidth / 2.0 ,SimConstants.fieldHieght / 2.0 , new Rotation2d(0)));
 
-        var simulatedPose = new Pose2d(m_swerveDrive.getPose().getTranslation(), m_swerveDrive.getSimulatedHeading());
-        m_field2d.setRobotPose(simulatedPose);
+        m_field2d.setRobotPose(m_swerveDrive.getPose());
 
         m_field2d.getObject("Turret").setPose(new Pose2d(m_swerveDrive.getPose().getTranslation(),
                 new Rotation2d(Math.toRadians(getIdealTurretAngle()))));
 
         updateModulePoses();
 
-        m_field2d.getObject("SwerveModulePositions").setPoses(Arrays.stream(SwerveModulePose)
-                                                                    .collect(Collectors.toList()));
-
-        m_field2d.getObject("SimSwerveModulePositions").setPoses(Arrays.stream(m_swerveDrive.getSimPoses())
-                                                                    .collect(Collectors.toList()));
+        m_field2d.getObject("SwerveModulePositions").setPoses(m_swerveDrive.getModulePoses());
 
         for(Powercell p:m_powercells) {
             updateBallState(p);

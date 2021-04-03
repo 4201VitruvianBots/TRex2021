@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 
+import static frc.robot.Constants.DriveConstants.modulePositions;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants.  This class should not be used for any other purpose.  All constants should be
@@ -46,12 +48,19 @@ public final class Constants {
         public static final double kWheelBase = Units.inchesToMeters(30);
         //Distance between front and back wheels on robot. Meters?
 
-        public static final SwerveDriveKinematics kDriveKinematics =
-                new SwerveDriveKinematics(
-                        new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-                        new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-                        new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-                        new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+        public static Translation2d[] modulePositions = {
+            new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)
+        };
+
+        public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
+            modulePositions[0],
+            modulePositions[1],
+            modulePositions[2],
+            modulePositions[3]
+        );
 
         public static final boolean kGyroReversed = false;
 
@@ -74,6 +83,9 @@ public final class Constants {
         public static final LinearSystem<N2, N2, N2> kDrivetrainPlant =
                 LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
                         kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
+
+        public static final double kMaxChassisRotationSpeed = 8 * Math.PI / 12.8;
+
     }
 
     public static final class ModuleConstants {
@@ -81,8 +93,8 @@ public final class Constants {
         public static final double kTurningMotorGearRatio = 12.8; //12 to 1
         public static final int kEncoderCPR = 2048;
         public static final double kWheelDiameterMeters = 0.10; //10.16 cm
-        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 8*2 * Math.PI/kTurningMotorGearRatio;
-        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 8*2 * Math.PI/kTurningMotorGearRatio;
+        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 5 * Math.PI;
+        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 5 * Math.PI;
 
         public static final double kDriveEncoderDistancePerPulse =
                 (kWheelDiameterMeters * Math.PI) / ((double) kEncoderCPR*kDriveMotorGearRatio);

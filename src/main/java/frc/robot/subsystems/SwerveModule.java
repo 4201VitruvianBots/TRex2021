@@ -12,18 +12,24 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+
+import static frc.robot.Constants.ModuleConstants.*;
 
 public class SwerveModule extends SubsystemBase {
   int mModuleNumber;
@@ -44,39 +50,45 @@ public class SwerveModule extends SubsystemBase {
   int kCruiseVelocity = 14000;
   int kMotionAcceleration = kCruiseVelocity * 10;
 
-  private double kS = 0.19;
-  private double kV = 2.23;
-  private double kA = 0.0289;
-
   private static final long STALL_TIMEOUT = 2000;
   private long mStallTimeBegin = Long.MAX_VALUE;
 
   private double m_turnOutput;
   private double m_driveOutput;
 
-  private static final double kWheelRadius = 0.0508;
-  private static final int kEncoderResolution = 4096;
-
-  private final PIDController m_drivePIDController = new PIDController(Constants.ModuleConstants.kPModuleDriveController, 0, 0);
+  private final PIDController m_drivePIDController = new PIDController(kPModuleDriveController, 0, 0);
 
   private final ProfiledPIDController m_turningPIDController
-          = new ProfiledPIDController(Constants.ModuleConstants.kPModuleTurningController, 0, 0,
-          new TrapezoidProfile.Constraints(Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond, Constants.ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
+          = new ProfiledPIDController(kPModuleTurningController, 0, 0,
+          new TrapezoidProfile.Constraints(kMaxModuleAngularSpeedRadiansPerSecond, kMaxModuleAngularAccelerationRadiansPerSecondSquared));
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0.587, 2.3, 0.0917);
   private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
 
+  private double simTurnEncoderDistance;
+  private double simThrottleEncoderDistance;
+
   private Encoder simulationTurnEncoder;
+  private Encoder simulationThrottleEncoder;
   private EncoderSim simulationTurnEncoderSim;
+  private EncoderSim simulationThrottleEncoderSim;
 
-  private SwerveModuleState swerveModuleState = new SwerveModuleState(0, new Rotation2d());
-  private SwerveModuleState simulatedSwerveState = new SwerveModuleState(0, new Rotation2d());
+  private final FlywheelSim moduleRotationSimModel = new FlywheelSim(
+//          LinearSystemId.identifyVelocitySystem(kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian),
+          LinearSystemId.identifyVelocitySystem(0.16, kaVoltSecondsSquaredPerRadian),
+          DCMotor.getFalcon500(1),
+          kTurningMotorGearRatio
+  );
 
-  private double timestamp, lastTimestamp;
+  private final FlywheelSim moduleThrottleSimModel = new FlywheelSim(
+          LinearSystemId.identifyVelocitySystem(Constants.DriveConstants.kvVoltSecondsPerMeter, Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
+//          LinearSystemId.identifyVelocitySystem(2.5, Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
+          DCMotor.getFalcon500(1),
+          8.16
+  );
 
-  private SwerveModuleState m_desiredState = new SwerveModuleState();
-  private SwerveModuleState m_rawDesiredState = new SwerveModuleState();
+  Pose2d swerveModulePose = new Pose2d();
 
   public SwerveModule(int moduleNumber, TalonFX TurningMotor, TalonFX driveMotor, double zeroOffset, boolean invertTurn, boolean invertThrottle) {
     mModuleNumber = moduleNumber;
@@ -113,24 +125,32 @@ public class SwerveModule extends SubsystemBase {
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
-    switch(moduleNumber) {
-      case 3:
-        simulationTurnEncoder = new Encoder(15,14);
-        break;
-      case 2:
-        simulationTurnEncoder = new Encoder(13,12);
-        break;
-      case 1:
-        simulationTurnEncoder = new Encoder(11,10);
-        break;
-      case 0:
-        simulationTurnEncoder = new Encoder(9,8);
-        break;
-    }
-    simulationTurnEncoder.setDistancePerPulse(1);
-    simulationTurnEncoderSim = new EncoderSim(simulationTurnEncoder);
 
-    simulationTurnEncoderSim = new EncoderSim(simulationTurnEncoder);
+    if(RobotBase.isSimulation()) {
+      switch (moduleNumber) {
+        case 3:
+          simulationTurnEncoder = new Encoder(15, 14);
+          simulationThrottleEncoder = new Encoder(0, 1);
+          break;
+        case 2:
+          simulationTurnEncoder = new Encoder(13, 12);
+          simulationThrottleEncoder = new Encoder(2, 3);
+          break;
+        case 1:
+          simulationTurnEncoder = new Encoder(11, 10);
+          simulationThrottleEncoder = new Encoder(4, 5);
+          break;
+        case 0:
+          simulationTurnEncoder = new Encoder(9, 8);
+          simulationThrottleEncoder = new Encoder(6, 7);
+          break;
+      }
+
+      simulationTurnEncoder.setDistancePerPulse(kDriveEncoderDistancePerPulse);
+      simulationThrottleEncoder.setDistancePerPulse(kTurningEncoderDistancePerPulse);
+      simulationTurnEncoderSim = new EncoderSim(simulationTurnEncoder);
+      simulationThrottleEncoderSim = new EncoderSim(simulationThrottleEncoder);
+    }
   }
 
   /**
@@ -139,23 +159,14 @@ public class SwerveModule extends SubsystemBase {
   public void resetEncoders() {
     mTurningMotor.setSelectedSensorPosition(0);
     mDriveMotor.setSelectedSensorPosition(0);
+    simulationTurnEncoder.reset();
+    simulationThrottleEncoder.reset();
   }
 
   public Rotation2d getHeading() {
     return new Rotation2d(getTurningRadians());
   }
 
-  public EncoderSim getEncoderSim() {
-    return simulationTurnEncoderSim;
-  }
-
-  public void setTurnEncoderSimAngle(double angle) {
-    simulationTurnEncoderSim.setDistance(angle);
-  }
-
-  public void setTurnEncoderSimRate(double rate) {
-    simulationTurnEncoderSim.setRate(rate);
-  }
   /**
    * Returns the current angle of the module.
    *
@@ -165,11 +176,11 @@ public class SwerveModule extends SubsystemBase {
     if(RobotBase.isReal())
       return mTurningMotor.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
     else
-      return simulatedSwerveState.angle.getRadians();
+      return simulationTurnEncoder.getDistance();
   }
 
   public double getTurnAngle() {
-    return getTurningRadians() * 180.0 / Math.PI;
+    return Units.radiansToDegrees(getTurningRadians());
   }
 
 
@@ -182,7 +193,7 @@ public class SwerveModule extends SubsystemBase {
     if(RobotBase.isReal())
       return mDriveMotor.getSelectedSensorVelocity() * Constants.ModuleConstants.kDriveEncoderDistancePerPulse * 10;
     else
-      return simulatedSwerveState.speedMetersPerSecond;
+      return simulationThrottleEncoder.getRate();
   }
 
   /**
@@ -191,23 +202,7 @@ public class SwerveModule extends SubsystemBase {
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
-    if(RobotBase.isReal())
       return new SwerveModuleState(getVelocity(), new Rotation2d(getTurningRadians()));
-    else
-      return simulatedSwerveState;
-  }
-
-  public void setSimulatedState(SwerveModuleState state) {
-    simulatedSwerveState = state;
-  }
-
-  /**
-   * The last angle setpoint of the module.
-   *
-   * @return The last angle setpoint of the module.
-   */
-  public Rotation2d getTargetHeading() {
-    return m_desiredState.angle;
   }
 
   /**
@@ -216,7 +211,6 @@ public class SwerveModule extends SubsystemBase {
    * @param state Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState state) {
-    m_desiredState = state;
     SwerveModuleState outputState = SwerveModuleState.optimize(state, new Rotation2d(getTurningRadians()));
 
     // Calculate the drive output from the drive PID controller.
@@ -242,18 +236,6 @@ public class SwerveModule extends SubsystemBase {
 //    setSimulationInput(m_driveOutput, m_turnOutput);
   }
 
-  public double getDriveOutput() {
-    return m_driveOutput;
-  }
-
-  public double getTurnOutput() {
-    return m_turnOutput;
-  }
-
-  public SwerveModuleState getRawDesiredState() {
-    return m_rawDesiredState;
-  }
-
   public void setPercentOutput(double speed) {
     mDriveMotor.set(ControlMode.PercentOutput, speed);
   }
@@ -262,6 +244,14 @@ public class SwerveModule extends SubsystemBase {
     mDriveMotor.setNeutralMode(mode ? NeutralMode.Brake : NeutralMode.Coast);
     mTurningMotor.setNeutralMode(NeutralMode.Brake);
   }
+  public Pose2d getPose() {
+    return swerveModulePose;
+  }
+
+  public void setPose(Pose2d pose) {
+    swerveModulePose = pose;
+  }
+
 
   public TalonFX getTurningMotor() {
     return mTurningMotor;
@@ -271,7 +261,6 @@ public class SwerveModule extends SubsystemBase {
     return mDriveMotor;
   }
 
-
   private void updateSmartDashboard() {
 //    SmartDashboardTab.putNumber("SwerveDrive","Turning PID " + mModuleNumber, turnOutput);
   }
@@ -280,5 +269,22 @@ public class SwerveModule extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     updateSmartDashboard();
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    moduleRotationSimModel.setInputVoltage(m_turnOutput / kMaxModuleAngularSpeedRadiansPerSecond * RobotController.getBatteryVoltage());
+    moduleThrottleSimModel.setInputVoltage(m_driveOutput / Constants.DriveConstants.kMaxSpeedMetersPerSecond * RobotController.getBatteryVoltage() * 1.2);
+
+    moduleRotationSimModel.update(0.02);
+    moduleThrottleSimModel.update(0.02);
+
+    simTurnEncoderDistance += moduleRotationSimModel.getAngularVelocityRadPerSec() * 0.02;
+    simulationTurnEncoderSim.setDistance(simTurnEncoderDistance);
+    simulationTurnEncoderSim.setRate(moduleRotationSimModel.getAngularVelocityRadPerSec());
+
+    simThrottleEncoderDistance += moduleThrottleSimModel.getAngularVelocityRPM() * 0.02;
+    simulationThrottleEncoderSim.setDistance(simThrottleEncoderDistance);
+    simulationThrottleEncoderSim.setRate(moduleThrottleSimModel.getAngularVelocityRPM());
   }
 }
