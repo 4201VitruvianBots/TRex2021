@@ -36,6 +36,7 @@ public class AutoNavBounce extends SequentialCommandGroup {
                 new Pose2d(Units.inchesToMeters(330), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(-180)))
         };
         boolean[] pathIsReversed = {false, true, true, false, false, false, true};
+//        boolean[] pathIsReversed = {true, true, false, false, false, true};
         Pose2d startPosition = waypoints[0];
 
         // Create config for trajectory

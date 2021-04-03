@@ -75,17 +75,17 @@ public class SwerveModule extends SubsystemBase {
   private EncoderSim simulationThrottleEncoderSim;
 
   private final FlywheelSim moduleRotationSimModel = new FlywheelSim(
-//          LinearSystemId.identifyVelocitySystem(kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian),
-          LinearSystemId.identifyVelocitySystem(0.16, kaVoltSecondsSquaredPerRadian),
+          LinearSystemId.identifyVelocitySystem(kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian),
+//          LinearSystemId.identifyVelocitySystem(0.16, kaVoltSecondsSquaredPerRadian),
           DCMotor.getFalcon500(1),
           kTurningMotorGearRatio
   );
 
   private final FlywheelSim moduleThrottleSimModel = new FlywheelSim(
           LinearSystemId.identifyVelocitySystem(Constants.DriveConstants.kvVoltSecondsPerMeter, Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
-//          LinearSystemId.identifyVelocitySystem(2.5, Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
+//          LinearSystemId.identifyVelocitySystem(2, 0.08),
           DCMotor.getFalcon500(1),
-          8.16
+          kDriveMotorGearRatio
   );
 
   Pose2d swerveModulePose = new Pose2d();
@@ -146,8 +146,9 @@ public class SwerveModule extends SubsystemBase {
           break;
       }
 
-      simulationTurnEncoder.setDistancePerPulse(kDriveEncoderDistancePerPulse);
-      simulationThrottleEncoder.setDistancePerPulse(kTurningEncoderDistancePerPulse);
+      simulationTurnEncoder.setDistancePerPulse(kTurningEncoderDistancePerPulse);
+      simulationThrottleEncoder.setDistancePerPulse(kDriveEncoderDistancePerPulse);
+
       simulationTurnEncoderSim = new EncoderSim(simulationTurnEncoder);
       simulationThrottleEncoderSim = new EncoderSim(simulationThrottleEncoder);
     }
@@ -279,9 +280,12 @@ public class SwerveModule extends SubsystemBase {
     moduleRotationSimModel.update(0.02);
     moduleThrottleSimModel.update(0.02);
 
-    simTurnEncoderDistance += moduleRotationSimModel.getAngularVelocityRadPerSec() * 0.02;
+    // I feel that using getAngularVelocityRadPerSec() here should be correct, but it doesn't? Need to think about why
+    // RPM is correct or if getAngularVelocityRadPerSec() is correct and fix it accordingly
+
+    simTurnEncoderDistance += moduleRotationSimModel.getAngularVelocityRPM() * 0.02;
     simulationTurnEncoderSim.setDistance(simTurnEncoderDistance);
-    simulationTurnEncoderSim.setRate(moduleRotationSimModel.getAngularVelocityRadPerSec());
+    simulationTurnEncoderSim.setRate(moduleRotationSimModel.getAngularVelocityRPM());
 
     simThrottleEncoderDistance += moduleThrottleSimModel.getAngularVelocityRPM() * 0.02;
     simulationThrottleEncoderSim.setDistance(simThrottleEncoderDistance);

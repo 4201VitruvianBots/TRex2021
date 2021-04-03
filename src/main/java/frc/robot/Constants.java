@@ -92,7 +92,7 @@ public final class Constants {
         public static final double  kDriveMotorGearRatio = 8.16; //6.89 to 1
         public static final double kTurningMotorGearRatio = 12.8; //12 to 1
         public static final int kEncoderCPR = 2048;
-        public static final double kWheelDiameterMeters = 0.10; //10.16 cm
+        public static final double kWheelDiameterMeters = Units.inchesToMeters(4); //10.16 cm
         public static final double kMaxModuleAngularSpeedRadiansPerSecond = 5 * Math.PI;
         public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 5 * Math.PI;
 
@@ -107,10 +107,6 @@ public final class Constants {
 
 //        public static final double kPModuleDriveController = 1.57;
         public static final double kPModuleDriveController = 0.25;
-
-        // This is the diameter of the wheel module itself (Not the wheel, the rotation gear)
-        public static final double kWheelModuleDiameter = 0.1;
-
 
         public static final double kvVoltSecondsPerMeter = 1.47;
         public static final double kaVoltSecondsSquaredPerMeter = 0.0348;

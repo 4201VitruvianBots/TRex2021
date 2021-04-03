@@ -12,6 +12,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.*;
@@ -19,7 +20,9 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpiutil.math.VecBuilder;
 import frc.robot.Constants;
+import frc.robot.simulation.SimulationReferencePose;
 
 import static frc.robot.Constants.DriveConstants.*;
 
@@ -35,6 +38,13 @@ public class SwerveDrive extends SubsystemBase {
     private int navXDebug = 0;
 
     private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(kDriveKinematics, getRotation());
+//    private final SwerveDrivePoseEstimator m_odometry = new SwerveDrivePoseEstimator(
+//        getRotation(),
+//        new Pose2d(),
+//        kDriveKinematics,
+//        VecBuilder.fill(0.1, 0.1, 0.1),
+//        VecBuilder.fill(0.05),
+//        VecBuilder.fill(0.1, 0.1, 0.1));
 
     PowerDistributionPanel m_pdp;
 
@@ -256,12 +266,16 @@ public class SwerveDrive extends SubsystemBase {
             mSwerveModules[2].getState(),
             mSwerveModules[3].getState()
         );
+        // Update module positions based on the chassis' position, but keep the module heading
         for (int i = 0; i < mSwerveModules.length; i++) {
             var modulePositionFromChassis = modulePositions[i].rotateBy(getRotation()).plus(getPose().getTranslation());
-            mSwerveModules[i].setPose(new Pose2d(modulePositionFromChassis,
-                mSwerveModules[i].getHeading()));
+            mSwerveModules[i].setPose(new Pose2d(modulePositionFromChassis, mSwerveModules[i].getHeading()));
         }
-//        simChassisOdometry.update(getHeading(), )
+
+//        m_odometry.addVisionMeasurement(SimulationReferencePose.getRobotFieldPose(), Timer.getFPGATimestamp() + 0.2);
+
+        System.out.println("Swerve Pose: " + getPose());
+//        System.out.println("Field Pose: " + SimulationReferencePose.getRobotFieldPose());
     }
 
     public void resetOdometry(Pose2d pose, Rotation2d rotation) {
@@ -309,7 +323,7 @@ public class SwerveDrive extends SubsystemBase {
             double yDelta = headingTargetPosition.getY() - getPose().getY();
             double xDelta = headingTargetPosition.getX() - getPose().getX();
             setHeadingToTargetHeading(new Rotation2d(Math.atan2(yDelta, xDelta)));
-            System.out.println("Target Heading: " + getHeadingTarget());
+//            System.out.println("Target Heading: " + getHeadingTarget());
         }
 
         // This method will be called once per scheduler run
@@ -330,6 +344,13 @@ public class SwerveDrive extends SubsystemBase {
         double simChassisInputVoltage = (inputRotationSpeed / kMaxAngularSpeed) * RobotController.getBatteryVoltage() / 2 * inputRotationFudge;
 
 
+        var testStates = inputStates;
+        SwerveModuleState.optimize(testStates[0], new Rotation2d(mSwerveModules[0].getTurningRadians()));
+
+        System.out.println("Raw Input States: " + inputStates[0]);
+        System.out.println("Optimized States: " + testStates[0]);
+
+
         // If the input angle flips, you must rotate the chassis the other way
         double currentInputSign = Math.signum(inputStates[0].angle.getRadians());
         if(lastInputSign != currentInputSign){
@@ -338,13 +359,10 @@ public class SwerveDrive extends SubsystemBase {
         lastInputSign = currentInputSign;
         simChassisInputVoltage *= inputTurnInversion;
 
-        System.out.println("Swerve Optimized Heading: " + inputStates[0]);
-        System.out.println("Sim Turn Model input: " + simChassisInputVoltage);
-
-
-
         swerveChassisSim.setInputs(simChassisInputVoltage, -simChassisInputVoltage);
         swerveChassisSim.update(0.02);
+
+        System.out.println("Sim Position: " + swerveChassisSim.getPose());
 
         SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
         angle.set(Math.IEEEremainder(-swerveChassisSim.getHeading().getDegrees(), 360));

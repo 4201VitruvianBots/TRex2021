@@ -22,6 +22,7 @@ import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.intake.ControlledIntake;
 import frc.robot.commands.intake.ToggleIntakePistons;
 import frc.robot.simulation.FieldSim;
+import frc.robot.simulation.SimulationReferencePose;
 import frc.robot.subsystems.*;
 import frc.vitruvianlib.utils.JoystickWrapper;
 import frc.vitruvianlib.utils.XBoxTrigger;
@@ -50,6 +51,7 @@ public class RobotContainer {
   private final Shooter m_shooter = new Shooter(m_vision, pdp);
 
   private FieldSim m_FieldSim;
+  private SimulationReferencePose m_referencePose;
 
   private enum CommandSelector {
     DRIVE_STRAIGHT
@@ -109,6 +111,7 @@ public class RobotContainer {
 
   public void initializeSubsystems() {
     m_FieldSim = new FieldSim(m_swerveDrive, m_turret, m_shooter);
+    m_referencePose = new SimulationReferencePose(m_FieldSim);
 
 //    m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
 //            () -> leftJoystick.getRawAxis(0), //left x
