@@ -85,6 +85,9 @@ public class SwerveDrive extends SubsystemBase {
     };
 
     private double inputRotationSpeed;
+    // Run the calculation for SimChassisInputVoltage without the fudge and print out the rotation input from a controller
+    // and the outputted sim rotation angular velocity (Velocity of one side of the drivetrain / tradkwidth / 2). The ratio
+    // between these two numbers is the fudge in order to get the rotation correct.
     private double inputRotationFudge = 0.850330956556336;
 
     private double inputTurnInversion;
