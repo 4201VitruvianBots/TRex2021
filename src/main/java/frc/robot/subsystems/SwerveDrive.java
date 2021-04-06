@@ -34,6 +34,8 @@ public class SwerveDrive extends SubsystemBase {
     private final double throttle = 0.8;
     private final double turningThrottle = 0.5;
 
+    final double deadZone = 0.075;
+
     private int navXDebug = 0;
 
     private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(Constants.DriveConstants.kDriveKinematics, getRotation());
@@ -50,7 +52,7 @@ public class SwerveDrive extends SubsystemBase {
             new SwerveModule(0, new TalonFX(Constants.frontLeftTurningMotor), new TalonFX(Constants.frontLeftDriveMotor), 0, true, false),
             new SwerveModule(1, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), 0, true, false), //true
             new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), 0, true, false),
-            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), 0, true, true) //true
+            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), 0, true, false) //true
     };
 
     private AHRS mNavX = new AHRS(SerialPort.Port.kMXP);
@@ -159,12 +161,17 @@ public class SwerveDrive extends SubsystemBase {
      */
     @SuppressWarnings("ParameterName")
     public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-        if (Math.abs(xSpeed)<=0.05)
+        if (Math.abs(xSpeed) <= deadZone)
             xSpeed=0;
-        if (Math.abs(ySpeed)<=0.05)
+        if (Math.abs(ySpeed) <= deadZone)
             ySpeed=0;
-        if (Math.abs(rot)<=0.05)
-            rot=0;
+        if (Math.abs(rot) <= deadZone)
+            rot=0;                          // Deadzones
+
+        xSpeed *= kMaxSpeed;
+        ySpeed *= kMaxSpeed;      // Try to normalize joystick limits to speed limits
+        rot *= kMaxAngularSpeed;
+
         var swerveModuleStates = Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         xSpeed, ySpeed, rot, getRotation())

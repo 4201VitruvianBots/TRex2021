@@ -44,13 +44,13 @@ public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   private final PowerDistributionPanel pdp = new PowerDistributionPanel();
-  private final Indexer m_indexer = new Indexer();
-  private final Intake m_intake = new Intake();
-  private final Uptake m_uptake = new Uptake();
+  // private final Indexer m_indexer = new Indexer();
+  // private final Intake m_intake = new Intake();
+  // private final Uptake m_uptake = new Uptake();
   private final SwerveDrive m_swerveDrive = new SwerveDrive(pdp);
-  private final Turret m_turret = new Turret(m_swerveDrive);
-  private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
-  private final Shooter m_shooter = new Shooter(m_vision, pdp);
+  // private final Turret m_turret = new Turret(m_swerveDrive);
+  // private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
+  // private final Shooter m_shooter = new Shooter(m_vision, pdp);
 
 
   private enum CommandSelector {
@@ -100,15 +100,15 @@ public class RobotContainer {
   }
 
   public void initializeSubsystems() {
-//    m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
-//            () -> leftJoystick.getRawAxis(0), //left x
-//            () -> leftJoystick.getRawAxis(1), //left y
-//            () -> rightJoystick.getRawAxis(0))); //right x
+   m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
+           () -> leftJoystick.getRawAxis(0), //left x
+           () -> leftJoystick.getRawAxis(1), //left y
+           () -> rightJoystick.getRawAxis(0))); //right x
 
-    m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
-            () -> testController.getRawAxis(0), //left x
-            () -> testController.getRawAxis(1), //left y
-            () -> testController.getRawAxis(2))); //right x
+    // m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
+    //         () -> testController.getRawAxis(0), //left x
+    //         () -> testController.getRawAxis(1), //left y
+    //         () -> testController.getRawAxis(2))); //right x
   }
 
   /**
@@ -138,7 +138,7 @@ public class RobotContainer {
       testController.invertRawAxis(5, true);
       for (int i = 0; i < testButtons.length; i++)
         testButtons[i] = new JoystickButton(testController, (i + 1));
-
+/*
       // Intake (PS4 X button)
       testButtons[1].whenPressed(new SetIntakePiston(m_intake, true));
       testButtons[1].whileHeld(new SetIntake(m_intake, 0.6));
@@ -146,7 +146,7 @@ public class RobotContainer {
 
       // Deploy Retract Intake (PS4 Left Shoulder/Trigger)
       testButtons[5].whenPressed(new SetIntakePiston(m_intake, true));
-      testButtons[7].whenPressed(new SetIntakePiston(m_intake, false));
+      testButtons[7].whenPressed(new SetIntakePiston(m_intake, false));*/
     }
   }
 
