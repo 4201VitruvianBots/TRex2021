@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -75,15 +76,16 @@ public class SwerveModule extends SubsystemBase {
   private EncoderSim simulationThrottleEncoderSim;
 
   private final FlywheelSim moduleRotationSimModel = new FlywheelSim(
-          LinearSystemId.identifyVelocitySystem(kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian),
-//          LinearSystemId.identifyVelocitySystem(0.16, kaVoltSecondsSquaredPerRadian),
+//          LinearSystemId.identifyVelocitySystem(kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian),
+//          LinearSystemId.identifyVelocitySystem(1.47, 0.0348),
+          LinearSystemId.identifyVelocitySystem(0.16, kaVoltSecondsSquaredPerRadian),
           DCMotor.getFalcon500(1),
           kTurningMotorGearRatio
   );
 
   private final FlywheelSim moduleThrottleSimModel = new FlywheelSim(
-          LinearSystemId.identifyVelocitySystem(Constants.DriveConstants.kvVoltSecondsPerMeter, Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
-//          LinearSystemId.identifyVelocitySystem(2, 0.08),
+//          LinearSystemId.identifyVelocitySystem(Constants.DriveConstants.kvVoltSecondsPerMeter, Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
+          LinearSystemId.identifyVelocitySystem(2, 1.24),
           DCMotor.getFalcon500(1),
           kDriveMotorGearRatio
   );
@@ -231,7 +233,7 @@ public class SwerveModule extends SubsystemBase {
 //    m_driveOutput = Math.signum(m_driveOutput) * Math.min(Math.abs(m_driveOutput), 0.1);
 //    m_turnOutput = Math.signum(m_turnOutput) * Math.min(Math.abs(m_turnOutput), 0.4);
 
-    mDriveMotor.set(ControlMode.PercentOutput, m_driveOutput);
+    mDriveMotor.set(ControlMode.PercentOutput, m_driveOutput + driveFeedforward);
     mTurningMotor.set(ControlMode.PercentOutput, m_turnOutput);
 
 //    setSimulationInput(m_driveOutput, m_turnOutput);
@@ -272,23 +274,24 @@ public class SwerveModule extends SubsystemBase {
     updateSmartDashboard();
   }
 
+  double rawCount;
+  double lastTimestamp;
   @Override
   public void simulationPeriodic() {
     moduleRotationSimModel.setInputVoltage(m_turnOutput / kMaxModuleAngularSpeedRadiansPerSecond * RobotController.getBatteryVoltage());
-    moduleThrottleSimModel.setInputVoltage(m_driveOutput / Constants.DriveConstants.kMaxSpeedMetersPerSecond * RobotController.getBatteryVoltage() * 1.2);
+    moduleThrottleSimModel.setInputVoltage(m_driveOutput / Constants.DriveConstants.kMaxSpeedMetersPerSecond * RobotController.getBatteryVoltage());
 
     moduleRotationSimModel.update(0.02);
     moduleThrottleSimModel.update(0.02);
 
-    // I feel that using getAngularVelocityRadPerSec() here should be correct, but it doesn't? Need to think about why
-    // RPM is correct or if getAngularVelocityRadPerSec() is correct and fix it accordingly
-
-    simTurnEncoderDistance += moduleRotationSimModel.getAngularVelocityRPM() * 0.02;
+    simTurnEncoderDistance += moduleRotationSimModel.getAngularVelocityRadPerSec() * 0.02;
     simulationTurnEncoderSim.setDistance(simTurnEncoderDistance);
-    simulationTurnEncoderSim.setRate(moduleRotationSimModel.getAngularVelocityRPM());
+    simulationTurnEncoderSim.setRate(moduleRotationSimModel.getAngularVelocityRadPerSec());
 
-    simThrottleEncoderDistance += moduleThrottleSimModel.getAngularVelocityRPM() * 0.02;
+    simThrottleEncoderDistance += moduleThrottleSimModel.getAngularVelocityRadPerSec() * 0.02;
     simulationThrottleEncoderSim.setDistance(simThrottleEncoderDistance);
-    simulationThrottleEncoderSim.setRate(moduleThrottleSimModel.getAngularVelocityRPM());
+    simulationThrottleEncoderSim.setRate(moduleThrottleSimModel.getAngularVelocityRadPerSec());
+
+    System.out.println("Module " + mModuleNumber + " State: " + getState());
   }
 }

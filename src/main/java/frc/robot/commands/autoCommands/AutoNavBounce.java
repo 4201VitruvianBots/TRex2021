@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj.util.Units;
@@ -79,12 +80,12 @@ public class AutoNavBounce extends SequentialCommandGroup {
                         new PIDController(Constants.AutoConstants.kPYController, 0,0),
                         new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
                         Constants.AutoConstants.kThetaControllerConstraints),
-
+                        () -> new Rotation2d(0),    // Fixes auto
                         swerveDrive::setModuleStates,
 
                         swerveDrive
                 );
-                addCommands(command);
+                addCommands(command.alongWith(new InstantCommand(() -> swerveDrive.setCurrentTrajectory(trajectory))));
         }
         fieldSim.getField2d().getObject("trajectory").setPoses(trajectoryStates);
 

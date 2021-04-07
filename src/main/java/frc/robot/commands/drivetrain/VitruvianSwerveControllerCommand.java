@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.drivetrain;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.PIDController;

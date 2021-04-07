@@ -76,6 +76,7 @@ public final class Constants {
         public static final double kaVoltSecondsSquaredPerMeter = 0.0917;
 
         public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(14);
+//        public static final double kMaxSpeedMetersPerSecond = 3;
 
         public static final double kvVoltSecondsPerRadian = 3.41; // originally 1.5
         public static final double kaVoltSecondsSquaredPerRadian = 0.111; // originally 0.3
@@ -84,7 +85,7 @@ public final class Constants {
                 LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
                         kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
 
-        public static final double kMaxChassisRotationSpeed = 8 * Math.PI / 12.8;
+        public static final double kMaxChassisRotationSpeed = 10 * Math.PI;
 
     }
 
@@ -93,20 +94,20 @@ public final class Constants {
         public static final double kTurningMotorGearRatio = 12.8; //12 to 1
         public static final int kEncoderCPR = 2048;
         public static final double kWheelDiameterMeters = Units.inchesToMeters(4); //10.16 cm
-        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 5 * Math.PI;
-        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 5 * Math.PI;
+        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 10 * Math.PI;
+        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 10 * Math.PI;
 
         public static final double kDriveEncoderDistancePerPulse =
-                (kWheelDiameterMeters * Math.PI) / ((double) kEncoderCPR*kDriveMotorGearRatio);
+                (kWheelDiameterMeters * Math.PI) / ((double) kEncoderCPR * kDriveMotorGearRatio);
 
         public static final double kTurningEncoderDistancePerPulse =
                 // Assumes the encoders are on a 1:1 reduction with the module shaft.
                 (2.0 * Math.PI) / (kEncoderCPR* kTurningMotorGearRatio);
 
-        public static final double kPModuleTurningController = 1.1;
+        public static final double kPModuleTurningController = 2.4;
 
 //        public static final double kPModuleDriveController = 1.57;
-        public static final double kPModuleDriveController = 0.25;
+        public static final double kPModuleDriveController = 2.3;
 
         public static final double kvVoltSecondsPerMeter = 1.47;
         public static final double kaVoltSecondsSquaredPerMeter = 0.0348;
@@ -125,14 +126,14 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final double kMaxSpeedMetersPerSecond = 4.25; //4.383024
+        public static final double kMaxSpeedMetersPerSecond = DriveConstants.kMaxSpeedMetersPerSecond;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
         public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-        public static final double kPXController = 1;
-        public static final double kPYController = 1;
-        public static final double kPThetaController = 1;
+        public static final double kPXController = 1.2;
+        public static final double kPYController = 1.2;
+        public static final double kPThetaController = 1.2;
 
         //Constraint for the motion profilied robot angle controller
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints =

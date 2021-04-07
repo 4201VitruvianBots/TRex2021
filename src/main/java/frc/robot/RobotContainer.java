@@ -8,6 +8,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,8 +18,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import frc.robot.commands.SetSwerveDrive;
 import frc.robot.commands.autoCommands.*;
+import frc.robot.commands.drivetrain.SetSwerveDrive;
+import frc.robot.commands.drivetrain.TestSwerveModule;
 import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.intake.ControlledIntake;
 import frc.robot.commands.intake.ToggleIntakePistons;
@@ -125,9 +128,13 @@ public class RobotContainer {
 //              () -> rightJoystick.getRawAxis(0))); //right x
 //    } else {
       m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
-              () -> testController.getRawAxis(0), //left x
               () -> testController.getRawAxis(1), //left y
+              () -> testController.getRawAxis(0), //left x
               () -> testController.getRawAxis(2))); //right x
+//    m_swerveDrive.setDefaultCommand(new TestSwerveModule(m_swerveDrive,
+//            () -> testController.getRawAxis(0),
+//            () -> testController.getRawAxis(1),
+//            1));
 //    }
   }
 
@@ -178,9 +185,9 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
 //    return m_autoCommand;
         //return new WaitCommand(0);
-    return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
+//    return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
 //    return new AutoNavBarrel(m_swerveDrive, m_FieldSim);
-//    return new AutoNavBounce(m_swerveDrive, m_FieldSim);
+    return new AutoNavBounce(m_swerveDrive, m_FieldSim);
 //    return new DriveForwardDistance(m_swerveDrive, m_FieldSim, 5);
   }
 

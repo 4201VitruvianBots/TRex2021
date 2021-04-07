@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package frc.robot.commands.drivetrain;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrive;
@@ -18,18 +18,18 @@ import java.util.function.DoubleSupplier;
 public class SetSwerveDrive extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final SwerveDrive m_swerveDrive;
-  private final DoubleSupplier m_leftX, m_leftY, m_rightX;
+  private final DoubleSupplier m_throttleInput, m_strafeInput, m_rotationInput;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param swerveDriveSubsystem The subsystem used by this command.
    */
-  public SetSwerveDrive(SwerveDrive swerveDriveSubsystem, DoubleSupplier leftX, DoubleSupplier leftY, DoubleSupplier rightX) {
+  public SetSwerveDrive(SwerveDrive swerveDriveSubsystem, DoubleSupplier throttleInput, DoubleSupplier strafeInput, DoubleSupplier rotationInput) {
     m_swerveDrive = swerveDriveSubsystem;
-    m_leftX = leftX;
-    m_leftY = leftY;
-    m_rightX = rightX;
+    m_throttleInput = throttleInput;
+    m_strafeInput = strafeInput;
+    m_rotationInput = rotationInput;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerveDriveSubsystem);
   }
@@ -42,11 +42,11 @@ public class SetSwerveDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double throttle = Math.abs(m_leftY.getAsDouble()) > 0.05 ? m_leftY.getAsDouble() : 0;
-    double strafe = Math.abs(m_leftX.getAsDouble()) > 0.05 ? m_leftX.getAsDouble() : 0;
-    double rotation = Math.abs(m_rightX.getAsDouble()) > 0.05 ? m_rightX.getAsDouble() : 0;
+    double throttle = Math.abs(m_throttleInput.getAsDouble()) > 0.05 ? m_throttleInput.getAsDouble() : 0;
+    double strafe = Math.abs(m_strafeInput.getAsDouble()) > 0.05 ? m_strafeInput.getAsDouble() : 0;
+    double rotation = Math.abs(m_rotationInput.getAsDouble()) > 0.05 ? m_rotationInput.getAsDouble() : 0;
 
-    m_swerveDrive.drive(throttle,strafe,rotation,false);    // Forward/Back Trottle, Left/Right Strafe, Left/Right Turn
+    m_swerveDrive.drive(throttle, strafe, rotation,false);    // Forward/Back Trottle, Left/Right Strafe, Left/Right Turn
 //    if(RobotBase.isReal())
 //      m_swerveDrive.drive(m_leftY.getAsDouble(), m_leftX.getAsDouble(),m_rightX.getAsDouble(),false);
 //    else

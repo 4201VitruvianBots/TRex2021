@@ -80,6 +80,8 @@ public class FieldSim {
 
         // Workaround for image loading bug
         m_field2d.getObject("trajectory").setPose(new Pose2d());
+
+//        m_field2d.getObject("Heading Target").setPose(new Pose2d());
     }
 
     private void updateModulePoses() {
@@ -168,15 +170,17 @@ public class FieldSim {
 
         updateModulePoses();
 
-        m_field2d.getObject("SwerveModulePositions").setPoses(m_swerveDrive.getModulePoses());
+        m_field2d.getObject("Swerve Modules").setPoses(m_swerveDrive.getModulePoses());
 
         for(Powercell p:m_powercells) {
             updateBallState(p);
         }
 
+//        m_field2d.getObject("Heading Target").setPose(m_swerveDrive.getTargetPose());
 
         m_field2d.getObject("PowerCells").setPoses(Arrays.stream(m_powercells).map(Powercell::getBallPose)
                                                                 .collect(Collectors.toList()));
+//        m_field2d.getObject("Heading Target").setPose(new Pose2d(m_swerveDrive.getTargetPose().getTranslation(), m_swerveDrive.getHeadingToTarget()));
 
         SmartDashboard.putData("Field2d", m_field2d);
     }

@@ -59,7 +59,6 @@ public class AutoNavSlalom extends SequentialCommandGroup {
                 new SetDriveNeutralMode(swerveDrive, true)
         );
 
-        swerveDrive.setHeadingToTargetPosition(new Pose2d(5,5,new Rotation2d()));
         var trajectoryStates = new ArrayList<Pose2d>();
         for (int i = 0; i < waypoints.length - 1; i++) {
                 if (i != 0) {
@@ -88,7 +87,7 @@ public class AutoNavSlalom extends SequentialCommandGroup {
                         new PIDController(Constants.AutoConstants.kPYController, 0,0),
                         new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
                             Constants.AutoConstants.kThetaControllerConstraints),
-                        swerveDrive::getHeadingTarget,
+//                        swerveDrive::getHeadingToTarget,
 
                         swerveDrive::setModuleStates,
 
