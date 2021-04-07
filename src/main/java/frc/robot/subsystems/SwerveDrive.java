@@ -69,15 +69,6 @@ public class SwerveDrive extends SubsystemBase {
         new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), 0, true, false) //true
     };
 
-    private DifferentialDrivetrainSim swerveChassisSim = new DifferentialDrivetrainSim(
-        Constants.DriveConstants.kDrivetrainPlant,
-        Constants.DriveConstants.kDriveGearbox,
-        Constants.ModuleConstants.kDriveMotorGearRatio,
-        Constants.DriveConstants.kTrackWidth,
-        Constants.ModuleConstants.kWheelDiameterMeters / 2.0,
-        null
-    );
-
     private SwerveModuleState[] inputStates = {
         new SwerveModuleState(),
         new SwerveModuleState(),
@@ -180,10 +171,6 @@ public class SwerveDrive extends SubsystemBase {
         return m_odometry.getPoseMeters();
     }
 
-    public Pose2d getSimulatedChassisPose() {
-        return swerveChassisSim.getPose();
-    }
-
     /**
      * Method to drive the robot using joystick info.
      *
@@ -276,7 +263,6 @@ public class SwerveDrive extends SubsystemBase {
 
     public void resetOdometry(Pose2d pose, Rotation2d rotation) {
         m_odometry.resetPosition(pose, rotation);
-        swerveChassisSim.setPose(pose);
 
         for(int i = 0; i < mSwerveModules.length; i++) {
             mSwerveModules[i].setPose(pose);

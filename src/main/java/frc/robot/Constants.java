@@ -81,10 +81,6 @@ public final class Constants {
         public static final double kvVoltSecondsPerRadian = 3.41; // originally 1.5
         public static final double kaVoltSecondsSquaredPerRadian = 0.111; // originally 0.3
 
-        public static final LinearSystem<N2, N2, N2> kDrivetrainPlant =
-                LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
-                        kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
-
         public static final double kMaxChassisRotationSpeed = 10 * Math.PI;
 
     }
@@ -115,9 +111,6 @@ public final class Constants {
         public static final double kvVoltSecondsPerRadian = 1.47; // originally 1.5
         public static final double kaVoltSecondsSquaredPerRadian = 0.0348; // originally 0.3
 
-        public static final LinearSystem<N2, N2, N2> kModulePlant =
-                LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
-                        kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
     }
 
     public static final class OIConstants {
