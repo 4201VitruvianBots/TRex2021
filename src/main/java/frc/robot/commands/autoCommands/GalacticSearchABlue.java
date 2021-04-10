@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants;
+import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 
 import java.util.List;
@@ -18,10 +19,10 @@ import java.util.List;
 public class GalacticSearchABlue extends SequentialCommandGroup {
     private final double percentageOfMaxVel = 0.3; // How much of max velocity to be going at when we intake a power cell
 
-    public GalacticSearchABlue(SwerveDrive swerveDrive) {
+    public GalacticSearchABlue(SwerveDrive swerveDrive, FieldSim fieldSim) {
         Pose2d[] waypoints = {
-                new Pose2d(Units.inchesToMeters(15), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(180), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(30))),
+                new Pose2d(Units.inchesToMeters(15), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(30))),
+                new Pose2d(Units.inchesToMeters(180), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(30))),
                 new Pose2d(Units.inchesToMeters(210), Units.inchesToMeters(120), new Rotation2d(Units.degreesToRadians(-30))),
                 new Pose2d(Units.inchesToMeters(270), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
                 new Pose2d(Units.inchesToMeters(345), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0)))
@@ -36,7 +37,7 @@ public class GalacticSearchABlue extends SequentialCommandGroup {
                         .setKinematics(Constants.DriveConstants.kDriveKinematics);
         config.setReversed(false);
 
-        addCommands(new SetOdometry(swerveDrive, startPosition),
+        addCommands(new SetOdometry(swerveDrive, fieldSim, startPosition),
                 new SetDriveNeutralMode(swerveDrive, true)
         );
 

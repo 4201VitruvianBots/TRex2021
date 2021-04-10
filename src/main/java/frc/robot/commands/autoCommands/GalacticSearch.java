@@ -8,22 +8,16 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.util.Units;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.Vision;
 
 import java.util.List;
 
-public class GalacticSearchLogicA extends SequentialCommandGroup {
-    public GalacticSearchLogicA(SwerveDrive swerveDrive, Vision vision, FieldSim fieldSim) {
+public class GalacticSearch extends SequentialCommandGroup {
 
-        var command = new ConditionalCommand(new GalacticSearchARed(swerveDrive, fieldSim), new GalacticSearchABlue(swerveDrive, fieldSim), () -> false);
-            // TODO: Vision function to determine path
-
-        addCommands(command);
+    public GalacticSearch(SwerveDrive swerveDrive, FieldSim fieldSim) {
     }
 }
