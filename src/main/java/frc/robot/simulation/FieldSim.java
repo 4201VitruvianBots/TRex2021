@@ -75,8 +75,8 @@ public class FieldSim {
 
         Pose2d startPosition = new Pose2d(Units.inchesToMeters(30),Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0)));
         m_field2d.setRobotPose(startPosition);
-        m_swerveDrive.resetOdometry(startPosition, startPosition.getRotation());
-        m_autoStartTime = Timer.getFPGATimestamp();
+        m_swerveDrive.resetOdometry(m_field2d.getRobotPose(), startPosition.getRotation());
+//        m_autoStartTime = Timer.getFPGATimestamp();
 
         // Workaround for image loading bug
         m_field2d.getObject("trajectory").setPose(new Pose2d());

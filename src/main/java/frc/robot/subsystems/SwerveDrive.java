@@ -69,16 +69,6 @@ public class SwerveDrive extends SubsystemBase {
         new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), 0, true, false) //true
     };
 
-    private SwerveModuleState[] inputStates = {
-        new SwerveModuleState(),
-        new SwerveModuleState(),
-        new SwerveModuleState(),
-        new SwerveModuleState()
-    };
-
-    private double inputTurnInversion = -1;
-    private double lastInputSign;
-
     private AHRS mNavX = new AHRS(SerialPort.Port.kMXP);
     int navXSim = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
 
@@ -190,14 +180,7 @@ public class SwerveDrive extends SubsystemBase {
                         xSpeed, ySpeed, rot, getRotation())
                         : new ChassisSpeeds(xSpeed, ySpeed, rot)
         ); //from 2910's code
-        SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeedMetersPerSecond);
-        inputStates = swerveModuleStates;
-
-//        // I'm not exactly sure why this needs to be inverted in teleop, but not auto?
-//        if(RobotBase.isSimulation())
-//            for(int i = 0; i < mSwerveModules.length; i++)
-//                swerveModuleStates[i].angle = swerveModuleStates[i].angle.unaryMinus();
-
+        SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, Constants.DriveConstants.kMaxSpeedMetersPerSecond);
 
         mSwerveModules[0].setDesiredState(swerveModuleStates[0]);
         mSwerveModules[1].setDesiredState(swerveModuleStates[1]);
@@ -329,21 +312,6 @@ public class SwerveDrive extends SubsystemBase {
     double yaw = 0;
     @Override
     public void simulationPeriodic() {
-//        double simChassisInputVoltage = (inputRotationSpeed / kMaxAngularSpeed) * RobotController.getBatteryVoltage() / 2 * inputRotationFudge;
-//
-//        var testStates = inputStates;
-//        SwerveModuleState.optimize(testStates[0], getRotation());
-//
-//        System.out.println("Input States: " + inputStates[0]);
-//        System.out.println("Test States: " + testStates[0]);
-//
-//        simChassisInputVoltage *= inputTurnInversion;
-//
-//        swerveChassisSim.setInputs(simChassisInputVoltage, -simChassisInputVoltage);
-//        swerveChassisSim.update(0.02);
-//
-//        System.out.println("Sim Position: " + swerveChassisSim.getPose());
-
         SwerveModuleState[] moduleStates = {
             mSwerveModules[0].getState(),
             mSwerveModules[1].getState(),
@@ -353,14 +321,6 @@ public class SwerveDrive extends SubsystemBase {
 
         var chassisSpeed = kDriveKinematics.toChassisSpeeds(moduleStates);
         double chassisRotationSpeed = chassisSpeed.omegaRadiansPerSecond;
-
-        // If the input angle flips, you must rotate the chassis the other way
-        double currentInputSign = Math.signum(inputStates[0].angle.getRadians());
-        if(lastInputSign != currentInputSign){
-            inputTurnInversion = -inputTurnInversion;
-        }
-        lastInputSign = currentInputSign;
-//        chassisRotationSpeed *= inputTurnInversion;
 
         yaw += chassisRotationSpeed * 0.02;
         SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
