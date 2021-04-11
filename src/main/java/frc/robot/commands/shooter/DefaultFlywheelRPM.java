@@ -24,6 +24,7 @@ public class DefaultFlywheelRPM extends CommandBase {
   public DefaultFlywheelRPM(Shooter shooter, Vision vision) {
     /**
      * Use addRequirements() here to declare subsystem dependencies.
+     * @param declaring the subsystem
      */
     m_shooter = shooter;
     m_vision = vision;
@@ -44,8 +45,14 @@ public class DefaultFlywheelRPM extends CommandBase {
   @Override
   public void execute() {
     if(m_vision.getValidTarget())
-      m_shooter.setRPM(3000);
+    /**
+     * sets the shooter's rpm to 3000  
+     */  
+    m_shooter.setRPM(3000);
     else
+    /**
+     * sets the shooter's rpm to 0
+     */
       m_shooter.setRPM(0);
   }
 

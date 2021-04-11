@@ -24,6 +24,7 @@ public class SetRPM extends CommandBase {
   public SetRPM(Shooter shooter, double RPM) {
     /**
      * Use addRequirements() here to declare subsystem dependencies.
+     * @param declaring the subsystem
      */
     m_shooter = shooter;
     m_RPM = RPM;
@@ -44,6 +45,9 @@ public class SetRPM extends CommandBase {
   @Override
   public void execute() {
     m_shooter.setRPM(m_RPM);
+    /**
+     * Returns the running time on the Smart Dashboard
+     */
     if(m_shooter.encoderAtSetpoint(0) && printed == false){
         SmartDashboard.putNumber("Time to Setpoint", Timer.getFPGATimestamp()-time);
         printed = true;
@@ -55,6 +59,9 @@ public class SetRPM extends CommandBase {
    */
   @Override
   public void end(boolean interrupted) {
+    /**
+     * Sets the power to 0 for the shooter
+     */
     m_shooter.setPower(0);
   }
 

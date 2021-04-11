@@ -30,6 +30,7 @@ public class ControlledFire extends CommandBase {
   public ControlledFire(Shooter shooter, Indexer indexer, Intake intake, double rpm) {
     /**
      * Use addRequirements() here to declare subsystem dependencies.
+     * @param declaring the subsystem
      */
     m_shooter = shooter;
     m_indexer = indexer;
@@ -54,6 +55,9 @@ public class ControlledFire extends CommandBase {
   public void execute() {
     m_shooter.setRPM(m_rpm);
 
+    /**
+     * starts the coontrolled fire
+     */
     if (Math.abs(m_rpm - m_shooter.getTestRPM()) < m_shooter.getRPMTolerance() && !timerStart) {
       timerStart = true;
       timestamp = Timer.getFPGATimestamp();
@@ -64,9 +68,15 @@ public class ControlledFire extends CommandBase {
 
     if (timestamp != 0)
       if (timerStart && Timer.getFPGATimestamp() - timestamp > 0.1) {
+        /**
+         * sets the power to 100 for the indexer and intake
+         */
         m_indexer.setIndexerOutput(1);
         m_intake.setIntakePercentOutput(1);
       } else {
+        /**
+         * sets the power to 0 for the indexer and intake
+         */
         m_indexer.setIndexerOutput(0);
         m_intake.setIntakePercentOutput(0);
 
@@ -78,6 +88,9 @@ public class ControlledFire extends CommandBase {
    */
   @Override
   public void end(boolean interrupted) {
+    /**
+     * sets the power to 0 for the intake, indexer, and shooter
+     */
     m_intake.setIntakePercentOutput(0);
     m_indexer.setIndexerOutput(0);
     m_shooter.setPower(0);

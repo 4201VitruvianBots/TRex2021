@@ -30,6 +30,7 @@ public class RapidFire extends CommandBase {
     public RapidFire(Shooter shooter, Indexer indexer, Intake intake, double rpm) {
         /**
          * Use addRequirements() here to declare subsystem dependencies.
+         * @param declaring the subsystem
          */
         m_shooter = shooter;
         m_indexer = indexer;
@@ -55,6 +56,9 @@ public class RapidFire extends CommandBase {
     public void execute() {
         m_shooter.setRPM(m_rpm);
 
+        /**
+         * starts the rapid fire
+         */
         if (Math.abs(m_rpm - m_shooter.getTestRPM()) < m_shooter.getRPMTolerance() && !timerStart) {
             timerStart = true;
             timestamp = Timer.getFPGATimestamp();
@@ -65,6 +69,9 @@ public class RapidFire extends CommandBase {
 
         if (timestamp != 0 || Timer.getFPGATimestamp() - startTime > 3)
             if (timerStart && Timer.getFPGATimestamp() - timestamp > 0.1 || Timer.getFPGATimestamp() - startTime > 2) {
+                /**
+                 * sets power to 100 for indexer and intake
+                 */
                 m_indexer.setIndexerOutput(1);
                 m_intake.setIntakePercentOutput(1);
             }
@@ -75,6 +82,9 @@ public class RapidFire extends CommandBase {
      */
     @Override
     public void end(boolean interrupted) {
+        /**
+         * sets power to 0 for the intake, indexer, and shooter
+         */
         m_intake.setIntakePercentOutput(0);
         m_indexer.setIndexerOutput(0);
         m_shooter.setPower(0);

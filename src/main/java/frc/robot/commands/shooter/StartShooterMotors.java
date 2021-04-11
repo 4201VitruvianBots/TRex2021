@@ -24,6 +24,7 @@ public class StartShooterMotors extends CommandBase {
   public StartShooterMotors(Shooter shooter) {
     /**
      * Use addRequirements() here to declare subsystem dependencies.
+     * @param declaring the subsystem
      */
     m_shooter = shooter;
     addRequirements(shooter);
@@ -43,6 +44,9 @@ public class StartShooterMotors extends CommandBase {
    */
   @Override
   public void execute() {
+    /**
+     * sets the power to 0 for the shooter's rpm
+     */
     m_shooter.setRPM(0);
   }
 
@@ -51,6 +55,9 @@ public class StartShooterMotors extends CommandBase {
    */
   @Override
   public void end(boolean interrupted) {
+    /**
+     * sets the power to 0 for the shooter
+     */
     m_shooter.setPower(0);
   }
 

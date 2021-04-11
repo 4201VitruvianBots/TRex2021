@@ -32,6 +32,7 @@ public class SetAutomatedRPM extends CommandBase {
   public SetAutomatedRPM(Shooter shooter, Indexer indexer, Intake intake, Vision vision) {
     /**
      * Use addRequirements() here to declare subsystem dependencies.
+     * @param declaring the subsystem
      */
     m_shooter = shooter;
     m_indexer = indexer;
@@ -56,6 +57,9 @@ public class SetAutomatedRPM extends CommandBase {
   public void execute() {
     m_shooter.setRPM(m_vision.getTargetDistance() );
 
+    /**
+     * starts running below the rpm tolerance
+     */
     if (Math.abs(m_shooter.getRPM(0) - m_shooter.getTestRPM()) < m_shooter.getRPMTolerance() && !timerStart) {
       timerStart = true;
       timestamp = Timer.getFPGATimestamp();
@@ -65,10 +69,19 @@ public class SetAutomatedRPM extends CommandBase {
     }
 
     if (timestamp != 0)
+      /**
+       * checks if it's running
+       */
       if (timerStart && Timer.getFPGATimestamp() - timestamp > 0.1) {
+        /**
+         * sets the power to 100 for the indexer and intake
+         */
         m_indexer.setIndexerOutput(1);
         m_intake.setIntakePercentOutput(1);
       } else {
+        /**
+         * sets the power to 0 for the indexer and intake
+         */
         m_indexer.setIndexerOutput(0);
         m_intake.setIntakePercentOutput(0);
       }
@@ -79,6 +92,9 @@ public class SetAutomatedRPM extends CommandBase {
    */
   @Override
   public void end(boolean interrupted) {
+    /**
+     * sets the power to 0 for the intake, indexer, and shooter
+     */
     m_intake.setIntakePercentOutput(0);
     m_indexer.setIndexerOutput(0);
     m_shooter.setPower(0);

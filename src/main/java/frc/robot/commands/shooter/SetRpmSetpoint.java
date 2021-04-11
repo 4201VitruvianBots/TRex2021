@@ -51,6 +51,9 @@ public class SetRpmSetpoint extends CommandBase {
    */
   @Override
   public void end(boolean interrupted) {
+    /**
+     * Makes the RPM work in reverse
+     */
     m_shooter.setRPM(-1);
   }
 

@@ -29,6 +29,7 @@ public class RapidFireSetpoint extends CommandBase {
   public RapidFireSetpoint(Shooter shooter, Indexer indexer, Intake intake) {
     /**
      * Use addRequirements() here to declare subsystem dependencies.
+     * @param declaring the subsystem
      */
     m_shooter = shooter;
     m_indexer = indexer;
@@ -53,6 +54,9 @@ public class RapidFireSetpoint extends CommandBase {
   public void execute() {
 
     if(Math.abs(m_shooter.getRPM(0)-m_shooter.getSetpoint())<=100 || Timer.getFPGATimestamp()-startTime>0.5) {
+      /**
+       * sets power to 100 to intake and indexer
+       */
       m_indexer.setIndexerOutput(1);
       m_intake.setIntakePercentOutput(1);
     }

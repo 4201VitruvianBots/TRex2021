@@ -38,6 +38,7 @@ public class TestShooterDelayed extends CommandBase {
     m_uptake = uptake;
     /**
      * Use addRequirements() here to declare subsystem dependencies.
+     * @param declaring the subsystem
      */
     addRequirements(shooter);
     addRequirements(indexer);
@@ -59,7 +60,13 @@ public class TestShooterDelayed extends CommandBase {
     m_shooter.setTestRPM();
 
     if(m_shooter.getTestRPM() != 0)
+      /**
+       * checks if the shooter's rpm doesn't pass the rpm tolerance
+       */
       if (Math.abs(m_shooter.getRPM(0) - m_shooter.getTestRPM()) < m_shooter.getRPMTolerance()) {
+        /**
+         * sets the power to 95 for the indexer, uptake, and intake
+         */
         m_indexer.setIndexerOutput(0.95);
         m_uptake.setPercentOutput(0.95);
         m_intake.setIntakePercentOutput(0.95);
@@ -67,6 +74,9 @@ public class TestShooterDelayed extends CommandBase {
 //      m_indexer.setIndexerOutput(1);
 //      m_uptake.setPercentOutput(-0.25);
       } else {
+        /**
+         * sets the power to 0 for the indexer and uptake
+         */
         m_indexer.setIndexerOutput(0);
         m_uptake.setPercentOutput(0);
       }
@@ -77,6 +87,9 @@ public class TestShooterDelayed extends CommandBase {
    */
   @Override
   public void end(boolean interrupted) {
+    /**
+     * sets the power to 0 for the intake, indexer, uptake, and shooter
+     */
     m_intake.setIntakePercentOutput(0);
     m_indexer.setIndexerOutput(0);
     m_uptake.setPercentOutput(0);

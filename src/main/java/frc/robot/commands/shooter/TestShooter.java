@@ -38,6 +38,7 @@ public class TestShooter extends CommandBase {
     m_uptake = uptake;
     /**
      * Use addRequirements() here to declare subsystem dependencies.
+     * @param declaring the subsystem
      */
     addRequirements(shooter);
     addRequirements(indexer);
@@ -59,7 +60,9 @@ public class TestShooter extends CommandBase {
 
     if(m_shooter.getTestRPM() != 0) {
 
-
+      /**
+       * checks if the shooter can run
+       */
       if (Math.abs(m_shooter.getRPM(0) - m_shooter.getTestRPM()) < m_shooter.getRPMTolerance() && !timerStart) {
         timerStart = true;
         timestamp = Timer.getFPGATimestamp();
@@ -69,10 +72,19 @@ public class TestShooter extends CommandBase {
       }
 
       if (timestamp != 0)
+        /**
+         * checks if the shooter is running
+         */
         if (timerStart && Timer.getFPGATimestamp() - timestamp > 0.1) {
+          /**
+           * sets the power to 100 for the indexer and intake
+           */
           m_indexer.setIndexerOutput(1);
           m_intake.setIntakePercentOutput(1);
         } else {
+          /**
+           * sets the power to 0 for the indexer and intake
+           */
           m_indexer.setIndexerOutput(0);
           m_intake.setIntakePercentOutput(0);
 
@@ -96,6 +108,9 @@ public class TestShooter extends CommandBase {
    */
   @Override
   public void end(boolean interrupted) {
+    /**
+     * sets the power to 0 for the intake, indexer, uptake, and shooter
+     */
     m_intake.setIntakePercentOutput(0);
     m_indexer.setIndexerOutput(0);
     m_uptake.setPercentOutput(0);

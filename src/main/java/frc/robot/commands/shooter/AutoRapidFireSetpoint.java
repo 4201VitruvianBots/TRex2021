@@ -29,6 +29,7 @@ public class AutoRapidFireSetpoint extends CommandBase {
     public AutoRapidFireSetpoint(Shooter shooter, Indexer indexer, Intake intake, double shootTimeout) {
         /**
          * Use addRequirements() here to declare subsystem dependencies.
+         * @param declaring the subsystem
          */
         m_shooter = shooter;
         m_indexer = indexer;
@@ -52,7 +53,13 @@ public class AutoRapidFireSetpoint extends CommandBase {
      */
     @Override
     public void execute() {
+        /**
+         * starts the shooter
+         */
         if (m_shooter.canShoot() || (Timer.getFPGATimestamp() - startTime) > m_shootTimeout) {
+            /**
+             * sets the power to 100 for the indexer and intake
+             */
             m_indexer.setIndexerOutput(1);
             m_intake.setIntakePercentOutput(1);
         }
@@ -63,6 +70,9 @@ public class AutoRapidFireSetpoint extends CommandBase {
      */
     @Override
     public void end(boolean interrupted) {
+        /**
+         * sets the power to 0 for the intake, indexer, and shooter
+         */
         m_intake.setIntakePercentOutput(0);
         m_indexer.setIndexerOutput(0);
         m_shooter.setPower(0);
