@@ -10,19 +10,16 @@ package frc.robot.commands.intake;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake;
 
-/**
- * An example command that uses an example subsystem.
- */
+
 public class SetIntake extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Intake m_intake;
     private final double m_output;
-
     /**
-     * Creates a new ExampleCommand.
-     *
-     * @param subsystem The subsystem used by this command.
-     */
+    * This function controls the intake during the teleop period.
+    * @param intake determines if the intake can begin intaking.
+    * @param output determines the percent at which the intake will run at.
+    */
     public SetIntake(Intake intake, double output) {
         m_intake = intake;
         m_output = output;

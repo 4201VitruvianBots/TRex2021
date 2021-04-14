@@ -12,9 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 
-/**
- * An example command that uses an example subsystem.
- */
+
 public class AutoControlledIntake extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Indexer m_indexer;
@@ -25,6 +23,11 @@ public class AutoControlledIntake extends CommandBase {
     private double timestamp, intakeTimestamp, indexerTimestamp, fourBallTimestamp;
     private boolean intaking, haveFour, haveFourTripped;
 
+    /**
+    * This function controls the intake during the autonomous period.
+    * @param intake determines the precentage at which the intake motor runs at.
+    * @param indexer determines the precentage at which the indexer motor runs at.
+    */
     public AutoControlledIntake(Intake intake, Indexer indexer) {
         m_intake = intake;
         m_indexer = indexer;

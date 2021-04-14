@@ -19,10 +19,10 @@ public class SetIntakePiston extends CommandBase {
     private final Intake intake;
 
     /**
-     * Creates a new ExampleCommand.
-     *
-     * @param subsystem The subsystem used by this command.
-     */
+    * This function controls the intake pistons.
+    * @param subsystem refrences the intake subsystem.
+    * @param extend determens if the intake pistons will be extended or retracted.
+    */
     public SetIntakePiston(Intake subsystem, boolean extend) {
         intake = subsystem;
         // Use addRequirements() here to declare subsystem dependencies.

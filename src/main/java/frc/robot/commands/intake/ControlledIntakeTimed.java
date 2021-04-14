@@ -12,9 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 
-/**
- * An example command that uses an example subsystem.
- */
+
 public class ControlledIntakeTimed extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Indexer m_indexer;
@@ -29,10 +27,11 @@ public class ControlledIntakeTimed extends CommandBase {
     private final double m_duration;
 
     /**
-     * Creates a new ExampleCommand.
-     *
-     * @param subsystem The subsystem used by this command.
-     */
+    * This function controls the intake during the teleop period.
+    * @param intake determines the precentage at which the intake motor runs at.
+    * @param indexer determines the precentage at which the indexer motor runs at.
+    * @param duration reads a specified time constraint to determine how long the intake and indexer should run for.
+    */
     public ControlledIntakeTimed(Intake intake, Indexer indexer, double duration) {
         m_intake = intake;
         m_indexer = indexer;

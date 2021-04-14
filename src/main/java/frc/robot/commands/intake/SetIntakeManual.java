@@ -11,19 +11,17 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 
-/**
- * An example command that uses an example subsystem.
- */
+
 public class SetIntakeManual extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Intake m_intake;
     private final Indexer m_indexer;
 
     /**
-     * Creates a new ExampleCommand.
-     *
-     * @param subsystem The subsystem used by this command.
-     */
+    * This function controls the intake and indexer.
+    * @param intake determines the precentage at which the intake motor runs at.
+    * @param indexer determines the precentage at which the indexer motor runs at.
+    */
     public SetIntakeManual(Intake intake, Indexer indexer) {
         m_intake = intake;
         m_indexer = indexer;

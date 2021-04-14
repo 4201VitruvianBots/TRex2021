@@ -14,9 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 
-/**
- * An example command that uses an example subsystem.
- */
+
 public class ControlledIntake extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Indexer m_indexer;
@@ -28,11 +26,12 @@ public class ControlledIntake extends CommandBase {
     private boolean intaking, haveFour, haveFourTripped;
     private final Joystick m_controller;
 
-    /*
-     * Creates a new ExampleCommand.
-     *
-     * @param subsystem The subsystem used by this command.
-     */
+    /**
+    * This function controls the intake during the teleop period.
+    * @param intake determines the precentage at which the intake motor runs at.
+    * @param indexer determines the precentage at which the indexer motor runs at.
+    * @param controller reads the input from the x-box controller 
+    */
     public ControlledIntake(Intake intake, Indexer indexer, Joystick controller) {
         this.m_intake = intake;
         this.m_indexer = indexer;
