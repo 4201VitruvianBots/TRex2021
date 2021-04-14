@@ -24,7 +24,7 @@ public class SetRPM extends CommandBase {
   public SetRPM(Shooter shooter, double RPM) {
     /**
      * Use addRequirements() here to declare subsystem dependencies.
-     * @param declaring the subsystem
+     * @param shooter
      */
     m_shooter = shooter;
     m_RPM = RPM;

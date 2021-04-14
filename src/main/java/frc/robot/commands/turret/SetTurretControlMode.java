@@ -18,13 +18,14 @@ public class SetTurretControlMode extends CommandBase {
     /**
      * Setting the control mode of the Turret Subsystem by the Mode's value
      *
-     * @param subsystem The subsystem used by this command.
+     * @param subsystem The Turret and the number mode
      */
     public SetTurretControlMode(Turret subsystem, int mode) {
         m_turret = subsystem;
         m_mode = mode;
         /**
          * adds specified requirements to the turret subsystem
+         * @param subsystem
          */
         addRequirements(subsystem);
     }

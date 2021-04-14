@@ -38,7 +38,7 @@ public class TestShooterDelayed extends CommandBase {
     m_uptake = uptake;
     /**
      * Use addRequirements() here to declare subsystem dependencies.
-     * @param declaring the subsystem
+     * @param shooter and indexer
      */
     addRequirements(shooter);
     addRequirements(indexer);

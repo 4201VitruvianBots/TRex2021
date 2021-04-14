@@ -22,6 +22,7 @@ public class SetAndHoldRpmSetpoint extends CommandBase {
   public SetAndHoldRpmSetpoint(Shooter shooter, Vision vision, double RPM) {
     /**
      * Use addRequirements() here to declare subsystem dependencies.
+     * @param shooter
      */
     m_shooter = shooter;
     m_RPM = RPM;

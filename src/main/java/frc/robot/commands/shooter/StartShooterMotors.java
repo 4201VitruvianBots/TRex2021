@@ -19,12 +19,12 @@ public class StartShooterMotors extends CommandBase {
   /**
    * Sets the Shooter Subsystem's power.
    *
-   * @param RobotContainer.m_shooter The subsystem used by this command.
+   * @param RobotContainer.m_shooter The Shooter
    */
   public StartShooterMotors(Shooter shooter) {
     /**
      * Use addRequirements() here to declare subsystem dependencies.
-     * @param declaring the subsystem
+     * @param shooter
      */
     m_shooter = shooter;
     addRequirements(shooter);

@@ -17,12 +17,13 @@ public class ZeroTurretEncoder extends CommandBase {
     /**
      * Setting the Turret Subsystem's encoders.
      *
-     * @param subsystem The subsystem used by this command.
+     * @param subsystem The Turret
      */
     public ZeroTurretEncoder(Turret subsystem) {
         m_turret = subsystem;
         /**
          * adds specified requirements to the turret subsystem
+         * @param subsystem
          */
         addRequirements(subsystem);
     }

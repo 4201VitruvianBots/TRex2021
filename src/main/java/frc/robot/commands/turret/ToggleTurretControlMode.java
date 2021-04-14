@@ -17,12 +17,13 @@ public class ToggleTurretControlMode extends CommandBase {
     /**
      * Setting the Turret Subsystem's control mode.
      *
-     * @param subsystem The subsystem used by this command.
+     * @param subsystem The Turret
      */
     public ToggleTurretControlMode(Turret subsystem) {
         m_turret = subsystem;
         /**
          * adds specified requirements to the turret subsystem
+         * @param subsystem
          */
         addRequirements(subsystem);
     }

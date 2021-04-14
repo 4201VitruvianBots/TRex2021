@@ -20,12 +20,13 @@ public class SetTurretManualOutput extends CommandBase {
     /**
      * Setting the percent output of the Turret Subsystem and setting the xvalue by the x-input.
      *
-     * @param subsystem The subsystem used by this command.
+     * @param subsystem The Turret and the x-value input
      */
     public SetTurretManualOutput(Turret subsystem, DoubleSupplier xInput) {
         m_turret = subsystem;
         /**
          * adds specified requirements to the turret subsystem
+         * @param subsystem
          */
         addRequirements(subsystem);
         xValue = xInput.getAsDouble();

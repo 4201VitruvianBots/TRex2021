@@ -13,13 +13,14 @@ public class SetTurretRobotRelativeAngle extends CommandBase {
     /**
      * Setting the Turret Subsystem's angle by the Setpoint.
      *
-     * @param subsystem The subsystem used by this command.
+     * @param subsystem The Turret and it's setpoint
      */
     public SetTurretRobotRelativeAngle(Turret subsystem, double setpoint) {
         m_turret = subsystem;
         m_setpoint = setpoint;
         /**
          * adds specified requirements to the turret subsystem
+         * @param subsystem
          */
         addRequirements(subsystem);
     }

@@ -25,12 +25,12 @@ public class RapidFire extends CommandBase {
     /**
      * Sets the RPM and power for the Shooter Subsystem
      *
-     * @param RobotContainer.m_shooter The subsystem used by this command.
+     * @param RobotContainer.m_shooter The Shooter, Indexer, Intake, and the rpm
      */
     public RapidFire(Shooter shooter, Indexer indexer, Intake intake, double rpm) {
         /**
          * Use addRequirements() here to declare subsystem dependencies.
-         * @param declaring the subsystem
+         * @param shooter, indexer, intake
          */
         m_shooter = shooter;
         m_indexer = indexer;

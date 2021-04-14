@@ -24,7 +24,7 @@ public class DefaultFlywheelRPM extends CommandBase {
   public DefaultFlywheelRPM(Shooter shooter, Vision vision) {
     /**
      * Use addRequirements() here to declare subsystem dependencies.
-     * @param declaring the subsystem
+     * @param shooter
      */
     m_shooter = shooter;
     m_vision = vision;

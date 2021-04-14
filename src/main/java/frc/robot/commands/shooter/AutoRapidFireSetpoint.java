@@ -24,12 +24,12 @@ public class AutoRapidFireSetpoint extends CommandBase {
     /**
      * Setting the Shooter Subsystem's time to shoot.
      *
-     * @param RobotContainer.m_shooter The subsystem used by this command.
+     * @param RobotContainer.m_shooter The Shooter, Indexer, Intake, and the shoot timeout
      */
     public AutoRapidFireSetpoint(Shooter shooter, Indexer indexer, Intake intake, double shootTimeout) {
         /**
          * Use addRequirements() here to declare subsystem dependencies.
-         * @param declaring the subsystem
+         * @param shooter, indexer, intake
          */
         m_shooter = shooter;
         m_indexer = indexer;
