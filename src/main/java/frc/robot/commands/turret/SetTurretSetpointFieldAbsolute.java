@@ -27,7 +27,7 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
 
     /**
      * Setting the Turret Subsystem's setpoint on the field
-     * @param turret, swervedrive, vision, shooter, climber, and the joystick
+     * @param subsystem turret, swervedrive, vision, shooter, climber, and the joystick
      */
     public SetTurretSetpointFieldAbsolute(Turret turretSubsystem, SwerveDrive swerveDriveSubsystem, Vision visionSubsystem,
                                           Shooter shooter, Climber climber, Joystick controller) {

@@ -20,6 +20,7 @@ public class SetRPM extends CommandBase {
   private boolean printed = false;
   /**
    * Sets the power and rpm for the Shooter Subsystem.
+   * @param subsystem shooter and rpm value
    */
   public SetRPM(Shooter shooter, double RPM) {
     /**

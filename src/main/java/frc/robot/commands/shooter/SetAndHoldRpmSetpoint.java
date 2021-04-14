@@ -18,6 +18,7 @@ public class SetAndHoldRpmSetpoint extends CommandBase {
   private double m_RPM;
   /**
    * Sets the Shooter Subsystem's RPM.
+   * @param subsystem shooter, vision, rpm value
    */
   public SetAndHoldRpmSetpoint(Shooter shooter, Vision vision, double RPM) {
     /**

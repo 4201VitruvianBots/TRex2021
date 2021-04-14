@@ -12,9 +12,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 
-/**
- * An example command that uses an example subsystem.
- */
 public class TimedIntake extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Intake m_intake;
@@ -25,18 +22,23 @@ public class TimedIntake extends CommandBase {
     /**
      * Creates a new ExampleCommand.
      *
-     * @param subsystem The subsystem used by this command.
+     * @param subsystem Intake, Indexer, Time
      */
     public TimedIntake(Intake intake, Indexer indexer, double time) {
         m_intake = intake;
         m_indexer = indexer;
         m_time = time;
-        // Use addRequirements() here to declare subsystem dependencies.
+        /**
+         * Use addRequirements() here to declare subsystem dependencies.
+         * @param intake and indexer
+         */
         addRequirements(intake);
         addRequirements(indexer);
     }
 
-    // Called when the command is initially scheduled.
+    /**
+     * Called when the command is initially scheduled.
+     */
     @Override
     public void initialize() {
         startTime = Timer.getFPGATimestamp();
@@ -45,14 +47,18 @@ public class TimedIntake extends CommandBase {
 
     }
 
-    // Called every time the scheduler runs while the command is scheduled.
+    /**
+     * Called every time the scheduler runs while the command is scheduled.
+     */
     @Override
     public void execute() {
         m_indexer.setIndexerOutput(1);
         m_intake.setIntakePercentOutput(0.9);
     }
 
-    // Called once the command ends or is interrupted.
+    /**
+     * Called once the command ends or is interrupted.
+     */
     @Override
     public void end(boolean interrupted) {
         m_indexer.setIndexerOutput(0);
@@ -61,7 +67,9 @@ public class TimedIntake extends CommandBase {
             m_intake.setintakePiston(false);
     }
 
-    // Returns true when the command should end.
+    /**
+     * Returns true when the command should end.
+     */
     @Override
     public boolean isFinished() {
         return Timer.getFPGATimestamp() - startTime > m_time;

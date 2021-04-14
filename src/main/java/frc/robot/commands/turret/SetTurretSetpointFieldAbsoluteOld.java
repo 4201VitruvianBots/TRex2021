@@ -30,7 +30,7 @@ public class SetTurretSetpointFieldAbsoluteOld extends CommandBase {
 
     /**
      * Setting the Turret Subsystem's setpoint on the field
-     * @param turret, swervedrive, vision, climber, x-value input, and y-value input
+     * @param subsystem turret, swervedrive, vision, climber, x-value input, and y-value input
      */
     public SetTurretSetpointFieldAbsoluteOld(Turret turretSubsystem, SwerveDrive swerveDriveSubsystem, Vision visionSubsystem,
                                              Climber climber, DoubleSupplier xInput, DoubleSupplier yInput) {
