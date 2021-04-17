@@ -18,11 +18,14 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.autoCommands.*;
 import frc.robot.commands.drivetrain.SetSwerveDrive;
 import frc.robot.commands.drivetrain.TestSwerveModule;
 import frc.robot.commands.indexer.FeedAll;
+import frc.robot.commands.intake.AutoControlledIntake;
 import frc.robot.commands.intake.ControlledIntake;
+import frc.robot.commands.intake.SetIntakePiston;
 import frc.robot.commands.intake.ToggleIntakePistons;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimulationReferencePose;
@@ -77,7 +80,18 @@ public class RobotContainer {
 
   private static boolean init = false;
 
+  public enum SkillsChallengeSelector {
+    ACCURACY_CHALLENGE,
+    AUTO_NAV_SLALOM,
+    AUTO_NAV_BARREL,
+    AUTO_NAV_BOUNCE,
+    GALACTIC_SEARCH,
+    GALACTIC_SEARCH_A,
+    GALACTIC_SEARCH_B,
+    None
+}
 
+private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelector.AUTO_NAV_SLALOM; // Change this depending on the challenge
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -186,6 +200,23 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
+    switch (selectedSkillsChallenge) {
+      case AUTO_NAV_BARREL:
+          return new AutoNavBarrel(m_swerveDrive, m_FieldSim);
+      case AUTO_NAV_BOUNCE:
+          return new AutoNavBounce(m_swerveDrive, m_FieldSim);
+      case AUTO_NAV_SLALOM:
+          return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
+      case GALACTIC_SEARCH:
+          return new SequentialCommandGroup(
+              //new SetIntakePiston(m_intake, true), 
+              new GalacticSearchARed(m_swerveDrive, m_FieldSim).deadlineWith(new AutoControlledIntake(m_intake, m_indexer)),
+              new SetIntakePiston(m_intake, false));
+      case None:
+      default:
+          System.out.println("Not a recognized skills command");
+          return null;
+  }
 //    return m_autoCommand;
 //        return new WaitCommand(0);
     return new AutoNavSlalom(m_swerveDrive, m_FieldSim);

@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.*;
 import frc.vitruvianlib.utils.TrajectoryUtils;
 import java.util.ArrayList;
@@ -29,13 +30,13 @@ import java.util.List;
 public class GalacticSearchARed extends SequentialCommandGroup {
     private final double percentageOfMaxVel = 0.3; // How much of max velocity to be going at when we intake a power cell
 
-    public GalacticSearchARed(SwerveDrive swerveDrive) {
+    public GalacticSearchARed(SwerveDrive swerveDrive, FieldSim fieldSim) {
         Pose2d[] waypoints = {
                 new Pose2d(Units.inchesToMeters(15), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
                 new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(150), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(-45))),
-                new Pose2d(Units.inchesToMeters(180), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(15))),
-                new Pose2d(Units.inchesToMeters(345), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0)))
+                new Pose2d(Units.inchesToMeters(150), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(-60))),
+                new Pose2d(Units.inchesToMeters(180), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(60))),
+                new Pose2d(Units.inchesToMeters(345), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(60)))
         };
         Pose2d startPosition = waypoints[0];
 
@@ -47,7 +48,7 @@ public class GalacticSearchARed extends SequentialCommandGroup {
                         .setKinematics(Constants.DriveConstants.kDriveKinematics);
         config.setReversed(false);
 
-        addCommands(new SetOdometry(swerveDrive, startPosition),
+        addCommands(new SetOdometry(swerveDrive, fieldSim, startPosition),
                 new SetDriveNeutralMode(swerveDrive, true)
         );
 
