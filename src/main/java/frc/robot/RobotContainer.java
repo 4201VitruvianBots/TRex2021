@@ -161,7 +161,10 @@ public class RobotContainer {
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
     }else{
+      //Invert raw axis of X, Y inputs to match WPILib convention
       testController.invertRawAxis(1, true);
+      testController.invertRawAxis(0, true);
+
       testController.invertRawAxis(5, true);
       for (int i = 0; i < testButtons.length; i++)
         testButtons[i] = new JoystickButton(testController, (i + 1));
@@ -184,7 +187,7 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
 //    return m_autoCommand;
-        //return new WaitCommand(0);
+//        return new WaitCommand(0);
     return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
 //    return new AutoNavBarrel(m_swerveDrive, m_FieldSim);
 //    return new AutoNavBounce(m_swerveDrive, m_FieldSim);
