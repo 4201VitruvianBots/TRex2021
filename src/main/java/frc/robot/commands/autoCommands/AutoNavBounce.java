@@ -26,6 +26,37 @@ import java.util.stream.Collectors;
 
 public class AutoNavBounce extends SequentialCommandGroup {
     public AutoNavBounce(SwerveDrive swerveDrive, FieldSim fieldSim) {
+        int[][] waypointsRaw = {
+                {30,90,0},
+                {80,146,90},
+                {115,85,100},
+                {150, 37,180},
+                {180,140,-90},
+                {180, 80, -90},
+                {260,30,30},
+                {270,140,90},
+                {310,90,135}
+        };
+        /*int[][] waypoints1 = {
+                {30,90,0},
+                {80,146,90},
+        };
+        int[][] waypoints2 = {
+                {80,146,90},
+                {115,85,100},
+                {150, 37,180},
+                {180,140,-90},
+        };
+        int[][] waypoints3 = {
+                {180,140,-90},
+                {180, 80, -90},
+                {260,30,30},
+                {270,140,90},
+        };
+        int[][] waypoints4 = {
+                {270,140,90},
+                {310,90,135}
+        };*/
         Pose2d[] waypoints = {
                 new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
                 new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(90))),
@@ -49,10 +80,15 @@ public class AutoNavBounce extends SequentialCommandGroup {
         config.setReversed(false);
 
         addCommands(new SetOdometry(swerveDrive, fieldSim, startPosition),
-                new SetDriveNeutralMode(swerveDrive, true)
+                new SetDriveNeutralMode(swerveDrive, true),
+                new ExecuteSwerveTrajectory(swerveDrive, config, fieldSim, waypointsRaw)
+                // new ExecuteSwerveTrajectory(swerveDrive, config, fieldSim, waypoints1),
+                // new ExecuteSwerveTrajectory(swerveDrive, config, fieldSim, waypoints2),
+                // new ExecuteSwerveTrajectory(swerveDrive, config, fieldSim, waypoints3),
+                // new ExecuteSwerveTrajectory(swerveDrive, config, fieldSim, waypoints4),
         );
 
-        double[] startVelocities = {config.getMaxVelocity(), 0, config.getMaxVelocity(), config.getMaxVelocity(), 0, 
+        /*double[] startVelocities = {config.getMaxVelocity(), 0, config.getMaxVelocity(), config.getMaxVelocity(), 0, 
                 config.getMaxVelocity(), config.getMaxVelocity(), 0, 0};
         double[] endVelocities = {0, config.getMaxVelocity(), config.getMaxVelocity(), 0, config.getMaxVelocity(), 
                 config.getMaxVelocity(), 0, 0};
@@ -87,7 +123,7 @@ public class AutoNavBounce extends SequentialCommandGroup {
                 );
                 addCommands(command.alongWith(new InstantCommand(() -> swerveDrive.setCurrentTrajectory(trajectory))));
         }
-        fieldSim.getField2d().getObject("trajectory").setPoses(trajectoryStates);
+        fieldSim.getField2d().getObject("trajectory").setPoses(trajectoryStates);*/
 
         addCommands(new WaitCommand(0).andThen(() -> swerveDrive.drive(0, 0, 0, false)));// Run path following command, then stop at the end.
     }

@@ -219,7 +219,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
   }
 //    return m_autoCommand;
 //        return new WaitCommand(0);
-    return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
+//    return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
 //    return new AutoNavBarrel(m_swerveDrive, m_FieldSim);
 //    return new AutoNavBounce(m_swerveDrive, m_FieldSim);
 //    return new DriveForwardDistance(m_swerveDrive, m_FieldSim, 5);

@@ -26,6 +26,21 @@ import java.util.stream.Collectors;
 
 public class AutoNavBarrel extends SequentialCommandGroup {
     public AutoNavBarrel(SwerveDrive swerveDrive, FieldSim fieldSim) {
+        int[][] waypointsRaw = {
+                {40,90,0},
+                {150,90,0},
+                {176,45,-120},
+                {135,45,120},
+                {150,90,0},
+                {250,96,30},
+                {270,141,135},
+                {210,120,-80},
+                {290,45,-45},
+                {330,45,45},
+                {300,92,175},
+                {180, 102, 180},
+                {30,102,180}
+        };
         Pose2d[] waypoints = {
                 new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
                 new Pose2d(Units.inchesToMeters(150), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
@@ -53,10 +68,11 @@ public class AutoNavBarrel extends SequentialCommandGroup {
         config.setReversed(false);
 
         addCommands(new SetOdometry(swerveDrive, fieldSim, startPosition),
-                new SetDriveNeutralMode(swerveDrive, true)
+                new SetDriveNeutralMode(swerveDrive, true),
+                new ExecuteSwerveTrajectory(swerveDrive, config, fieldSim, waypointsRaw)
         );
 
-        var trajectoryStates = new ArrayList<Pose2d>();
+        /*var trajectoryStates = new ArrayList<Pose2d>();
         for (int i = 0; i < waypoints.length - 1; i++) {
                 if (i != 0) {
                         config.setEndVelocity(config.getMaxVelocity());
@@ -90,7 +106,7 @@ public class AutoNavBarrel extends SequentialCommandGroup {
                 );
                 addCommands(command);
         }
-        fieldSim.getField2d().getObject("trajectory").setPoses(trajectoryStates);
+        fieldSim.getField2d().getObject("trajectory").setPoses(trajectoryStates);*/
 
         addCommands(new WaitCommand(0).andThen(() -> swerveDrive.drive(0, 0, 0, false)));// Run path following command, then stop at the end.
     }

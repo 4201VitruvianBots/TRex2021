@@ -2,6 +2,10 @@ package frc.vitruvianlib.utils;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.util.Units;
 
 import java.io.BufferedReader;
@@ -55,4 +59,29 @@ public class TrajectoryUtils {
 //        );
 //        return ramseteCommand;
 //    }
+
+    public static Trajectory generateSwerveTrajectory(TrajectoryConfig config, int[][] waypoints) {
+        Pose2d start = new Pose2d(
+                Units.inchesToMeters(waypoints[0][0]),
+                Units.inchesToMeters(waypoints[0][1]),
+                new Rotation2d(Units.degreesToRadians(waypoints[0][2]))
+        );
+
+        Pose2d end = new Pose2d(
+                Units.inchesToMeters(waypoints[waypoints.length - 1][0]),
+                Units.inchesToMeters(waypoints[waypoints.length - 1][1]),
+                new Rotation2d(Units.degreesToRadians(waypoints[waypoints.length - 1][2]))
+        );
+
+        ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
+
+        for (int i = 1; i < waypoints.length - 1; i++) {
+            internalPoints.add(new Translation2d(
+                    Units.inchesToMeters(waypoints[i][0]),
+                    Units.inchesToMeters(waypoints[i][1])
+            ));
+        }
+
+        return TrajectoryGenerator.generateTrajectory(start, internalPoints, end, config);
+    }
 }
