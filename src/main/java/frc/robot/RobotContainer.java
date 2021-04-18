@@ -175,9 +175,10 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
     }else{
-      //Invert raw axis of X, Y inputs to match WPILib convention
+      //Invert raw axis of X, Y, and rotation inputs to match WPILib convention
       testController.invertRawAxis(1, true);
       testController.invertRawAxis(0, true);
+      testController.invertRawAxis(2, true);
 
       testController.invertRawAxis(5, true);
       for (int i = 0; i < testButtons.length; i++)
@@ -200,26 +201,25 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
   }
 
   public Command getAutonomousCommand() {
-    switch (selectedSkillsChallenge) {
-      case AUTO_NAV_BARREL:
-          return new AutoNavBarrel(m_swerveDrive, m_FieldSim);
-      case AUTO_NAV_BOUNCE:
-          return new AutoNavBounce(m_swerveDrive, m_FieldSim);
-      case AUTO_NAV_SLALOM:
-          return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
-      case GALACTIC_SEARCH:
-          return new SequentialCommandGroup(
-              //new SetIntakePiston(m_intake, true), 
-              new GalacticSearchARed(m_swerveDrive, m_FieldSim).deadlineWith(new AutoControlledIntake(m_intake, m_indexer)),
-              new SetIntakePiston(m_intake, false));
-      case None:
-      default:
-          System.out.println("Not a recognized skills command");
-          return null;
-  }
+//    switch (selectedSkillsChallenge) {
+//      case AUTO_NAV_BARREL:
+//          return new AutoNavBarrel(m_swerveDrive, m_FieldSim);
+//      case AUTO_NAV_BOUNCE:
+//          return new AutoNavBounce(m_swerveDrive, m_FieldSim);
+//      case AUTO_NAV_SLALOM:
+//          return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
+//      case GALACTIC_SEARCH:
+//          return new SequentialCommandGroup(
+//              //new SetIntakePiston(m_intake, true),
+//              new GalacticSearchARed(m_swerveDrive, m_FieldSim).deadlineWith(new AutoControlledIntake(m_intake, m_indexer)),
+//              new SetIntakePiston(m_intake, false));
+//      case None:
+//      default:
+//          System.out.println("Not a recognized skills command");
+//          return null;
 //    return m_autoCommand;
 //        return new WaitCommand(0);
-    return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
+      return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
 //    return new AutoNavBarrel(m_swerveDrive, m_FieldSim);
 //    return new AutoNavBounce(m_swerveDrive, m_FieldSim);
 //    return new DriveForwardDistance(m_swerveDrive, m_FieldSim, 5);

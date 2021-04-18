@@ -293,7 +293,7 @@ public class SwerveDrive extends SubsystemBase {
 //                target = target.unaryMinus();
 
             setHeadingToTargetHeading(target);
-//            System.out.println("Target Heading: " + getHeadingToTarget());
+            System.out.println("Target Heading: " + getHeadingToTarget());
         }
 
         // This method will be called once per scheduler run
@@ -325,7 +325,7 @@ public class SwerveDrive extends SubsystemBase {
         yaw += chassisRotationSpeed * 0.02;
         SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
 //        angle.set(Math.IEEEremainder(-swerveChassisSim.getHeading().getDegrees(), 360));
-        angle.set(Units.radiansToDegrees(yaw));
+        angle.set(-Units.radiansToDegrees(yaw));
     }
 
     private void sampleTrajectory() {

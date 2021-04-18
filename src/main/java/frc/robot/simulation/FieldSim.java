@@ -180,7 +180,7 @@ public class FieldSim {
 
         m_field2d.getObject("PowerCells").setPoses(Arrays.stream(m_powercells).map(Powercell::getBallPose)
                                                                 .collect(Collectors.toList()));
-//        m_field2d.getObject("Heading Target").setPose(new Pose2d(m_swerveDrive.getTargetPose().getTranslation(), m_swerveDrive.getHeadingToTarget()));
+        m_field2d.getObject("Heading Target").setPose(new Pose2d(m_swerveDrive.getTargetPose().getTranslation(), m_swerveDrive.getHeadingToTarget()));
 
         SmartDashboard.putData("Field2d", m_field2d);
     }

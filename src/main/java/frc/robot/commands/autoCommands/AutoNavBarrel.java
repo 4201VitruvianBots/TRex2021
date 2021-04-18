@@ -19,6 +19,7 @@ import frc.vitruvianlib.utils.TrajectoryUtils;
 
 import java.awt.image.PackedColorModel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,7 @@ public class AutoNavBarrel extends SequentialCommandGroup {
                 new Pose2d(Units.inchesToMeters(125), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(90))),
                 new Pose2d(Units.inchesToMeters(240), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(0))),
                 new Pose2d(Units.inchesToMeters(265), Units.inchesToMeters(135), new Rotation2d(Units.degreesToRadians(90))),
-                new Pose2d(Units.inchesToMeters(240), Units.inchesToMeters(165), new Rotation2d(Units.degreesToRadians(180))),
+                new Pose2d(Units.inchesToMeters(240), Units.inchesToMeters(150), new Rotation2d(Units.degreesToRadians(180))),
                 new Pose2d(Units.inchesToMeters(215), Units.inchesToMeters(135), new Rotation2d(Units.degreesToRadians(-90))),
                 new Pose2d(Units.inchesToMeters(285), Units.inchesToMeters(34), new Rotation2d(Units.degreesToRadians(0))),
                 new Pose2d(Units.inchesToMeters(330), Units.inchesToMeters(60), new Rotation2d(Units.degreesToRadians(90))),
@@ -56,41 +57,49 @@ public class AutoNavBarrel extends SequentialCommandGroup {
                 new SetDriveNeutralMode(swerveDrive, true)
         );
 
+        var trajectory = TrajectoryGenerator.generateTrajectory(Arrays.asList(waypoints.clone()), config);
+
         var trajectoryStates = new ArrayList<Pose2d>();
-        for (int i = 0; i < waypoints.length - 1; i++) {
-                if (i != 0) {
-                        config.setEndVelocity(config.getMaxVelocity());
-                        config.setStartVelocity(config.getMaxVelocity());
-                }
-                if (i == waypoints.length - 2) {
-                        config.setEndVelocity(0);
-                }
-                Trajectory trajectory = TrajectoryGenerator.generateTrajectory(waypoints[i],
-                        List.of(),
-                        waypoints[i + 1],
-                        config);
-
-                trajectoryStates.addAll(trajectory.getStates().stream()
-                        .map(state -> state.poseMeters)
-                        .collect(Collectors.toList()));
-
-                SwerveControllerCommand command = new SwerveControllerCommand(
-                        trajectory,
-                        swerveDrive::getPose,
-                        Constants.DriveConstants.kDriveKinematics,
-                        //Position controllers
-                        new PIDController(Constants.AutoConstants.kPXController, 0,0),
-                        new PIDController(Constants.AutoConstants.kPYController, 0,0),
-                        new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
-                        Constants.AutoConstants.kThetaControllerConstraints),
-
-                        swerveDrive::setModuleStates,
-
-                        swerveDrive
-                );
-                addCommands(command);
-        }
+        trajectoryStates.addAll(trajectory.getStates().stream()
+                .map(state -> state.poseMeters)
+                .collect(Collectors.toList()));
         fieldSim.getField2d().getObject("trajectory").setPoses(trajectoryStates);
+
+        addCommands(TrajectoryUtils.generateSwerveCommand(swerveDrive, trajectory, ()-> new Rotation2d()));
+
+//        for (int i = 0; i < waypoints.length - 1; i++) {
+//                if (i != 0) {
+//                        config.setEndVelocity(config.getMaxVelocity());
+//                        config.setStartVelocity(config.getMaxVelocity());
+//                }
+//                if (i == waypoints.length - 2) {
+//                        config.setEndVelocity(0);
+//                }
+//                Trajectory trajectory = TrajectoryGenerator.generateTrajectory(waypoints[i],
+//                        List.of(),
+//                        waypoints[i + 1],
+//                        config);
+//
+//                trajectoryStates.addAll(trajectory.getStates().stream()
+//                        .map(state -> state.poseMeters)
+//                        .collect(Collectors.toList()));
+//
+//                SwerveControllerCommand command = new SwerveControllerCommand(
+//                        trajectory,
+//                        swerveDrive::getPose,
+//                        Constants.DriveConstants.kDriveKinematics,
+//                        //Position controllers
+//                        new PIDController(Constants.AutoConstants.kPXController, 0,0),
+//                        new PIDController(Constants.AutoConstants.kPYController, 0,0),
+//                        new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
+//                        Constants.AutoConstants.kThetaControllerConstraints),
+//
+//                        swerveDrive::setModuleStates,
+//
+//                        swerveDrive
+//                );
+//                addCommands(command);
+//        }
 
         addCommands(new WaitCommand(0).andThen(() -> swerveDrive.drive(0, 0, 0, false)));// Run path following command, then stop at the end.
     }

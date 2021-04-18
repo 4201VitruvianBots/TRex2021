@@ -292,6 +292,6 @@ public class SwerveModule extends SubsystemBase {
     simulationThrottleEncoderSim.setDistance(simThrottleEncoderDistance);
     simulationThrottleEncoderSim.setRate(moduleThrottleSimModel.getAngularVelocityRadPerSec());
 
-    System.out.println("Module " + mModuleNumber + " State: " + getState());
+//    System.out.println("Module " + mModuleNumber + " State: " + getState());
   }
 }
