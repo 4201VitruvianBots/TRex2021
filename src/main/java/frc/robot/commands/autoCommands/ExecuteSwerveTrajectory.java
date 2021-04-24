@@ -43,7 +43,7 @@ public class ExecuteSwerveTrajectory extends SequentialCommandGroup {
                 new PIDController(Constants.AutoConstants.kPYController, 0,0),
                 new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
                         Constants.AutoConstants.kThetaControllerConstraints),
-                swerveDrive::getHeadingToTarget,
+                //swerveDrive::getHeadingToTarget,
                 //() -> new Rotation2d(0),
 
                 swerveDrive::setModuleStates,

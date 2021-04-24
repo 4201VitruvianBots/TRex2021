@@ -325,7 +325,7 @@ public class SwerveDrive extends SubsystemBase {
         yaw += chassisRotationSpeed * 0.02;
         SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
 //        angle.set(Math.IEEEremainder(-swerveChassisSim.getHeading().getDegrees(), 360));
-        angle.set(Units.radiansToDegrees(yaw));
+        angle.set(-Units.radiansToDegrees(yaw));
     }
 
     private void sampleTrajectory() {

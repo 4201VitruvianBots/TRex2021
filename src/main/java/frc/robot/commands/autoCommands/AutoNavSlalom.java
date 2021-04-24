@@ -59,7 +59,7 @@ public class AutoNavSlalom extends SequentialCommandGroup {
                 {240,30,0},
                 {180,30,0},
                 {120,30,0},
-                {30,90,0}
+                {30,90,180}
         };
         Pose2d[] waypoints = {
                 new Pose2d(Units.inchesToMeters(40), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
