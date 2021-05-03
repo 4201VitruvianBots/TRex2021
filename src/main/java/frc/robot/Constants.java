@@ -26,14 +26,14 @@ public final class Constants {
     public static final int xBoxController = 2;
 
     // CAN ADDRESSES
-    public static final int frontLeftDriveMotor = 20;
-    public static final int frontLeftTurningMotor = 21;
-    public static final int frontRightDriveMotor = 22;
-    public static final int frontRightTurningMotor = 23;
-    public static final int backLeftDriveMotor = 24;
-    public static final int backLeftTurningMotor = 25;
-    public static final int backRightDriveMotor = 26;
-    public static final int backRightTurningMotor = 27;
+    public static final int frontLeftDriveMotor = 26;
+    public static final int frontLeftTurningMotor = 27;
+    public static final int frontRightDriveMotor = 24;
+    public static final int frontRightTurningMotor = 25;
+    public static final int backLeftDriveMotor = 22;
+    public static final int backLeftTurningMotor = 23;
+    public static final int backRightDriveMotor = 20;
+    public static final int backRightTurningMotor = 21;
 
     public static final class DriveConstants {
         public static final double kTrackWidth = 0.5;
@@ -122,8 +122,8 @@ public final class Constants {
     public static final int climbPistonAReverse = 32;
     public static final int climbPistonBForward = 33;
     public static final int climbPistonBReverse = 34;
-    public static final int indexerMotor = 35;
-    public static final int uptakeMotor = 36;
+    public static final int indexerMotor = 31;
+    public static final int uptakeMotor = 35;
 
     // Undetermined IDs
     public static final int carouselMotor = 4201;
