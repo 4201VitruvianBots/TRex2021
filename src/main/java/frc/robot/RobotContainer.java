@@ -44,9 +44,9 @@ public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   private final PowerDistributionPanel pdp = new PowerDistributionPanel();
-  // private final Indexer m_indexer = new Indexer();
-  // private final Intake m_intake = new Intake();
-  // private final Uptake m_uptake = new Uptake();
+   private final Indexer m_indexer = new Indexer();
+   private final Intake m_intake = new Intake();
+   private final Uptake m_uptake = new Uptake();
   private final SwerveDrive m_swerveDrive = new SwerveDrive(pdp);
   // private final Turret m_turret = new Turret(m_swerveDrive);
   // private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
@@ -133,20 +133,28 @@ public class RobotContainer {
         xBoxPOVButtons[i] = new POVButton(xBoxController, (i * 45));
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
+
+//      Intake (Xbox button 4)
+
+      xBoxButtons[1].whenPressed(new SetIntakePiston(m_intake, true));
+      xBoxButtons[1].whileHeld(new SetIntake(m_intake, 0.6));
+      xBoxButtons[1].whileHeld(new SetCaroselOutput(m_indexer, 0.6));
+      xBoxButtons[1].whenReleased(new SetIntakePiston(m_intake, false));
+
     }else{
       testController.invertRawAxis(1, true);
       testController.invertRawAxis(5, true);
       for (int i = 0; i < testButtons.length; i++)
         testButtons[i] = new JoystickButton(testController, (i + 1));
-/*
+
       // Intake (PS4 X button)
-      testButtons[1].whenPressed(new SetIntakePiston(m_intake, true));
-      testButtons[1].whileHeld(new SetIntake(m_intake, 0.6));
-      testButtons[1].whileHeld(new SetCaroselOutput(m_indexer, 0.6));
+//      testButtons[1].whenPressed(new SetIntakePiston(m_intake, true));
+//      testButtons[1].whileHeld(new SetIntake(m_intake, 0.6));
+//      testButtons[1].whileHeld(new SetCaroselOutput(m_indexer, 0.6));
 
       // Deploy Retract Intake (PS4 Left Shoulder/Trigger)
       testButtons[5].whenPressed(new SetIntakePiston(m_intake, true));
-      testButtons[7].whenPressed(new SetIntakePiston(m_intake, false));*/
+      testButtons[7].whenPressed(new SetIntakePiston(m_intake, false));
     }
   }
 
