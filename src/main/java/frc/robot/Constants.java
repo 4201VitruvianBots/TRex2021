@@ -104,14 +104,14 @@ public final class Constants {
 
     }
 
-    public static int intakeMotor = 47;
     public static final int pcmOne = 11;
-    public static final int intakePistonForward = 2; // 2
-    public static final int intakePistonReverse = 3; // 3
+    public static final int intakePistonForward = 0; // 2
+    public static final int intakePistonReverse = 1; // 3
     public static enum IntakeStates {
         INTAKE_EMPTY, INTAKE_ONE_BALL, INTAKE_FOUR_BALLS, INTAKE_FIVE_BALLS
     }
     public static final int flywheelMotorA = 40;
+    public static int intakeMotor = 47;
     public static final int flywheelMotorB = 41;
     public static final int turretEncoder = 61;
     public static final int turretMotor = 60;
