@@ -26,7 +26,7 @@ public class Turret extends SubsystemBase {
     private final int encoderUnitsPerRotation = 4096;
     private final SwerveDrive m_swerveDrive;
     // setup motor and encoder variables
-    CANSparkMax turretMotor = new CANSparkMax(Constants.indexerMotor, MotorType.kBrushless);
+    CANSparkMax turretMotor = new CANSparkMax(Constants.turretMotor, MotorType.kBrushless);
     CANEncoder encoder = turretMotor.getEncoder();
     CANPIDController pidController = turretMotor.getPIDController();
     // Turret PID gains

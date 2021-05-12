@@ -2,9 +2,12 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import frc.robot.Constants;
 
 /*
@@ -26,7 +29,7 @@ public class Intake extends SubsystemBase {
     private boolean intaking = false;
 
     // Intake motor setup
-    private CANSparkMax intakeMotor =  new CANSparkMax(Constants.intakeMotor, MotorType.kBrushless);
+    private TalonFX intakeMotor =  new TalonFX(Constants.intakeMotor);
 //  private CANEncoder intakeEncoder = intakeMotor.getEncoder();
 //  private CANPIDController canPidController = intakeMotor.getPIDController();
 
@@ -34,9 +37,9 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         // Configure motors
-
-        intakeMotor.restoreFactoryDefaults();
-        intakeMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        intakeMotor.configFactoryDefault();
+        // intakeMotor.restoreFactoryDefaults();
+        // intakeMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
         intakeMotor.setInverted(false);
 
 //    canPidController.setFF(kFF);
@@ -67,7 +70,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void setIntakePercentOutput(double value){
-        intakeMotor.set(value);
+        intakeMotor.set(ControlMode.PercentOutput, value);
     }
 
 //  public double getRPM(){

@@ -25,6 +25,9 @@ import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.indexer.SetCaroselOutput;
 import frc.robot.commands.indexer.SetKickerOutput;
 import frc.robot.commands.intake.*;
+import frc.robot.commands.turret.SetTurretRobotRelativeAngle;
+import frc.robot.commands.shooter.SetUptake;
+import frc.robot.commands.shooter.SetRPM;
 import frc.robot.subsystems.*;
 import frc.vitruvianlib.utils.JoystickWrapper;
 import frc.vitruvianlib.utils.XBoxTrigger;
@@ -48,9 +51,9 @@ public class RobotContainer {
    private final Intake m_intake = new Intake();
    private final Uptake m_uptake = new Uptake();
   private final SwerveDrive m_swerveDrive = new SwerveDrive(pdp);
-  // private final Turret m_turret = new Turret(m_swerveDrive);
-  // private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
-  // private final Shooter m_shooter = new Shooter(m_vision, pdp);
+  private final Turret m_turret = new Turret(m_swerveDrive);
+  private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
+  private final Shooter m_shooter = new Shooter(m_vision, pdp);
 
 
   private enum CommandSelector {
@@ -136,10 +139,14 @@ public class RobotContainer {
 
 //      Intake (Xbox button 4)
 
-      xBoxButtons[1].whenPressed(new SetIntakePiston(m_intake, true));
+      // xBoxButtons[1].whenPressed(new SetIntakePiston(m_intake, true));
       xBoxButtons[1].whileHeld(new SetIntake(m_intake, 0.6));
-      xBoxButtons[1].whileHeld(new SetCaroselOutput(m_indexer, 0.6));
-      xBoxButtons[1].whenReleased(new SetIntakePiston(m_intake, false));
+      // xBoxButtons[1].whileHeld(new SetCaroselOutput(m_indexer, 0.6));
+      // xBoxButtons[1].whenReleased(new SetIntakePiston(m_intake, false));
+
+      xBoxButtons[0].whileHeld(new SetRPM(m_shooter, 400));
+      xBoxButtons[2].whileHeld(new SetCaroselOutput(m_indexer, 0.3));
+      xBoxButtons[3].whileHeld(new SetUptake(m_uptake, 0.3));
 
     }else{
       testController.invertRawAxis(1, true);
