@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import edu.wpi.first.wpilibj.controller.PIDController;
+
 
 public class SwerveDrive extends SubsystemBase {
 
@@ -37,6 +39,14 @@ public class SwerveDrive extends SubsystemBase {
     final double deadZone = 0.075;
 
     private int navXDebug = 0;
+
+    private double thetaSetPoint = 0;
+    private final PIDController rotationController = new PIDController(0.2, 0, 0);
+    private boolean setpointPending = true;
+    // private boolean deltaThetaDead = false; // Whether rate of turn is within the dead zone
+    private double pTheta; // Past heading
+    private double ppTheta; // Past Past heading
+    private double rotationOutput;
 
     private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(Constants.DriveConstants.kDriveKinematics, getRotation());
 
@@ -67,6 +77,7 @@ public class SwerveDrive extends SubsystemBase {
 
     public SwerveDrive(PowerDistributionPanel pdp) {
         m_pdp = pdp;
+        rotationController.enableContinuousInput(-180, 180);
 
         SmartDashboardTab.putData("SwerveDrive","swerveDriveSubsystem", this);
     }
@@ -165,17 +176,38 @@ public class SwerveDrive extends SubsystemBase {
             xSpeed=0;
         if (Math.abs(ySpeed) <= deadZone)
             ySpeed=0;
-        if (Math.abs(rot) <= deadZone)
-            rot=0;                          // Deadzones
-
+        if (Math.abs(rot) <= 0.01) {
+            rot = 0; //takes care of the dead zone
+            if (Math.signum(getHeading() - pTheta) == Math.signum(pTheta - ppTheta) && setpointPending) { //Dead zone
+                thetaSetPoint = getHeading();
+                setpointPending = false;
+            } 
+            // if (setpointPending) {
+            //   // thetaSetPoint = getHeading();
+                
+            //   setpointPending = false;
+            // }
+        } else if (!setpointPending) {
+            setpointPending = true;
+        }
+        
         xSpeed *= kMaxSpeed;
         ySpeed *= kMaxSpeed;      // Try to normalize joystick limits to speed limits
         rot *= kMaxAngularSpeed;
 
+        pTheta = getHeading();
+        ppTheta = pTheta;
+
+        if (setpointPending) {
+            rotationOutput = rot;
+        } else {
+            rotationOutput = rotationController.calculate(getHeading(),thetaSetPoint);
+        }
+
         var swerveModuleStates = Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         xSpeed, ySpeed, rot, getRotation())
-                        : new ChassisSpeeds(xSpeed, ySpeed, rot)
+                        : new ChassisSpeeds(xSpeed, ySpeed, rotationOutput)
         ); //from 2910's code
         //todo: rotationSpeed += PIDOutput //this PID calculates the speed needed to turn to a setpoint based off of a button input. Probably from the D-PAD
         SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
@@ -290,7 +322,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     private void updateSmartDashboard() {
-        SmartDashboardTab.putNumber("SwerveDrive","Angle",getRawGyroAngle());
+        SmartDashboardTab.putNumber("SwerveDrive","Angle",getHeading());
         for(int i = 0; i < mSwerveModules.length; i++) {
             SmartDashboardTab.putNumber("SwerveDrive", "Swerve Module " + i + " Angle", mSwerveModules[i].getState().angle.getDegrees());
             SmartDashboardTab.putNumber("SwerveDrive", "Swerve Module " + i + " Speed", mSwerveModules[i].getState().speedMetersPerSecond);
@@ -307,6 +339,12 @@ public class SwerveDrive extends SubsystemBase {
 //    SmartDashboardTab.putNumber("SwerveDrive","Front Left Speed",mSwerveModules[1].getState().speedMetersPerSecond);
 //    SmartDashboardTab.putNumber("SwerveDrive","Back Left Speed",mSwerveModules[2].getState().speedMetersPerSecond);
 //    SmartDashboardTab.putNumber("SwerveDrive","Back Right Speed",mSwerveModules[3].getState().speedMetersPerSecond);
+        SmartDashboardTab.putNumber("SwerveDrive", "Rotation Setpoint",thetaSetPoint);
+        SmartDashboardTab.putNumber("SwerveDrive", "Change in heading", getHeading() - pTheta);
+        SmartDashboardTab.putBoolean("SwerveDrive", "setpointPending", setpointPending);
+
+        SmartDashboardTab.putNumber("SwerveDrive", "pTheta", pTheta);
+        SmartDashboardTab.putNumber("SwerveDrive", "ppTheta", ppTheta);
     }
 
     @Override
