@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.SetSwerveDrive;
 import frc.robot.commands.autoCommands.DriveStraight;
+import frc.robot.simulation.FieldSim;
 import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.indexer.SetCaroselOutput;
 import frc.robot.commands.indexer.SetKickerOutput;
@@ -47,10 +48,11 @@ public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   private final PowerDistributionPanel pdp = new PowerDistributionPanel();
-   private final Indexer m_indexer = new Indexer();
-   private final Intake m_intake = new Intake();
-   private final Uptake m_uptake = new Uptake();
+  private final Indexer m_indexer = new Indexer();
+  private final Intake m_intake = new Intake();
+  private final Uptake m_uptake = new Uptake();
   private final SwerveDrive m_swerveDrive = new SwerveDrive(pdp);
+  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive);
   private final Turret m_turret = new Turret(m_swerveDrive);
   private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
   private final Shooter m_shooter = new Shooter(m_vision, pdp);
@@ -121,7 +123,8 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    if(RobotBase.isReal()) {
+    // if(RobotBase.isReal()) {
+    // if (true) {
       leftJoystick.invertRawAxis(1, true);
       rightJoystick.invertRawAxis(0, true);
       xBoxController.invertRawAxis(1, true);
@@ -148,21 +151,21 @@ public class RobotContainer {
       xBoxButtons[2].whileHeld(new SetCaroselOutput(m_indexer, 0.3));
       xBoxButtons[3].whileHeld(new SetUptake(m_uptake, 0.3));
 
-    }else{
-      testController.invertRawAxis(1, true);
-      testController.invertRawAxis(5, true);
-      for (int i = 0; i < testButtons.length; i++)
-        testButtons[i] = new JoystickButton(testController, (i + 1));
+//     } else {
+//       testController.invertRawAxis(1, true);
+//       testController.invertRawAxis(5, true);
+//       for (int i = 0; i < testButtons.length; i++)
+//         testButtons[i] = new JoystickButton(testController, (i + 1));
 
-      // Intake (PS4 X button)
-//      testButtons[1].whenPressed(new SetIntakePiston(m_intake, true));
-//      testButtons[1].whileHeld(new SetIntake(m_intake, 0.6));
-//      testButtons[1].whileHeld(new SetCaroselOutput(m_indexer, 0.6));
+//       // Intake (PS4 X button)
+// //      testButtons[1].whenPressed(new SetIntakePiston(m_intake, true));
+// //      testButtons[1].whileHeld(new SetIntake(m_intake, 0.6));
+// //      testButtons[1].whileHeld(new SetCaroselOutput(m_indexer, 0.6));
 
-      // Deploy Retract Intake (PS4 Left Shoulder/Trigger)
-      testButtons[5].whenPressed(new SetIntakePiston(m_intake, true));
-      testButtons[7].whenPressed(new SetIntakePiston(m_intake, false));
-    }
+//       // Deploy Retract Intake (PS4 Left Shoulder/Trigger)
+//       testButtons[5].whenPressed(new SetIntakePiston(m_intake, true));
+//       testButtons[7].whenPressed(new SetIntakePiston(m_intake, false));
+//     }
   }
 
   /**
@@ -182,5 +185,13 @@ public class RobotContainer {
 
   public void initializeLogTopics() {
 //    m_controls.initLogging();
+  }
+
+   public void initSim() {
+     m_fieldSim.initSim();
+   }
+
+  public void simulationPeriodic() {
+    m_fieldSim.simulationPeriodic();
   }
 }
