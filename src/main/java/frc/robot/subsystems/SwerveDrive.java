@@ -46,6 +46,7 @@ public class SwerveDrive extends SubsystemBase {
     // private boolean deltaThetaDead = false; // Whether rate of turn is within the dead zone
     private double pTheta; // Past heading
     private double ppTheta; // Past Past heading
+    private boolean turnClockwise;
     private double rotationOutput;
 
     private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(Constants.DriveConstants.kDriveKinematics, getRotation());
@@ -129,7 +130,7 @@ public class SwerveDrive extends SubsystemBase {
      * @return the robot's heading in degrees, from 180 to 180
      */
     public double getHeading() {
-        return Math.IEEEremainder(mNavX.getAngle(), 360);
+        return -mNavX.getAngle();
     }
 
     /**
@@ -178,7 +179,7 @@ public class SwerveDrive extends SubsystemBase {
             ySpeed=0;
         if (Math.abs(rot) <= 0.01) {
             rot = 0; //takes care of the dead zone
-            if (Math.signum(getHeading() - pTheta) == Math.signum(pTheta - ppTheta) && setpointPending) { //Dead zone
+            if (((getHeading() - ppTheta > 0) ^ turnClockwise) && setpointPending) { //Dead zone
                 thetaSetPoint = getHeading();
                 setpointPending = false;
             } 
@@ -189,14 +190,17 @@ public class SwerveDrive extends SubsystemBase {
             // }
         } else if (!setpointPending) {
             setpointPending = true;
+        } else {
+            turnClockwise = getHeading() - ppTheta >= 0;
         }
+    
         
         xSpeed *= kMaxSpeed;
         ySpeed *= kMaxSpeed;      // Try to normalize joystick limits to speed limits
         rot *= kMaxAngularSpeed;
 
-        pTheta = getHeading();
         ppTheta = pTheta;
+        pTheta = getHeading();
 
         if (setpointPending) {
             rotationOutput = rot;
