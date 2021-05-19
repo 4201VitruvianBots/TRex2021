@@ -59,7 +59,7 @@ public final class Constants {
         public static final double kvVoltSecondsPerMeter = 2.3;
         public static final double kaVoltSecondsSquaredPerMeter = 0.0917;
 
-        public static final double kMaxSpeedMetersPerSecond = 3;
+        public static final double kMaxSpeedMetersPerSecond = 9;
     }
 
     public static final class ModuleConstants {
@@ -67,8 +67,8 @@ public final class Constants {
         public static final double kTurningMotorGearRatio = 12.8; //12 to 1
         public static final int kEncoderCPR = 2048;
         public static final double kWheelDiameterMeters = 0.10; //10.16 cm
-        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 4*2 * Math.PI;
-        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 4*2 * Math.PI;
+        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 6*2 * Math.PI;
+        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 6*2 * Math.PI;
 
         public static final double kDriveEncoderDistancePerPulse =
                 (kWheelDiameterMeters * Math.PI) / ((double) kEncoderCPR*kDriveMotorGearRatio);
@@ -127,4 +127,6 @@ public final class Constants {
 
     // Undetermined IDs
     public static final int carouselMotor = 4201;
+
+    // Food toast = Toaster.cook(new Bread());
 }

@@ -29,9 +29,6 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 
 public class SwerveDrive extends SubsystemBase {
 
-    public static final double kMaxSpeed = 3.0; // 3 meters per second
-    public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
-
     private boolean isFieldOriented;
     private final double throttle = 0.8;
     private final double turningThrottle = 0.5;
@@ -60,10 +57,10 @@ public class SwerveDrive extends SubsystemBase {
      * 3 is Back Right
      */
     private SwerveModule[] mSwerveModules = new SwerveModule[] {
-            new SwerveModule(0, new TalonFX(Constants.frontLeftTurningMotor), new TalonFX(Constants.frontLeftDriveMotor), 0, true, false),
-            new SwerveModule(1, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), 0, true, false), //true
-            new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), 0, true, false),
-            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), 0, true, false) //true
+            new SwerveModule(0, new TalonFX(Constants.frontLeftTurningMotor), new TalonFX(Constants.frontLeftDriveMotor), 0, false, false),
+            new SwerveModule(1, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), 0, false, false), //true
+            new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), 0, false, false),
+            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), 0, false, false) //true
     };
 
     private AHRS mNavX = new AHRS(SerialPort.Port.kMXP);
@@ -195,9 +192,9 @@ public class SwerveDrive extends SubsystemBase {
         }
     
         
-        xSpeed *= kMaxSpeed;
-        ySpeed *= kMaxSpeed;      // Try to normalize joystick limits to speed limits
-        rot *= kMaxAngularSpeed;
+        xSpeed *= Constants.DriveConstants.kMaxSpeedMetersPerSecond;
+        ySpeed *= Constants.DriveConstants.kMaxSpeedMetersPerSecond;      // Try to normalize joystick limits to speed limits
+        rot *= Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond;
 
         ppTheta = pTheta;
         pTheta = getHeading();
@@ -214,7 +211,7 @@ public class SwerveDrive extends SubsystemBase {
                         : new ChassisSpeeds(xSpeed, ySpeed, rotationOutput)
         ); //from 2910's code
         //todo: rotationSpeed += PIDOutput //this PID calculates the speed needed to turn to a setpoint based off of a button input. Probably from the D-PAD
-        SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
+        SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, Constants.DriveConstants.kMaxSpeedMetersPerSecond);
         SmartDashboardTab.putNumber("SwerveDrive","Desired State",swerveModuleStates[0].angle.getDegrees());
         // mSwerveModules[0].setDesiredState(swerveModuleStates[0]);
         // mSwerveModules[2].setDesiredState(swerveModuleStates[1]);
