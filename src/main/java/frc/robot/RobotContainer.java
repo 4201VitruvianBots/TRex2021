@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.SetSwerveDrive;
+import frc.robot.commands.SwerveAngles;
 import frc.robot.commands.autoCommands.DriveStraight;
 import frc.robot.simulation.FieldSim;
 import frc.robot.commands.indexer.FeedAll;
@@ -151,6 +152,15 @@ public class RobotContainer {
       xBoxButtons[0].whileHeld(new SetRPM(m_shooter, 400));
       xBoxButtons[2].whileHeld(new SetCaroselOutput(m_indexer, 0.3));
       xBoxButtons[3].whileHeld(new SetUptake(m_uptake, 0.3));
+
+      for (Button i : xBoxPOVButtons) {
+        i.whileHeld(new SwerveAngles(
+          m_swerveDrive,
+          () -> leftJoystick.getRawAxis(0),
+          () -> leftJoystick.getRawAxis(1),
+          () -> xBoxController.getPOV())
+        );
+      }
 
 //     } else {
 //       testController.invertRawAxis(1, true);

@@ -151,6 +151,10 @@ public class SwerveDrive extends SubsystemBase {
         return mSwerveModules[i];
     }
 
+    public void setSetpointRelative(int angle) {
+        thetaSetPoint = angle;
+    }
+
     /**
      * Returns the currently-estimated pose of the robot.
      *
