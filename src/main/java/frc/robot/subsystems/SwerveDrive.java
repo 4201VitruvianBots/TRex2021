@@ -193,7 +193,7 @@ public class SwerveDrive extends SubsystemBase {
                 noSetpoint = false;
             }
 
-            rotOutput = rotationController.calculate(getHeading() - headingSetpoint, 0);
+            rotOutput = rotationController.calculate(Math.IEEEremainder(getHeading() - headingSetpoint, 360), 0);
         }
 
         var swerveModuleStates = kDriveKinematics.toSwerveModuleStates(
