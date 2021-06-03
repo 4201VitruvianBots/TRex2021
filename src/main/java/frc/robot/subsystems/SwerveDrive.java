@@ -12,6 +12,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -19,13 +20,17 @@ import edu.wpi.first.wpilibj.kinematics.*;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import frc.robot.Constants;
 import frc.robot.simulation.SimulationReferencePose;
+import org.opencv.core.Mat;
 
+import static frc.robot.Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;
+import static frc.robot.Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared;
 import static frc.robot.Constants.DriveConstants.*;
 
 public class SwerveDrive extends SubsystemBase {
@@ -46,6 +51,13 @@ public class SwerveDrive extends SubsystemBase {
 //        VecBuilder.fill(0.1, 0.1, 0.1),
 //        VecBuilder.fill(0.05),
 //        VecBuilder.fill(0.1, 0.1, 0.1));
+
+    private final TrapezoidProfile.Constraints headingProfile =
+            new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond * 10,
+                    kMaxAngularSpeedRadiansPerSecondSquared * 10);
+    private final ProfiledPIDController rotationController = new ProfiledPIDController(0.2, 0, 0, headingProfile);
+    private double headingSetpoint;
+    private boolean noSetpoint;
 
     PowerDistributionPanel m_pdp;
 
@@ -74,7 +86,7 @@ public class SwerveDrive extends SubsystemBase {
 
     public SwerveDrive(PowerDistributionPanel pdp) {
         m_pdp = pdp;
-
+        rotationController.enableContinuousInput(-180, 180);
         SmartDashboardTab.putData("SwerveDrive","swerveDriveSubsystem", this);
         if (RobotBase.isSimulation()) {
 
@@ -84,10 +96,6 @@ public class SwerveDrive extends SubsystemBase {
 
     public AHRS getNavX() {
         return mNavX;
-    }
-
-    public double getGyroRate() {
-        return mNavX.getRate();
     }
 
     /**
@@ -174,11 +182,24 @@ public class SwerveDrive extends SubsystemBase {
         xSpeed *= kMaxSpeedMetersPerSecond;
         ySpeed *= kMaxSpeedMetersPerSecond;
         rot *= kMaxAngularSpeed;
+        double rotOutput = 0;
+
+        if(Math.abs(rot) > 0) {
+            rotOutput = rot;
+            noSetpoint = true;
+        } else {
+            if(noSetpoint) {
+                headingSetpoint = getHeading();
+                noSetpoint = false;
+            }
+
+            rotOutput = rotationController.calculate(getHeading() - headingSetpoint, 0);
+        }
 
         var swerveModuleStates = kDriveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                        xSpeed, ySpeed, rot, getRotation())
-                        : new ChassisSpeeds(xSpeed, ySpeed, rot)
+                        xSpeed, ySpeed, rotOutput, getRotation())
+                        : new ChassisSpeeds(xSpeed, ySpeed, rotOutput)
         ); //from 2910's code
         SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, Constants.DriveConstants.kMaxSpeedMetersPerSecond);
 
@@ -293,7 +314,7 @@ public class SwerveDrive extends SubsystemBase {
 //                target = target.unaryMinus();
 
             setHeadingToTargetHeading(target);
-            System.out.println("Target Heading: " + getHeadingToTarget());
+//            System.out.println("Target Heading: " + getHeadingToTarget());
         }
 
         // This method will be called once per scheduler run
@@ -324,8 +345,10 @@ public class SwerveDrive extends SubsystemBase {
 
         yaw += chassisRotationSpeed * 0.02;
         SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
+        SimDouble angleRate = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Rate"));
 //        angle.set(Math.IEEEremainder(-swerveChassisSim.getHeading().getDegrees(), 360));
         angle.set(-Units.radiansToDegrees(yaw));
+        angleRate.set(-Units.radiansToDegrees(chassisRotationSpeed));
     }
 
     private void sampleTrajectory() {
