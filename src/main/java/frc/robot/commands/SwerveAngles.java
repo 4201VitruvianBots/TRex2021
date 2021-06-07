@@ -26,7 +26,9 @@ public class SwerveAngles extends CommandBase {
   // private final DoubleSupplier m_leftX, m_leftY;
   private final IntSupplier m_angSupply;
   private int m_ang;
-  // private final PIDController pidcontroller = new PIDController(1, 0, 0);
+  
+  private DoubleSupplier m_leftX, m_leftY;
+// private final PIDController pidcontroller = new PIDController(1, 0, 0);
 
   /**
    * Creates a new ExampleCommand.
@@ -37,8 +39,8 @@ public class SwerveAngles extends CommandBase {
     // pidcontroller.enableContinuousInput(-180, 180);
     // pidcontroller.setTolerance(5);
     m_swerveDrive = swerveDriveSubsystem;
-    // m_leftX = leftX;
-    // m_leftY = leftY;
+    m_leftX = leftX;
+    m_leftY = leftY;
     m_angSupply = angSupply;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerveDriveSubsystem);
@@ -56,21 +58,7 @@ public class SwerveAngles extends CommandBase {
   public void execute() {
     // Forward/Back Throttle, Left/Right Strafe, Left/Right Turn
     m_ang = m_angSupply.getAsInt();
-    /*if(m_ang >= 0 ) {
-      m_ang =  +m_ang;
-      pidcontroller.calculate(m_swerveDrive.getHeading() ,m_ang);
-      if(!pidcontroller.atSetpoint()) {
-        if(RobotBase.isReal())
-          m_swerveDrive.drive(m_leftY.getAsDouble(), m_leftX.getAsDouble(), Units.degreesToRadians(-pidcontroller.calculate(m_swerveDrive.getHeading() ,m_ang)),false);
-        else
-          m_swerveDrive.drive(-m_leftY.getAsDouble(), m_leftX.getAsDouble(), Units.degreesToRadians(-pidcontroller.calculate(m_swerveDrive.getHeading() ,m_ang)),false);
-      }
-    } else {
-      if(RobotBase.isReal())
-        m_swerveDrive.drive(m_leftY.getAsDouble(), m_leftX.getAsDouble(), Units.degreesToRadians(0),false);
-      else
-        m_swerveDrive.drive(-m_leftY.getAsDouble(), m_leftX.getAsDouble(), Units.degreesToRadians(0),false);
-    }*/
+    m_swerveDrive.drive(m_leftX.getAsDouble(), m_leftY.getAsDouble(), 0, false);
     if (m_ang >= 0) {
       m_swerveDrive.setSetpointRelative(m_ang);
     }

@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 
 
 public class SwerveDrive extends SubsystemBase {
@@ -38,7 +39,7 @@ public class SwerveDrive extends SubsystemBase {
     private int navXDebug = 0;
 
     private double thetaSetPoint = 0;
-    private final profiledPIDController rotationController = new profiledPIDController(0.2, 0, 0, Constants.autoConstants.kThetaControllerConstraints);
+    private final ProfiledPIDController rotationController = new ProfiledPIDController(0.12, 0, 0, Constants.AutoConstants.kThetaControllerConstraints);
     private boolean setpointPending = true;
     // private boolean deltaThetaDead = false; // Whether rate of turn is within the dead zone
     private double pTheta; // Past heading
@@ -75,7 +76,7 @@ public class SwerveDrive extends SubsystemBase {
 
     public SwerveDrive(PowerDistributionPanel pdp) {
         m_pdp = pdp;
-        rotationController.enableContinuousInput(-180, 180);
+//        rotationController.enableContinuousInput(-180, 180);
 
         SmartDashboardTab.putData("SwerveDrive","swerveDriveSubsystem", this);
     }
@@ -127,7 +128,7 @@ public class SwerveDrive extends SubsystemBase {
      * @return the robot's heading in degrees, from 180 to 180
      */
     public double getHeading() {
-        return -mNavX.getAngle();
+        return Math.IEEEremainder(-mNavX.getAngle(), 360);
     }
 
     /**
@@ -153,7 +154,6 @@ public class SwerveDrive extends SubsystemBase {
 
     public void setSetpointRelative(int angle) {
         thetaSetPoint = angle;
-        setpointPending = false;
     }
 
     /**
@@ -181,10 +181,15 @@ public class SwerveDrive extends SubsystemBase {
             ySpeed=0;
         if (Math.abs(rot) <= 0.01) {
             rot = 0; //takes care of the dead zone
-            if (((mNavX.getRate() > 0) ^ turnClockwise) && setpointPending) { //Dead zone
+            if (Math.abs(mNavX.getRate()) < 0.001 && setpointPending) { //Dead zone
                 thetaSetPoint = getHeading();
                 setpointPending = false;
             } 
+            // if (setpointPending) {
+            //   // thetaSetPoint = getHeading();
+                
+            //   setpointPending = false;
+            // }
         } else if (!setpointPending) {
             setpointPending = true;
         } else {
@@ -196,15 +201,13 @@ public class SwerveDrive extends SubsystemBase {
         ySpeed *= Constants.DriveConstants.kMaxSpeedMetersPerSecond;      // Try to normalize joystick limits to speed limits
         rot *= Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond;
 
-        ppTheta = pTheta;
-        pTheta = getHeading();
+//        ppTheta = pTheta;
+//        pTheta = getHeading();
 
         if (setpointPending) {
             rotationOutput = rot;
         } else {
-            rotationOutput = rotationController.calculate(Math.IEEEremainder(getHeading() - thetaSetPoint, 360), 0);
-            // pidController.calculate(Math.IEEEremainder(getHeading() - setpoint + 180, 360) - 180, 0)
-
+            rotationOutput = rotationController.calculate(getHeading(),thetaSetPoint);
         }
 
         var swerveModuleStates = Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(
@@ -345,6 +348,8 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboardTab.putNumber("SwerveDrive", "Rotation Setpoint",thetaSetPoint);
         SmartDashboardTab.putNumber("SwerveDrive", "Change in heading", getHeading() - pTheta);
         SmartDashboardTab.putBoolean("SwerveDrive", "setpointPending", setpointPending);
+
+        SmartDashboardTab.putNumber("SwerveDrive", "Rate", mNavX.getRate());
 
         SmartDashboardTab.putNumber("SwerveDrive", "pTheta", pTheta);
         SmartDashboardTab.putNumber("SwerveDrive", "ppTheta", ppTheta);
