@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 
 
 public class SwerveDrive extends SubsystemBase {
@@ -38,7 +39,7 @@ public class SwerveDrive extends SubsystemBase {
     private int navXDebug = 0;
 
     private double thetaSetPoint = 0;
-    private final profiledPIDController rotationController = new profiledPIDController(0.2, 0, 0, Constants.autoConstants.kThetaControllerConstraints);
+    private final ProfiledPIDController rotationController = new ProfiledPIDController(0.1, 0, 0, Constants.AutoConstants.kThetaControllerConstraints);
     private boolean setpointPending = true;
     // private boolean deltaThetaDead = false; // Whether rate of turn is within the dead zone
     private double pTheta; // Past heading
