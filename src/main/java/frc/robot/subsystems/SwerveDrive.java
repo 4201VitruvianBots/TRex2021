@@ -39,7 +39,7 @@ public class SwerveDrive extends SubsystemBase {
     private int navXDebug = 0;
 
     private double thetaSetPoint = 0;
-    private final ProfiledPIDController rotationController = new ProfiledPIDController(0.1, 0, 0, Constants.AutoConstants.kThetaControllerConstraints);
+    private final ProfiledPIDController rotationController = new ProfiledPIDController(0.1, 0, 0.001, Constants.AutoConstants.kThetaControllerConstraints);
     private boolean setpointPending = true;
     // private boolean deltaThetaDead = false; // Whether rate of turn is within the dead zone
     private double pTheta; // Past heading
