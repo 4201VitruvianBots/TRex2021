@@ -49,7 +49,7 @@ public class TestSwerveModule extends CommandBase {
     double xInput = Math.abs(m_xInput.getAsDouble()) > 0.05 ? m_xInput.getAsDouble() : 0;
 
     var inputState = new SwerveModuleState(0, new Rotation2d(Math.atan2(yInput, xInput)));
-    m_swerveDrive.getSwerveModule(m_moduleIdx).setDesiredState(inputState);
+    m_swerveDrive.getSwerveModule(m_moduleIdx).setDesiredState(inputState, false);
 
     System.out.println("Input State: " + inputState);
     System.out.println("Output State: " + m_swerveDrive.getSwerveModule(m_moduleIdx).getState());

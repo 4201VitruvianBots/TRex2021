@@ -101,6 +101,6 @@ public class AutoNavBarrel extends SequentialCommandGroup {
 //                addCommands(command);
 //        }
 
-        addCommands(new WaitCommand(0).andThen(() -> swerveDrive.drive(0, 0, 0, false)));// Run path following command, then stop at the end.
+        addCommands(new WaitCommand(0).andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));// Run path following command, then stop at the end.
     }
 }

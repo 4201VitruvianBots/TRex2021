@@ -7,6 +7,15 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
+import com.ctre.phoenix.sensors.CANCoderConfiguration;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+import com.ctre.phoenix.sensors.SensorTimeBase;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.system.LinearSystem;
@@ -15,8 +24,6 @@ import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.numbers.N2;
-
-import static frc.robot.Constants.DriveConstants.modulePositions;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -64,53 +71,44 @@ public final class Constants {
 
         public static final boolean kGyroReversed = false;
 
-        public static final DCMotor kDriveGearbox = DCMotor.getFalcon500(2);
-
-        // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
-        // These characterization values MUST be determined either experimentally or theoretically
-        // for *your* robot's drive.
-        // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
-        // values for your robot.
-        public static final double ksVolts = 0.587;
-        public static final double kvVoltSecondsPerMeter = 2.3;
-        public static final double kaVoltSecondsSquaredPerMeter = 0.0917;
-
         public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(14);
 //        public static final double kMaxSpeedMetersPerSecond = 3;
 
-        public static final double kvVoltSecondsPerRadian = 3.41; // originally 1.5
-        public static final double kaVoltSecondsSquaredPerRadian = 0.111; // originally 0.3
 
         public static final double kMaxChassisRotationSpeed = 10 * Math.PI;
 
     }
 
     public static final class ModuleConstants {
-        public static final double  kDriveMotorGearRatio = 8.16; //6.89 to 1
+        public static final double kDriveMotorGearRatio = 8.16; //6.89 to 1
         public static final double kTurningMotorGearRatio = 12.8; //12 to 1
         public static final int kEncoderCPR = 2048;
         public static final double kWheelDiameterMeters = Units.inchesToMeters(4); //10.16 cm
-        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 10 * Math.PI;
-        public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 10 * Math.PI;
+        public static final double kMaxModuleAngularSpeedRadiansPerSecond = 11.5;
 
         public static final double kDriveEncoderDistancePerPulse =
                 (kWheelDiameterMeters * Math.PI) / ((double) kEncoderCPR * kDriveMotorGearRatio);
 
+        public static final double kDriveSimEncoderDistancePerPulse = kDriveEncoderDistancePerPulse / 2;
+
         public static final double kTurningEncoderDistancePerPulse =
                 // Assumes the encoders are on a 1:1 reduction with the module shaft.
-                (2.0 * Math.PI) / (kEncoderCPR* kTurningMotorGearRatio);
+                (2.0 * Math.PI) / (kEncoderCPR * kTurningMotorGearRatio);
 
-        public static final double kPModuleTurningController = 2.4;
+        public static final double kTurningSimEncoderDistancePerPulse = kTurningEncoderDistancePerPulse / 2;
 
-//        public static final double kPModuleDriveController = 1.57;
-        public static final double kPModuleDriveController = 2.3;
+        public static final double ksDriveVoltSecondsPerMeter = (0.667 / 12);
+        public static final double kvDriveVoltSecondsSquaredPerMeter = (2.44 / 12);
+        public static final double kaDriveVoltSecondsSquaredPerMeter = (0.27 / 12);
 
-        public static final double kvVoltSecondsPerMeter = 1.47;
-        public static final double kaVoltSecondsSquaredPerMeter = 0.0348;
+        public static final double kvTurnVoltSecondsPerRadian = 1.47; // originally 1.5
+        public static final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3
 
-        public static final double kvVoltSecondsPerRadian = 1.47; // originally 1.5
-        public static final double kaVoltSecondsSquaredPerRadian = 0.0348; // originally 0.3
+        public static TalonFXConfiguration TurnMotorConfig = generateTurnMotorConfig();
+        public static TalonFXConfiguration DriveMotorConfig = generateDriveMotorConfig();
 
+        public static TalonSRXConfiguration TurnSimMotorConfig = generateTurnSimMotorConfig();
+        public static TalonSRXConfiguration DriveSimMotorConfig = generateDriveSimMotorConfig();
     }
 
     public static final class OIConstants {
@@ -128,7 +126,7 @@ public final class Constants {
         public static final double kPYController = 1;
         public static final double kPThetaController = 3.5;
 
-        //Constraint for the motion profilied robot angle controller
+        //Constraint for the motion profiled robot angle controller
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
                 new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond * 10,
                         kMaxAngularSpeedRadiansPerSecondSquared * 10);
@@ -166,4 +164,84 @@ public final class Constants {
     public static final int rotationEncoderPortA = 4;
     public static final int rotationEncoderPortB = 5;
 
+    private static TalonFXConfiguration generateTurnMotorConfig() {
+        TalonFXConfiguration motorConfig = new TalonFXConfiguration();
+
+        motorConfig.slot0.kF = 0.0;
+        motorConfig.slot0.kP = 0.6;
+        motorConfig.slot0.kI = 0.0;
+        motorConfig.slot0.kD = 12.0;
+        motorConfig.motionCruiseVelocity = ModuleConstants.kTurningEncoderDistancePerPulse * 11.5;
+        motorConfig.motionAcceleration = ModuleConstants.kTurningEncoderDistancePerPulse * 11.5;
+
+        SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true,25, 40, 0.1);
+        motorConfig.supplyCurrLimit = supplyCurrentLimit;
+
+        motorConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
+
+        return motorConfig;
+    }
+    private static TalonSRXConfiguration generateTurnSimMotorConfig() {
+        TalonSRXConfiguration motorConfig = new TalonSRXConfiguration();
+
+        motorConfig.slot0.kF = 0.0;
+        motorConfig.slot0.kP = 0.001;
+        motorConfig.slot0.kI = 0.0;
+        motorConfig.slot0.kD = 0.2;
+        motorConfig.motionCruiseVelocity = ModuleConstants.kTurningSimEncoderDistancePerPulse * 11.5;
+        motorConfig.motionAcceleration = ModuleConstants.kTurningSimEncoderDistancePerPulse * 11.5;
+
+        motorConfig.continuousCurrentLimit = 25;
+        motorConfig.peakCurrentLimit = 40;
+        motorConfig.peakCurrentDuration = 100;
+
+        return motorConfig;
+    }
+
+    private static TalonFXConfiguration generateDriveMotorConfig() {
+        TalonFXConfiguration motorConfig = new TalonFXConfiguration();
+
+        motorConfig.slot0.kF = 0.0;
+        motorConfig.slot0.kP = 0.1;
+        motorConfig.slot0.kI = 0.0;
+        motorConfig.slot0.kD = 0.0;
+
+        SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true,35, 60, 0.1);
+        motorConfig.supplyCurrLimit = supplyCurrentLimit;
+
+        motorConfig.openloopRamp = 0.25;
+        motorConfig.closedloopRamp = 0;
+
+        motorConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
+
+        return motorConfig;
+    }
+
+    private static TalonSRXConfiguration generateDriveSimMotorConfig() {
+        TalonSRXConfiguration motorConfig = new TalonSRXConfiguration();
+
+        motorConfig.slot0.kF = 0.0;
+        motorConfig.slot0.kP = 0.002;
+        motorConfig.slot0.kI = 0.0;
+        motorConfig.slot0.kD = 0.0;
+
+        motorConfig.continuousCurrentLimit = 35;
+        motorConfig.peakCurrentLimit = 60;
+        motorConfig.peakCurrentDuration = 100;
+
+        motorConfig.openloopRamp = 0.25;
+        motorConfig.closedloopRamp = 0;
+
+        return motorConfig;
+    }
+
+    private static CANCoderConfiguration generateCanCoderConfig() {
+        CANCoderConfiguration sensorConfig = new CANCoderConfiguration();
+
+        sensorConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+        sensorConfig.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
+        sensorConfig.sensorTimeBase = SensorTimeBase.PerSecond;
+
+        return sensorConfig;
+    }
 }

@@ -8,9 +8,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.cscore.UsbCamera;
-import edu.wpi.cscore.VideoMode;
-import edu.wpi.cscore.VideoSource;
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -158,7 +155,7 @@ public class Vision extends SubsystemBase {
 				double yDistance = -Math.signum(getFilteredTargetX()) * Math.abs(Math.sin(targetRadians)) * getTargetDistance();
 
 				m_swerveDrive.resetOdometry(new Pose2d(xDistance, yDistance, new Rotation2d()),
-						Rotation2d.fromDegrees(m_swerveDrive.getHeading()));
+						Rotation2d.fromDegrees(m_swerveDrive.getHeadingDegrees()));
 
 				resetPose = true;
 			}

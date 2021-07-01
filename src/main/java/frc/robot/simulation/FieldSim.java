@@ -1,9 +1,6 @@
 package frc.robot.simulation;
 
-import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -12,10 +9,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Units;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.Turret;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -27,7 +22,14 @@ public class FieldSim {
     private final SwerveDrive m_swerveDrive;
     private final Turret m_turret;
     private final Shooter m_shooter;
+
     private final Powercell[] m_powercells = new Powercell[17];
+    private Pose2d SwerveModulePose[] = {
+        new Pose2d(),
+        new Pose2d(),
+        new Pose2d(),
+        new Pose2d()
+    };
 
     private int ballCount;
 
@@ -96,17 +98,17 @@ public class FieldSim {
          */
 
         // Look up rotating a point about another point in 2D space for the math explanation
-//        Pose2d robotPose = m_swerveDrive.getPose();
-//        Translation2d [] ModuleLocations = {
-//            new Translation2d(kWheelBase/2, kTrackWidth/2),
-//            new Translation2d(kWheelBase/2, -kTrackWidth/2),
-//            new Translation2d(-kWheelBase/2, kTrackWidth/2),
-//            new Translation2d(-kWheelBase/2, -kTrackWidth/2)
-//        };
-//        for (int i = 0; i < ModuleLocations.length; i++) {
-//            Translation2d updatedPositions = ModuleLocations[i].rotateBy(robotPose.getRotation()).plus(robotPose.getTranslation());
-//            SwerveModulePose[i] = new Pose2d(updatedPositions,m_swerveDrive.getSwerveModule(i).getHeading().plus(m_swerveDrive.getRotation()));
-//        }
+        Pose2d robotPose = m_swerveDrive.getPose();
+        Translation2d [] ModuleLocations = {
+            new Translation2d(kWheelBase/2, kTrackWidth/2),
+            new Translation2d(kWheelBase/2, -kTrackWidth/2),
+            new Translation2d(-kWheelBase/2, kTrackWidth/2),
+            new Translation2d(-kWheelBase/2, -kTrackWidth/2)
+        };
+        for (int i = 0; i < ModuleLocations.length; i++) {
+            Translation2d updatedPositions = ModuleLocations[i].rotateBy(robotPose.getRotation()).plus(robotPose.getTranslation());
+            SwerveModulePose[i] = new Pose2d(updatedPositions,m_swerveDrive.getSwerveModule(i).getHeading().plus(m_swerveDrive.getRotation()));
+        }
     }
 
     private boolean isBallInIntakeZone(Pose2d ballPose){

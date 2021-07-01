@@ -92,6 +92,6 @@ public class AutoNavSlalom extends SequentialCommandGroup {
 //        }
         fieldSim.getField2d().getObject("trajectory").setPoses(trajectoryStates);
 
-        addCommands(new InstantCommand(() -> swerveDrive.drive(0, 0, 0, false), swerveDrive));// Run path following command, then stop at the end.
+        addCommands(new InstantCommand(() -> swerveDrive.drive(0, 0, 0, false, false), swerveDrive));// Run path following command, then stop at the end.
     }
 }

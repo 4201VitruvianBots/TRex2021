@@ -12,31 +12,42 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.*;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import edu.wpi.first.wpiutil.math.VecBuilder;
 import frc.robot.Constants;
-import frc.robot.simulation.SimulationReferencePose;
 
 import static frc.robot.Constants.DriveConstants.*;
 
 public class SwerveDrive extends SubsystemBase {
+    static double kP = 0.005;
+    static double kI = 0;
+    static double kD = 0.00025;
 
-    public static final double kMaxAngularSpeed = kMaxChassisRotationSpeed; // 3 meters per second
+    /**
+     * Just like a graph's quadrants
+     * 0 is Front Left
+     * 1 is Back Left
+     * 2 is Front Right
+     * 3 is Back Right
+     */
+    private SwerveModule[] mSwerveModules = new SwerveModule[] {
+            new SwerveModule(0, new TalonFX(Constants.frontLeftTurningMotor), new TalonFX(Constants.frontLeftDriveMotor), 0, true, false),
+            new SwerveModule(1, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), 0, true, false), //true
+            new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), 0, true, false),
+            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), 0, true, false) //true
+    };
 
-    private boolean isFieldOriented;
-    private final double throttle = 0.8;
-    private final double turningThrottle = 0.5;
+    PowerDistributionPanel m_pdp;
 
-    private int navXDebug = 0;
+    private AHRS mNavX = new AHRS(SerialPort.Port.kMXP);
+    int navXSim = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
 
     private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(kDriveKinematics, getRotation());
 //    private final SwerveDrivePoseEstimator m_odometry = new SwerveDrivePoseEstimator(
@@ -47,43 +58,27 @@ public class SwerveDrive extends SubsystemBase {
 //        VecBuilder.fill(0.05),
 //        VecBuilder.fill(0.1, 0.1, 0.1));
 
-    PowerDistributionPanel m_pdp;
+    private ProfiledPIDController turnPidController = new ProfiledPIDController(kP, kI, kD, new TrapezoidProfile.Constraints(360, 360));
 
-    private double m_trajectoryTime;
-    private Trajectory currentTrajectory;
+    private boolean enablePidTurn = false;
+    private double pidTurnOutput;
 
     private Rotation2d headingTarget;
     private Pose2d headingTargetPosition = new Pose2d(-1, -1, new Rotation2d());
 
-    /**
-     * Just like a graph's quadrants
-     * 0 is Front Left
-     * 1 is Back Left
-     * 2 is Front Right
-     * 3 is Back Right
-     */
-    private SwerveModule[] mSwerveModules = new SwerveModule[] {
-        new SwerveModule(0, new TalonFX(Constants.frontLeftTurningMotor), new TalonFX(Constants.frontLeftDriveMotor), 0, true, false),
-        new SwerveModule(1, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), 0, true, false), //true
-        new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), 0, true, false),
-        new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), 0, true, false) //true
-    };
-
-    private AHRS mNavX = new AHRS(SerialPort.Port.kMXP);
-    int navXSim = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
+    private double m_trajectoryTime;
+    private Trajectory currentTrajectory;
 
     public SwerveDrive(PowerDistributionPanel pdp) {
         m_pdp = pdp;
+
+        turnPidController.setTolerance(0.2);
+        turnPidController.enableContinuousInput(-180, 180);
 
         SmartDashboardTab.putData("SwerveDrive","swerveDriveSubsystem", this);
         if (RobotBase.isSimulation()) {
 
         }
-    }
-
-
-    public AHRS getNavX() {
-        return mNavX;
     }
 
     public double getGyroRate() {
@@ -105,7 +100,7 @@ public class SwerveDrive extends SubsystemBase {
 //            } catch (Exception e) {
 //                return new Rotation2d();
 //            }
-        return Rotation2d.fromDegrees(getHeading());
+        return Rotation2d.fromDegrees(getHeadingDegrees());
     }
 
     /**
@@ -122,7 +117,7 @@ public class SwerveDrive extends SubsystemBase {
      *
      * @return the robot's heading in degrees, from 180 to 180
      */
-    public double getHeading() {
+    public double getHeadingDegrees() {
         try {
             return Math.IEEEremainder(-mNavX.getAngle(), 360);
         } catch (Exception e) {
@@ -135,9 +130,8 @@ public class SwerveDrive extends SubsystemBase {
      * Resets the drive encoders to currently read a position of 0.
      */
     public void resetEncoders() {
-        for (int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++)
             mSwerveModules[i].resetEncoders();
-        }
     }
 
     /**
@@ -146,7 +140,6 @@ public class SwerveDrive extends SubsystemBase {
     public void zeroHeading() {
         mNavX.reset();
     }
-
 
     public SwerveModule getSwerveModule(int i) {
         return mSwerveModules[i];
@@ -170,10 +163,15 @@ public class SwerveDrive extends SubsystemBase {
      * @param fieldRelative Whether the provided x and y speeds are relative to the field.
      */
     @SuppressWarnings("ParameterName")
-    public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean isOpenLoop) {
         xSpeed *= kMaxSpeedMetersPerSecond;
         ySpeed *= kMaxSpeedMetersPerSecond;
-        rot *= kMaxAngularSpeed;
+        rot *= kMaxChassisRotationSpeed;
+
+        //If pidTurn is getting a value override the drivers steering control
+        if (enablePidTurn) {
+            rot = turnPidController.calculate(getHeadingDegrees());
+        }
 
         var swerveModuleStates = kDriveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -182,16 +180,24 @@ public class SwerveDrive extends SubsystemBase {
         ); //from 2910's code
         SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, Constants.DriveConstants.kMaxSpeedMetersPerSecond);
 
-        mSwerveModules[0].setDesiredState(swerveModuleStates[0]);
-        mSwerveModules[1].setDesiredState(swerveModuleStates[1]);
-        mSwerveModules[2].setDesiredState(swerveModuleStates[2]);
-        mSwerveModules[3].setDesiredState(swerveModuleStates[3]);
+        mSwerveModules[0].setDesiredState(swerveModuleStates[0], isOpenLoop);
+        mSwerveModules[1].setDesiredState(swerveModuleStates[1], isOpenLoop);
+        mSwerveModules[2].setDesiredState(swerveModuleStates[2], isOpenLoop);
+        mSwerveModules[3].setDesiredState(swerveModuleStates[3], isOpenLoop);
+    }
+
+    public void setAngleSetpoint(double angleSetpoint, boolean enabled) {
+        enablePidTurn = enabled;
+//        double differance = angle - RobotContainer.swerve.getDegrees();
+//        if (differance > 180) {
+//            differance = (360 - differance) * -1;
+//        }
+        turnPidController.setGoal(angleSetpoint - getHeadingDegrees());
     }
 
     public void setSwerveDriveNeutralMode(boolean mode) {
-        for(int i = 0; i < mSwerveModules.length; i++) {
+        for(int i = 0; i < mSwerveModules.length; i++)
             mSwerveModules[i].setBrakeMode(mode);
-        }
     }
 
     /**
@@ -201,10 +207,10 @@ public class SwerveDrive extends SubsystemBase {
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, Constants.DriveConstants.kMaxSpeedMetersPerSecond);
-        mSwerveModules[0].setDesiredState(desiredStates[0]);
-        mSwerveModules[1].setDesiredState(desiredStates[1]);
-        mSwerveModules[2].setDesiredState(desiredStates[2]);
-        mSwerveModules[3].setDesiredState(desiredStates[3]);
+        mSwerveModules[0].setDesiredState(desiredStates[0], false);
+        mSwerveModules[1].setDesiredState(desiredStates[1], false);
+        mSwerveModules[2].setDesiredState(desiredStates[2], false);
+        mSwerveModules[3].setDesiredState(desiredStates[3], false);
     }
 
     public void setHeadingToTargetHeading(Rotation2d targetHeading) {
@@ -218,6 +224,7 @@ public class SwerveDrive extends SubsystemBase {
     public Rotation2d getHeadingToTarget() {
         return headingTarget;
     }
+
     public Pose2d getTargetPose() {
         return headingTargetPosition;
     }
@@ -254,7 +261,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     private void updateSmartDashboard() {
-        SmartDashboardTab.putNumber("SwerveDrive","Chassis Angle",getHeading());
+        SmartDashboardTab.putNumber("SwerveDrive","Chassis Angle", getHeadingDegrees());
         for(int i = 0; i < mSwerveModules.length; i++) {
             SmartDashboardTab.putNumber("SwerveDrive", "Swerve Module " + i + " Angle", mSwerveModules[i].getState().angle.getDegrees());
             SmartDashboardTab.putNumber("SwerveDrive", "Swerve Module " + i + " Speed", mSwerveModules[i].getState().speedMetersPerSecond);

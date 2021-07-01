@@ -140,6 +140,6 @@ public class AutoNavBounce extends SequentialCommandGroup {
 //        }
 //        fieldSim.getField2d().getObject("trajectory").setPoses(trajectoryStates);
 
-        addCommands(new WaitCommand(0).andThen(() -> swerveDrive.drive(0, 0, 0, false)));// Run path following command, then stop at the end.
+        addCommands(new WaitCommand(0).andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));// Run path following command, then stop at the end.
     }
 }

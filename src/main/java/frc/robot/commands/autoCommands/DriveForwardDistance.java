@@ -56,7 +56,7 @@ public class DriveForwardDistance extends SequentialCommandGroup {
                         new SetOdometry(swerveDrive, fieldSim, startPosition),
                         new SetDriveNeutralMode(swerveDrive, true),
                         driveForwardCommand,
-                        new InstantCommand(() -> swerveDrive.drive(0,0,0, false))
+                        new InstantCommand(() -> swerveDrive.drive(0,0,0, false, false))
                     );
         }
         
