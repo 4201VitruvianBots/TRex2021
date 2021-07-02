@@ -93,7 +93,7 @@ public final class Constants {
 
         public static final double kTurningEncoderDistancePerPulse =
                 // Assumes the encoders are on a 1:1 reduction with the module shaft.
-                (2.0 * Math.PI) / (kEncoderCPR * kTurningMotorGearRatio);
+                (360.0) / (kEncoderCPR * kTurningMotorGearRatio);
 
         public static final double kTurningSimEncoderDistancePerPulse = kTurningEncoderDistancePerPulse / 2;
 
@@ -185,9 +185,9 @@ public final class Constants {
         TalonSRXConfiguration motorConfig = new TalonSRXConfiguration();
 
         motorConfig.slot0.kF = 0.0;
-        motorConfig.slot0.kP = 0.001;
+        motorConfig.slot0.kP = 0.04;
         motorConfig.slot0.kI = 0.0;
-        motorConfig.slot0.kD = 0.2;
+        motorConfig.slot0.kD = 0.0;
         motorConfig.motionCruiseVelocity = ModuleConstants.kTurningSimEncoderDistancePerPulse * 11.5;
         motorConfig.motionAcceleration = ModuleConstants.kTurningSimEncoderDistancePerPulse * 11.5;
 

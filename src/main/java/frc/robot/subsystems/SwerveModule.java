@@ -45,16 +45,13 @@ public class SwerveModule extends SubsystemBase {
   private double m_driveOutput;
   private double m_lastAngle;
 
-  private Encoder m_turnEncoder;
-  private EncoderSim m_encoderSim;
-
   private double simTurnEncoderDistance;
   private double simThrottleEncoderDistance;
 
   private final FlywheelSim moduleRotationSimModel = new FlywheelSim(
 //          LinearSystemId.identifyVelocitySystem(kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian),
 //          LinearSystemId.identifyVelocitySystem(1.47, 0.0348),
-          LinearSystemId.identifyVelocitySystem(kvTurnVoltSecondsPerRadian, kaTurnVoltSecondsSquaredPerRadian),
+          LinearSystemId.identifyVelocitySystem(kvTurnVoltSecondsPerRadian / 90, kaTurnVoltSecondsSquaredPerRadian / 90),
           DCMotor.getFalcon500(1),
           kTurningMotorGearRatio
   );
@@ -85,9 +82,6 @@ public class SwerveModule extends SubsystemBase {
     if(RobotBase.isSimulation()) {
       m_driveMotorSim = new TalonSRX(driveMotor.getDeviceID());
       m_turnMotorSim = new TalonSRX(turnMotor.getDeviceID());
-      m_turnEncoder = new Encoder(turnMotor.getDeviceID() - 11, turnMotor.getDeviceID() - 12);
-      m_turnEncoder.setDistancePerPulse(kTurningEncoderDistancePerPulse);
-      m_encoderSim = new EncoderSim(m_turnEncoder);
 
       m_driveMotorSim.configFactoryDefault();
       m_driveMotorSim.configAllSettings(DriveSimMotorConfig);
@@ -114,7 +108,10 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public double getHeadingDegrees() {
-    return Units.radiansToDegrees(getHeadingRadians());
+    if(RobotBase.isReal())
+      return m_turnMotor.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
+    else
+      return m_turnMotorSim.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningSimEncoderDistancePerPulse;
   }
 
   /**
@@ -123,11 +120,7 @@ public class SwerveModule extends SubsystemBase {
    * @return The current angle of the module in radians.
    */
   public double getHeadingRadians() {
-    if(RobotBase.isReal())
-      return m_turnMotor.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
-    else
-      return m_turnMotorSim.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningSimEncoderDistancePerPulse;
-//      return m_turnEncoder.getDistance();
+    return Units.degreesToRadians(getHeadingDegrees());
   }
 
   /**
@@ -158,21 +151,23 @@ public class SwerveModule extends SubsystemBase {
    */
   public void setDesiredState(SwerveModuleState state, boolean isOpenLoop) {
     SwerveModuleState outputState = CTREModuleState.optimize(state, getHeading());
+    double angle = 0.0;
 
-    if(isOpenLoop) {
-      double percentOutput = outputState.speedMetersPerSecond / Constants.DriveConstants.kMaxSpeedMetersPerSecond;
-      m_driveMotor.set(ControlMode.PercentOutput, percentOutput);
+    if(RobotBase.isReal()) {
+      if (isOpenLoop) {
+        double percentOutput = outputState.speedMetersPerSecond / Constants.DriveConstants.kMaxSpeedMetersPerSecond;
+        m_driveMotor.set(ControlMode.PercentOutput, percentOutput);
+      } else {
+        double velocityOutput = outputState.speedMetersPerSecond / kDriveEncoderDistancePerPulse;
+        m_driveMotor.set(ControlMode.Velocity, velocityOutput, DemandType.ArbitraryFeedForward, m_driveFeedforward.calculate(outputState.speedMetersPerSecond));
+      }
+
+      //Prevent rotating module if speed is less then 1%. Prevents Jittering.
+      angle = (Math.abs(outputState.speedMetersPerSecond) <= (Constants.DriveConstants.kMaxSpeedMetersPerSecond * 0.01)) ?
+              m_lastAngle : outputState.angle.getDegrees();
+      m_turnMotor.set(ControlMode.Position, angle / kTurningEncoderDistancePerPulse);
+
     } else {
-      double velocityOutput = outputState.speedMetersPerSecond / kDriveEncoderDistancePerPulse;
-      m_driveMotor.set(ControlMode.Velocity, velocityOutput, DemandType.ArbitraryFeedForward, m_driveFeedforward.calculate(outputState.speedMetersPerSecond));
-    }
-
-    //Prevent rotating module if speed is less then 1%. Prevents Jittering.
-    double angle = (Math.abs(outputState.speedMetersPerSecond) <= (Constants.DriveConstants.kMaxSpeedMetersPerSecond * 0.01)) ?
-            m_lastAngle : outputState.angle.getDegrees();
-    m_turnMotor.set(ControlMode.Position, angle / kTurningEncoderDistancePerPulse);
-
-    if(RobotBase.isSimulation()) {
       if(isOpenLoop) {
         double percentOutput = outputState.speedMetersPerSecond / Constants.DriveConstants.kMaxSpeedMetersPerSecond;
         m_driveMotorSim.set(ControlMode.PercentOutput, percentOutput);
@@ -184,6 +179,7 @@ public class SwerveModule extends SubsystemBase {
       //Prevent rotating module if speed is less then 1%. Prevents Jittering.
       angle = (Math.abs(outputState.speedMetersPerSecond) <= (Constants.DriveConstants.kMaxSpeedMetersPerSecond * 0.01)) ?
               m_lastAngle : outputState.angle.getDegrees();
+
       m_turnMotorSim.set(ControlMode.Position, angle / kTurningSimEncoderDistancePerPulse);
 
       m_driveOutput = m_driveMotorSim.getMotorOutputPercent();
@@ -224,9 +220,6 @@ public class SwerveModule extends SubsystemBase {
     moduleThrottleSimModel.update(0.02);
 
     simTurnEncoderDistance += moduleRotationSimModel.getAngularVelocityRadPerSec() * 0.02;
-    m_encoderSim.setDistance(simTurnEncoderDistance);
-    m_encoderSim.setRate(moduleRotationSimModel.getAngularVelocityRadPerSec());
-
     simThrottleEncoderDistance += moduleThrottleSimModel.getAngularVelocityRadPerSec() * 0.02;
 
     Unmanaged.feedEnable(20);
@@ -234,14 +227,11 @@ public class SwerveModule extends SubsystemBase {
 //    m_turnMotor.getSimCollection().setQuadratureVelocity((int) (moduleRotationSimModel.getAngularVelocityRadPerSec() / kTurningEncoderDistancePerPulse * 10));
 //    m_driveMotor.getSimCollection().setQuadratureRawPosition((int) (simThrottleEncoderDistance / kDriveEncoderDistancePerPulse));
 //    m_driveMotor.getSimCollection().setQuadratureVelocity((int) (moduleThrottleSimModel.getAngularVelocityRadPerSec() / kDriveEncoderDistancePerPulse * 10));
-//    m_turnMotorSim.getSimCollection().setAnalogVelocity((int) m_turnEncoder.getRate() / 10);
-//    m_turnMotorSim.getSimCollection().setAnalogPosition((int) m_turnEncoder.getDistance());
     m_turnMotorSim.getSimCollection().setQuadratureRawPosition((int) (simTurnEncoderDistance / kTurningEncoderDistancePerPulse));
     m_turnMotorSim.getSimCollection().setQuadratureVelocity((int) (moduleRotationSimModel.getAngularVelocityRadPerSec() / kTurningEncoderDistancePerPulse * 10));
-//    m_driveMotorSim.getSimCollection().setQuadratureRawPosition((int) (simThrottleEncoderDistance / kDriveSimEncoderDistancePerPulse));
-//    m_driveMotorSim.getSimCollection().setQuadratureVelocity((int) (moduleThrottleSimModel.getAngularVelocityRadPerSec() / kDriveSimEncoderDistancePerPulse / 10));
-    System.out.println("Module Output: " + m_turnOutput);
-    System.out.println("Module Angle: " + getHeadingDegrees());
+    m_driveMotorSim.getSimCollection().setQuadratureRawPosition((int) (simThrottleEncoderDistance / kDriveSimEncoderDistancePerPulse));
+    m_driveMotorSim.getSimCollection().setQuadratureVelocity((int) (moduleThrottleSimModel.getAngularVelocityRadPerSec() / kDriveSimEncoderDistancePerPulse / 10));
+
 //    System.out.println("Module " + mModuleNumber + " State: " + getState());
   }
 }
