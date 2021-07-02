@@ -8,25 +8,19 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.autoCommands.*;
-import frc.robot.commands.drivetrain.SetSwerveDrive;
-import frc.robot.commands.drivetrain.TestSwerveModule;
+import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.indexer.FeedAll;
-import frc.robot.commands.intake.AutoControlledIntake;
 import frc.robot.commands.intake.ControlledIntake;
-import frc.robot.commands.intake.SetIntakePiston;
 import frc.robot.commands.intake.ToggleIntakePistons;
+import frc.robot.commands.swerve.SetSwerveDriveWithAngle;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimulationReferencePose;
 import frc.robot.subsystems.*;
@@ -184,9 +178,13 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       for (int i = 0; i < testButtons.length; i++)
         testButtons[i] = new JoystickButton(testController, (i + 1));
 
-      testButtons[1].whileHeld(new FeedAll(m_indexer, m_uptake));
-      testButtons[9].whenPressed(new ToggleIntakePistons(m_intake));
-      testButtons[6].whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
+//      testButtons[1].whileHeld(new FeedAll(m_indexer, m_uptake));
+//      testButtons[9].whenPressed(new ToggleIntakePistons(m_intake));
+//      testButtons[6].whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
+      testButtons[1].whileHeld(new SetSwerveDriveWithAngle(m_swerveDrive,
+              () -> testController.getRawAxis(1), //left y
+              () -> testController.getRawAxis(0), //left x
+              () -> 45)); //right x
     }
   }
 

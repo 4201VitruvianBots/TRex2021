@@ -5,10 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.drivetrain;
+package frc.robot.commands.swerve;
 
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrive;
 
@@ -17,22 +15,21 @@ import java.util.function.DoubleSupplier;
 /**
  * An example command that uses an example subsystem.
  */
-public class TestSwerveModule extends CommandBase {
+public class SetSwerveDriveWithAngle extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final SwerveDrive m_swerveDrive;
-  private final DoubleSupplier m_xInput, m_yInput;
-  private final int m_moduleIdx;
+  private final DoubleSupplier m_throttleInput, m_strafeInput, m_rotationInput;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param swerveDriveSubsystem The subsystem used by this command.
    */
-  public TestSwerveModule(SwerveDrive swerveDriveSubsystem, DoubleSupplier xInput, DoubleSupplier yInput, int moduleIdx) {
+  public SetSwerveDriveWithAngle(SwerveDrive swerveDriveSubsystem, DoubleSupplier throttleInput, DoubleSupplier strafeInput, DoubleSupplier rotationInput) {
     m_swerveDrive = swerveDriveSubsystem;
-    m_xInput = xInput;
-    m_yInput = yInput;
-    m_moduleIdx = moduleIdx;
+    m_throttleInput = throttleInput;
+    m_strafeInput = strafeInput;
+    m_rotationInput = rotationInput;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerveDriveSubsystem);
   }
@@ -45,19 +42,22 @@ public class TestSwerveModule extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double yInput = Math.abs(m_yInput.getAsDouble()) > 0.05 ? -m_yInput.getAsDouble() : 0;
-    double xInput = Math.abs(m_xInput.getAsDouble()) > 0.05 ? m_xInput.getAsDouble() : 0;
+    double throttle = Math.abs(m_throttleInput.getAsDouble()) > 0.05 ? m_throttleInput.getAsDouble() : 0;
+    double strafe = Math.abs(m_strafeInput.getAsDouble()) > 0.05 ? m_strafeInput.getAsDouble() : 0;
+    double rotation =  m_rotationInput.getAsDouble();
 
-    var inputState = new SwerveModuleState(0, new Rotation2d(Math.atan2(yInput, xInput)));
-    m_swerveDrive.getSwerveModule(m_moduleIdx).setDesiredState(inputState, false);
-
-    System.out.println("Input State: " + inputState);
-    System.out.println("Output State: " + m_swerveDrive.getSwerveModule(m_moduleIdx).getState());
+    m_swerveDrive.setAngleSetpoint(rotation, true);
+    m_swerveDrive.drive(throttle, strafe, rotation,false, false);    // Forward/Back Trottle, Left/Right Strafe, Left/Right Turn
+//    if(RobotBase.isReal())
+//      m_swerveDrive.drive(m_leftY.getAsDouble(), m_leftX.getAsDouble(),m_rightX.getAsDouble(),false);
+//    else
+//      m_swerveDrive.drive(-m_leftY.getAsDouble(), m_leftX.getAsDouble(),m_rightX.getAsDouble(),false);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    m_swerveDrive.setAngleSetpoint(0, false);
   }
 
   // Returns true when the command should end.
