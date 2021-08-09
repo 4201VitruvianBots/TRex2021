@@ -99,8 +99,10 @@ public class SwerveModule extends SubsystemBase {
   public void resetEncoders() {
     m_turnMotor.setSelectedSensorPosition(0);
     m_driveMotor.setSelectedSensorPosition(0);
-    m_turnMotorSim.setSelectedSensorPosition(0);
-    m_driveMotorSim.setSelectedSensorPosition(0);
+    if (RobotBase.isSimulation()) {
+      m_turnMotorSim.setSelectedSensorPosition(0);
+      m_driveMotorSim.setSelectedSensorPosition(0);
+    }
   }
 
   public Rotation2d getHeading() {
