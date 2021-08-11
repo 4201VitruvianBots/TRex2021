@@ -8,7 +8,9 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
 import com.kauailabs.navx.frc.AHRS;
+import com.revrobotics.CANEncoder;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.wpilibj.*;
@@ -37,11 +39,12 @@ public class SwerveDrive extends SubsystemBase {
      * 2 is Front Right
      * 3 is Back Right
      */
+    // TODO: Update zero offsets after updating swerve module IDs
     private SwerveModule[] mSwerveModules = new SwerveModule[] {
-            new SwerveModule(0, new TalonFX(Constants.frontLeftTurningMotor), new TalonFX(Constants.frontLeftDriveMotor), 0, true, false),
-            new SwerveModule(1, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), 0, true, false), //true
-            new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), 0, true, false),
-            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), 0, true, false) //true
+            new SwerveModule(0, new TalonFX(Constants.frontLeftTurningMotor), new TalonFX(Constants.frontLeftDriveMotor), new CANCoder(Constants.frontLeftCANCoder), 0, true, false),
+            new SwerveModule(1, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), new CANCoder(Constants.frontRightCANCoder), 0, true, false), //true
+            new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), new CANCoder(Constants.backLeftCANCoder), 0, true, false),
+            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), new CANCoder(Constants.backRightCANCoder), 0, true, false) //true
     };
 
     PowerDistributionPanel m_pdp;

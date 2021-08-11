@@ -49,6 +49,11 @@ public final class Constants {
     public static final int backRightDriveMotor = 26;
     public static final int backRightTurningMotor = 27;
 
+    public static final int frontLeftCANCoder = 11;
+    public static final int frontRightCANCoder = 12;
+    public static final int backLeftCANCoder = 13;
+    public static final int backRightCANCoder = 14;
+
     public static final class DriveConstants {
         public static final double kTrackWidth = Units.inchesToMeters(30);
         //Distance between centers of right and left wheels on robot. Meters?
@@ -82,7 +87,7 @@ public final class Constants {
     public static final class ModuleConstants {
         public static final double kDriveMotorGearRatio = 8.16; //6.89 to 1
         public static final double kTurningMotorGearRatio = 12.8; //12 to 1
-        public static final int kEncoderCPR = 2048;
+        public static final int kEncoderCPR = 4096;
         public static final double kWheelDiameterMeters = Units.inchesToMeters(4); //10.16 cm
         public static final double kMaxModuleAngularSpeedRadiansPerSecond = 11.5;
 
@@ -91,9 +96,12 @@ public final class Constants {
 
         public static final double kDriveSimEncoderDistancePerPulse = kDriveEncoderDistancePerPulse / 2;
 
+//        public static final double kTurningEncoderDistancePerPulse =
+//                // Assumes the encoders are on a 1:1 reduction with the module shaft.
+//                (360.0) / (kEncoderCPR * kTurningMotorGearRatio);
         public static final double kTurningEncoderDistancePerPulse =
                 // Assumes the encoders are on a 1:1 reduction with the module shaft.
-                (360.0) / (kEncoderCPR * kTurningMotorGearRatio);
+                (360.0) / kEncoderCPR;
 
         public static final double kTurningSimEncoderDistancePerPulse = kTurningEncoderDistancePerPulse / 2;
 
@@ -106,6 +114,7 @@ public final class Constants {
 
         public static TalonFXConfiguration TurnMotorConfig = generateTurnMotorConfig();
         public static TalonFXConfiguration DriveMotorConfig = generateDriveMotorConfig();
+        public static CANCoderConfiguration AngleEncoderConfig = generateCanCoderConfig();
 
         public static TalonSRXConfiguration TurnSimMotorConfig = generateTurnSimMotorConfig();
         public static TalonSRXConfiguration DriveSimMotorConfig = generateDriveSimMotorConfig();

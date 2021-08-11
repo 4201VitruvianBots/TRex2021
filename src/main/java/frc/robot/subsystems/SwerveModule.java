@@ -10,6 +10,8 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.unmanaged.Unmanaged;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.util.Units;
@@ -34,8 +37,9 @@ public class SwerveModule extends SubsystemBase {
   double m_zeroOffset;
   boolean m_inverted;
 
-  public final TalonFX m_turnMotor;
-  public final TalonFX m_driveMotor;
+  private final TalonFX m_turnMotor;
+  private final TalonFX m_driveMotor;
+  private final CANCoder m_angleEncoder;
   private TalonSRX m_turnMotorSim;
   private TalonSRX m_driveMotorSim;
 
@@ -64,11 +68,16 @@ public class SwerveModule extends SubsystemBase {
 
   Pose2d swerveModulePose = new Pose2d();
 
-  public SwerveModule(int moduleNumber, TalonFX turnMotor, TalonFX driveMotor, double zeroOffset, boolean invertTurn, boolean invertThrottle) {
+  public SwerveModule(int moduleNumber, TalonFX turnMotor, TalonFX driveMotor, CANCoder angleEncoder, double zeroOffset, boolean invertTurn, boolean invertThrottle) {
     m_moduleNumber = moduleNumber;
     m_driveMotor = driveMotor;
     m_turnMotor = turnMotor;
+    m_angleEncoder = angleEncoder;
     m_zeroOffset = zeroOffset;
+
+    m_angleEncoder.configFactoryDefault();
+    m_angleEncoder.configAllSettings(AngleEncoderConfig);
+    m_angleEncoder.configMagnetOffset(m_zeroOffset);
 
     m_driveMotor.configFactoryDefault();
     m_driveMotor.configAllSettings(DriveMotorConfig);
@@ -76,7 +85,8 @@ public class SwerveModule extends SubsystemBase {
 
     m_turnMotor.configFactoryDefault();
     m_turnMotor.configAllSettings(TurnMotorConfig);
-    m_turnMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+    m_turnMotor.configRemoteFeedbackFilter(m_angleEncoder, 0, 20);
+//    m_turnMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 
 
     if(RobotBase.isSimulation()) {
@@ -97,7 +107,7 @@ public class SwerveModule extends SubsystemBase {
    * Zeros all the SwerveModule encoders.
    */
   public void resetEncoders() {
-    m_turnMotor.setSelectedSensorPosition(0);
+//    m_turnMotor.setSelectedSensorPosition(0);
     m_driveMotor.setSelectedSensorPosition(0);
     if (RobotBase.isSimulation()) {
       m_turnMotorSim.setSelectedSensorPosition(0);
@@ -111,7 +121,8 @@ public class SwerveModule extends SubsystemBase {
 
   public double getHeadingDegrees() {
     if(RobotBase.isReal())
-      return m_turnMotor.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
+//      return m_turnMotor.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
+      return m_angleEncoder.getAbsolutePosition();
     else
       return m_turnMotorSim.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningSimEncoderDistancePerPulse;
   }
@@ -204,7 +215,7 @@ public class SwerveModule extends SubsystemBase {
 
 
   private void updateSmartDashboard() {
-//    SmartDashboardTab.putNumber("SwerveDrive","Turning PID " + mModuleNumber, turnOutput);
+
   }
 
   @Override
