@@ -131,9 +131,9 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 
 //    if(RobotBase.isReal()) {
       m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
-              () -> -leftJoystick.getRawAxis(1), //left x
-              () -> leftJoystick.getRawAxis(0), //left y
-              () -> -rightJoystick.getRawAxis(0))); //right x
+              () -> leftJoystick.getRawAxis(1), //left x
+              () -> -leftJoystick.getRawAxis(0), //left y
+              () -> rightJoystick.getRawAxis(0))); //right x
 //    } else {
 //      m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
 //              () -> testController.getRawAxis(1), //left y
@@ -235,7 +235,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 
   public void teleOpInit() {
     if(RobotBase.isReal()) {
-      m_swerveDrive.resetEncoders();
+      // m_swerveDrive.resetEncoders();
       m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
       m_swerveDrive.setSwerveDriveNeutralMode(false);
     } else {

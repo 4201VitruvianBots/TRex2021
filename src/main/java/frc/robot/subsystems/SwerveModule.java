@@ -86,6 +86,8 @@ public class SwerveModule extends SubsystemBase {
     m_turnMotor.configFactoryDefault();
     m_turnMotor.configAllSettings(TurnMotorConfig);
     m_turnMotor.configRemoteFeedbackFilter(m_angleEncoder, 0, 20);
+    m_turnMotor.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0);
+    m_turnMotor.setSelectedSensorPosition((getHeadingDegrees() - zeroOffset) / kTurningEncoderDistancePerPulse);
 //    m_turnMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 
 
