@@ -22,6 +22,7 @@ import frc.robot.commands.indexer.SetCaroselOutput;
 import frc.robot.commands.intake.ControlledIntake;
 import frc.robot.commands.intake.ToggleIntakePistons;
 import frc.robot.commands.shooter.SetRpmSetpoint;
+import frc.robot.commands.shooter.SetUptake;
 import frc.robot.commands.shooter.TestShooter;
 import frc.robot.commands.shooter.RapidFireSetpoint;
 import frc.robot.commands.turret.ToggleTurretControlMode;
@@ -177,17 +178,19 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
 
-      xBoxButtons[4].whenPressed(new ToggleIntakePistons(m_intake));
-      xBoxLeftTrigger.whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
+      xBoxButtons[3].whenPressed(new ToggleIntakePistons(m_intake));
+      xBoxButtons[3].whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
 
-      xBoxButtons[2].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 1000));//green                  // X - Set RPM Medium
+      // xBoxButtons[2].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 1000));//green                  // X - Set RPM Medium
       // xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3410));//blue                  // B - Set RPM Medium
       // xBoxPOVButtons[0].whileHeld(new EjectAll(m_indexer, m_intake));                                  //Top POV - Eject All
-      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900));//yellow                     // Y - Set RPM Far
+      xBoxButtons[4].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900));//yellow                     // Y - Set RPM Far
+      xBoxButtons[4].whileHeld(new SetUptake(m_uptake, 0.1));
       //xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3500));//red                 // A - Set RPM Close
       // xBoxButtons[0].whileHeld(new TestShooting(m_swerveDrive, m_shooter, m_turret, m_vision));   // What should this be replaced with?
 
-      xBoxButtons[1].whileHeld(new SetCaroselOutput(m_indexer, 0.1));
+      xBoxButtons[3].whileHeld(new SetCaroselOutput(m_indexer, 0.1));
+      xBoxButtons[4].whileHeld(new SetCaroselOutput(m_indexer, 0.1));
       // xBoxButtons[]
 
       //xBoxButtons[5].whileHeld(new RapidFire(m_shooter, m_indexer, m_intake, 3700));              // Set Distance RPM
