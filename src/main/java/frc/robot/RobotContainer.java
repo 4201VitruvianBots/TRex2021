@@ -20,6 +20,12 @@ import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.intake.ControlledIntake;
 import frc.robot.commands.intake.ToggleIntakePistons;
+import frc.robot.commands.shooter.SetRpmSetpoint;
+import frc.robot.commands.shooter.TestShooter;
+import frc.robot.commands.shooter.RapidFireSetpoint;
+import frc.robot.commands.turret.ToggleTurretControlMode;
+import frc.robot.commands.turret.ZeroTurretEncoder;
+import frc.robot.commands.climber.EnableClimbMode;
 import frc.robot.commands.swerve.SetSwerveDriveWithAngle;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimulationReferencePose;
@@ -49,6 +55,7 @@ public class RobotContainer {
   private final Turret m_turret = new Turret(m_swerveDrive);
   private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
   private final Shooter m_shooter = new Shooter(m_vision, pdp);
+  private final Climber m_climber = new Climber();
 
   private FieldSim m_FieldSim;
   private SimulationReferencePose m_referencePose;
@@ -168,6 +175,29 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
         xBoxPOVButtons[i] = new POVButton(xBoxController, (i * 45));
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
+
+      xBoxButtons[4].whenPressed(new ToggleIntakePistons(m_intake));
+      xBoxLeftTrigger.whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
+
+      xBoxButtons[2].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 1000));//green                  // X - Set RPM Medium
+      xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3410));//blue                  // B - Set RPM Medium
+      // xBoxPOVButtons[0].whileHeld(new EjectAll(m_indexer, m_intake));                                  //Top POV - Eject All
+      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900));//yellow                     // Y - Set RPM Far
+      //xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3500));//red                 // A - Set RPM Close
+      // xBoxButtons[0].whileHeld(new TestShooting(m_swerveDrive, m_shooter, m_turret, m_vision));
+
+      //xBoxButtons[5].whileHeld(new RapidFire(m_shooter, m_indexer, m_intake, 3700));              // Set Distance RPM
+      xBoxRightTrigger.whileHeld(new RapidFireSetpoint(m_shooter, m_indexer, m_intake));            // flywheel on toggle
+
+      xBoxButtons[6].whenPressed(new ToggleTurretControlMode(m_turret));                            // start - toggle control mode turret
+      //xBoxButtons[7].whenPressed(new ToggleIndexerControlMode(m_indexer));                        // select - toggle control mode uptake
+//        xBoxButtons[8].whenPressed(new DisableClimbMode(m_climber,m_turret)); //left stick
+      xBoxButtons[9].whenPressed(new EnableClimbMode(m_climber, m_turret));                         // R3 - toggle driver climb mode?
+
+      xBoxPOVButtons[4].whenPressed(new ZeroTurretEncoder(m_turret));
+      //xBoxPOVButtons[4].whileHeld(new EjectAll(m_indexer, m_intake));
+//        SmartDashboard.putData("disable climb mode", new DisableClimbMode(m_climber,m_turret));
+
     }else{
       //Invert raw axis of X, Y, and rotation inputs to match WPILib convention
       testController.invertRawAxis(1, true);
