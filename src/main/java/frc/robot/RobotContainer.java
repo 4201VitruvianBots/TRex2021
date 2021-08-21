@@ -20,6 +20,7 @@ import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.indexer.SetCaroselOutput;
 import frc.robot.commands.intake.ControlledIntake;
+import frc.robot.commands.intake.SetIntakePiston;
 import frc.robot.commands.intake.ToggleIntakePistons;
 import frc.robot.commands.shooter.SetRpmSetpoint;
 import frc.robot.commands.shooter.SetUptake;
@@ -178,7 +179,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
 
-      xBoxButtons[2].whenPressed(new ToggleIntakePistons(m_intake));
+      xBoxButtons[3].whenPressed(new SetIntakePiston(m_intake, true));
+      xBoxButtons[3].whenReleased(new SetIntakePiston(m_intake, false));
       xBoxButtons[3].whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
 
       // xBoxButtons[2].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 1000));//green                  // X - Set RPM Medium
