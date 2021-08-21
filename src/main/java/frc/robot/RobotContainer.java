@@ -178,7 +178,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
 
-      xBoxButtons[3].whenPressed(new ToggleIntakePistons(m_intake));
+      xBoxButtons[2].whenPressed(new ToggleIntakePistons(m_intake));
       xBoxButtons[3].whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
 
       // xBoxButtons[2].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 1000));//green                  // X - Set RPM Medium
