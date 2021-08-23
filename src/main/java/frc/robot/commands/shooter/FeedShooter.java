@@ -5,65 +5,66 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.intake;
+package frc.robot.commands.shooter;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Uptake;
+import frc.robot.subsystems.Shooter;
+
 
 /**
- * An example command that uses an example subsystem.
+ * Runs the uptake and indexer if the shooter can shoot (has target and flywheel is at proper speed)
  */
-public class TimedIntake extends CommandBase {
+public class FeedShooter extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final Intake m_intake;
+    private final Uptake m_uptake;
     private final Indexer m_indexer;
-    private double startTime;
-    private final double m_time;
+    private final Shooter m_shooter;
 
     /**
-     * Creates a new ExampleCommand.
+     * Creates a new FeedShooter.
      *
      * @param subsystem The subsystem used by this command.
      */
-    public TimedIntake(Intake intake, Indexer indexer, double time) {
-        m_intake = intake;
+
+    public FeedShooter(Uptake uptake, Indexer indexer, Shooter shooter) {
+        m_uptake = uptake;
         m_indexer = indexer;
-        m_time = time;
+        m_shooter = shooter;
         // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(intake);
-        addRequirements(indexer);
+        addRequirements(m_uptake);
+        addRequirements(m_indexer);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        startTime = Timer.getFPGATimestamp();
-        if (m_intake.getIntakePistonExtendStatus() != true)
-            m_intake.setIntakePiston(true);
 
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        m_indexer.setIndexerOutput(1);
-        m_intake.setIntakePercentOutput(0.9);
+        if (m_shooter.canShoot()) { // Only runs  uptake and indexer if the shooter is able to shoot
+            m_uptake.setPercentOutput(1);
+            m_indexer.setIndexerOutput(0.2);
+        } else { // Sets output to 0 if the shooter can no longer shoot
+            m_uptake.setPercentOutput(0);
+            m_indexer.setIndexerOutput(0);
+        }
     }
 
     // Called once the command ends or is interrupted.
     @Override
-    public void end(boolean interrupted) {
+    public void end(boolean interrupted) { // Sets output to 0 when command is finished
+        m_uptake.setPercentOutput(0);
         m_indexer.setIndexerOutput(0);
-        m_intake.setIntakePercentOutput(0);
-        if (m_intake.getIntakePistonExtendStatus() != false)
-            m_intake.setIntakePiston(false);
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return Timer.getFPGATimestamp() - startTime > m_time;
+        return false;
     }
 }

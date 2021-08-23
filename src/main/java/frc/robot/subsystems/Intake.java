@@ -62,7 +62,7 @@ public class Intake extends SubsystemBase {
         return intakePiston.get() == DoubleSolenoid.Value.kForward ? true : false;
     }
 
-    public void setintakePiston(boolean state){
+    public void setIntakePiston(boolean state){
         intakePiston.set(state ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse);
     }
 

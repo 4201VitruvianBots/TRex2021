@@ -7,6 +7,7 @@
 
 package frc.robot.commands.indexer;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
@@ -16,16 +17,18 @@ import frc.robot.subsystems.Shooter;
  */
 public class SetCaroselOutput extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final Indexer m_shooter;
+  private final Indexer m_carosel;
   private final double m_output;
   private boolean printed = false;
+  private Timer timer;
+  private double timeStamp;
   /**
    * Creates a new ExampleCommand.
    *
    */
   public SetCaroselOutput(Indexer carosel, double output) {
     // Use addRequirements() here to declare subsystem dependencies.
-    m_shooter = carosel;
+    m_carosel = carosel;
     m_output = output;
     addRequirements(carosel);
   }
@@ -38,14 +41,20 @@ public class SetCaroselOutput extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooter.setIndexerOutput(m_output);
-
+    m_carosel.setIndexerOutput(m_output);
+    
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_shooter.setIndexerOutput(0);
+    timer.reset();
+    timer.start();
+    timeStamp = timer.getFPGATimestamp();
+    while(timer.getFPGATimestamp() > timeStamp + 0.5) { // Waits for 0.5 seconds for the shooter to slow before stopping carousel
+      m_carosel.setIndexerOutput(m_output);
+    }
+    m_carosel.setIndexerOutput(0);
   }
 
   // Returns true when the command should end.

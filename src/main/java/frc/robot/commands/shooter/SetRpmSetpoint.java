@@ -19,15 +19,17 @@ public class SetRpmSetpoint extends CommandBase {
   private final Shooter m_shooter;
   private final Vision m_vision;
   private double m_RPM;
+  private boolean m_reset;
   /**
    * Creates a new ExampleCommand.
    *
    */
-  public SetRpmSetpoint(Shooter shooter, Vision vision, double RPM) {
+  public SetRpmSetpoint(Shooter shooter, Vision vision, double RPM, boolean reset) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooter = shooter;
     m_RPM = RPM;
     m_vision = vision;
+    m_reset = reset; // For if the setpoint should remain at that value after command finishes
 //  addRequirements(shooter);
   }
 
@@ -47,7 +49,9 @@ public class SetRpmSetpoint extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_shooter.setRPM(-1);
+    if (m_reset) {
+      m_shooter.setRPM(-1);
+    }
   }
 
   // Returns true when the command should end.

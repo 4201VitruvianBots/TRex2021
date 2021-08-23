@@ -98,7 +98,7 @@ public class ControlledIntakeTimed extends CommandBase {
         m_intake.setIntakePercentOutput(0);
         m_indexer.setIndexerOutput(0);
 //    if(intakeState == IntakeStates.INTAKE_FIVE_BALLS)
-        m_intake.setintakePiston(false);
+        m_intake.setIntakePiston(false);
     }
 
     // Returns true when the command should end.

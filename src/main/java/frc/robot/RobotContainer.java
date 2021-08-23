@@ -20,11 +20,14 @@ import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.indexer.SetCaroselOutput;
 import frc.robot.commands.intake.ControlledIntake;
+import frc.robot.commands.intake.SetIntake;
 import frc.robot.commands.intake.SetIntakePiston;
 import frc.robot.commands.intake.ToggleIntakePistons;
+import frc.robot.commands.intake.SetIntakePiston;
 import frc.robot.commands.shooter.SetRpmSetpoint;
 import frc.robot.commands.shooter.SetUptake;
 import frc.robot.commands.shooter.TestShooter;
+import frc.robot.commands.shooter.FeedShooter;
 import frc.robot.commands.shooter.RapidFireSetpoint;
 import frc.robot.commands.turret.ToggleTurretControlMode;
 import frc.robot.commands.turret.ZeroTurretEncoder;
@@ -178,34 +181,18 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
         xBoxPOVButtons[i] = new POVButton(xBoxController, (i * 45));
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
+      
+      // Right Button : extend and run intake
+      xBoxButtons[5].whenPressed(new SetIntakePiston(m_intake, true));
+      xBoxButtons[5].whenReleased(new SetIntakePiston(m_intake, false));
+      xBoxButtons[5].whileHeld(new SetIntake(m_intake, 0.2));
 
-      xBoxButtons[3].whenPressed(new SetIntakePiston(m_intake, true));
-      xBoxButtons[3].whenReleased(new SetIntakePiston(m_intake, false));
-      xBoxButtons[3].whileHeld(new ControlledIntake(m_intake, m_indexer, xBoxController)); // Deploy intake
-
-      // xBoxButtons[2].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 1000));//green                  // X - Set RPM Medium
-      // xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3410));//blue                  // B - Set RPM Medium
-      // xBoxPOVButtons[0].whileHeld(new EjectAll(m_indexer, m_intake));                                  //Top POV - Eject All
-      xBoxButtons[4].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900));//yellow                     // Y - Set RPM Far
-      xBoxButtons[4].whileHeld(new SetUptake(m_uptake, 0.1));
-      //xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3500));//red                 // A - Set RPM Close
-      // xBoxButtons[0].whileHeld(new TestShooting(m_swerveDrive, m_shooter, m_turret, m_vision));   // What should this be replaced with?
-
+      // Y : Run carousel
       xBoxButtons[3].whileHeld(new SetCaroselOutput(m_indexer, 0.1));
-      xBoxButtons[4].whileHeld(new SetCaroselOutput(m_indexer, 0.1));
-      // xBoxButtons[]
 
-      //xBoxButtons[5].whileHeld(new RapidFire(m_shooter, m_indexer, m_intake, 3700));              // Set Distance RPM
-      xBoxRightTrigger.whileHeld(new RapidFireSetpoint(m_shooter, m_indexer, m_intake));            // flywheel on toggle
-
-      xBoxButtons[6].whenPressed(new ToggleTurretControlMode(m_turret));                            // start - toggle control mode turret
-      //xBoxButtons[7].whenPressed(new ToggleIndexerControlMode(m_indexer));                        // select - toggle control mode uptake
-//        xBoxButtons[8].whenPressed(new DisableClimbMode(m_climber,m_turret)); //left stick
-      xBoxButtons[9].whenPressed(new EnableClimbMode(m_climber, m_turret));                         // R3 - toggle driver climb mode?
-
-      xBoxPOVButtons[4].whenPressed(new ZeroTurretEncoder(m_turret));
-      //xBoxPOVButtons[4].whileHeld(new EjectAll(m_indexer, m_intake));
-//        SmartDashboard.putData("disable climb mode", new DisableClimbMode(m_climber,m_turret));
+      // Left Button : Run shooter, carousel, and uptake
+      xBoxButtons[4].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900, true));
+      xBoxButtons[4].whileHeld(new FeedShooter(m_uptake, m_indexer, m_shooter));
 
     }else{
       //Invert raw axis of X, Y, and rotation inputs to match WPILib convention
