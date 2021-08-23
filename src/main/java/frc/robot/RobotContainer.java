@@ -182,13 +182,13 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
       
-      // Right Button : extend and run intake
-      xBoxButtons[5].whenPressed(new SetIntakePiston(m_intake, true));
-      xBoxButtons[5].whenReleased(new SetIntakePiston(m_intake, false));
-      xBoxButtons[5].whileHeld(new SetIntake(m_intake, 0.2));
+      // X : Extend intake
+      xBoxButtons[1].whenPressed(new SetIntakePiston(m_intake, true));
+      xBoxButtons[1].whenReleased(new SetIntakePiston(m_intake, false));
 
-      // Y : Run carousel
-      xBoxButtons[3].whileHeld(new SetCaroselOutput(m_indexer, 0.1));
+      // Right Button : run intake and carousel
+      xBoxButtons[5].whileHeld(new SetIntake(m_intake, 0.2));
+      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.1));
 
       // Left Button : Run shooter, carousel, and uptake
       xBoxButtons[4].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900, true));
