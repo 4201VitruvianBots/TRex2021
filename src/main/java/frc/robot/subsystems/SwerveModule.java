@@ -126,7 +126,11 @@ public class SwerveModule extends SubsystemBase {
 //      return m_turnMotor.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
       return m_angleEncoder.getAbsolutePosition();
     else
-      return m_turnMotorSim.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningSimEncoderDistancePerPulse;
+	  try {
+		return m_turnMotorSim.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningSimEncoderDistancePerPulse;
+	  } catch (Exception e) {
+	    return 0;
+	  }
   }
 
   /**
