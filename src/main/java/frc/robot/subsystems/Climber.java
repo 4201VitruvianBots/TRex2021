@@ -30,10 +30,8 @@ public class Climber extends SubsystemBase {
 
   // Climber motors and solenoid
   private TalonFX climbMotors[] = {new TalonFX(Constants.climbMotorA), new TalonFX(Constants.climbMotorB)};
-  
 
-
-  DoubleSolenoid climbPistons[] = {new DoubleSolenoid(Constants.pcmOne, Constants.climbPistonAForward, Constants.climbPistonAReverse), new DoubleSolenoid(Constants.pcmOne, Constants.climbPistonBForward, Constants.climbPistonBReverse)};
+  DoubleSolenoid climbPistons = new DoubleSolenoid(Constants.pcmOne, Constants.climbPistonAForward, Constants.climbPistonAReverse);
 
   private boolean climbState;
 
@@ -54,13 +52,12 @@ public class Climber extends SubsystemBase {
 
 
   public boolean getClimbPistonExtendStatus(){
-    return climbPistons[0].get() == DoubleSolenoid.Value.kForward ? true : false; //Gives the ClimbPistonExtendStatus if the climbPiston value equals the value of forward speed??
+    return climbPistons.get() == DoubleSolenoid.Value.kForward ? true : false; //Gives the ClimbPistonExtendStatus if the climbPiston value equals the value of forward speed??
 
   }
 
   public void setClimbPistons(boolean state){
-climbPistons[0].set(state ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse); //sets values based on the ClimbPiston State
-climbPistons[1].set(state ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse); //sets values based on the ClimbPiston State
+    climbPistons.set(state ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse); //sets values based on the ClimbPiston State
   }
 
   public boolean getClimbState() {

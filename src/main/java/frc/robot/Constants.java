@@ -144,8 +144,10 @@ public final class Constants {
 
     public static int intakeMotor = 47;
     public static final int pcmOne = 11;
-    public static final int intakePistonForward = 2; // 2
-    public static final int intakePistonReverse = 3; // 3
+    public static final int intakePistonForward = 0; // 2
+    public static final int intakePistonReverse = 1; // 3
+    public static final int climbPistonAForward = 2;
+    public static final int climbPistonAReverse = 3;
     public static enum IntakeStates {
         INTAKE_EMPTY, INTAKE_ONE_BALL, INTAKE_FOUR_BALLS, INTAKE_FIVE_BALLS
     }
@@ -156,10 +158,6 @@ public final class Constants {
     public static final int turretHomeSensor = 30;
     public static final int climbMotorA = 50;
     public static final int climbMotorB = 51;
-    public static final int climbPistonAForward = 31;
-    public static final int climbPistonAReverse = 32;
-    public static final int climbPistonBForward = 33;
-    public static final int climbPistonBReverse = 34;
     public static final int indexerMotor = 35;
     public static final int uptakeMotor = 36;
 
