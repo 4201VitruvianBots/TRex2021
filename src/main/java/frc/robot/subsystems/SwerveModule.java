@@ -52,16 +52,23 @@ public class SwerveModule extends SubsystemBase {
   private double simTurnEncoderDistance;
   private double simThrottleEncoderDistance;
 
+  private Encoder simulationTurnEncoder;
+  private Encoder simulationThrottleEncoder;
+  private EncoderSim simulationTurnEncoderSim;
+  private EncoderSim simulationThrottleEncoderSim;
+
   private final FlywheelSim moduleRotationSimModel = new FlywheelSim(
 //          LinearSystemId.identifyVelocitySystem(kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian),
-//          LinearSystemId.identifyVelocitySystem(1.47, 0.0348),
-          LinearSystemId.identifyVelocitySystem(kvTurnVoltSecondsPerRadian / 90, kaTurnVoltSecondsSquaredPerRadian / 90),
+          // Sim Values
+          LinearSystemId.identifyVelocitySystem(0.16, 0.0348),
           DCMotor.getFalcon500(1),
           kTurningMotorGearRatio
   );
 
   private final FlywheelSim moduleThrottleSimModel = new FlywheelSim(
-          LinearSystemId.identifyVelocitySystem(kvDriveVoltSecondsSquaredPerMeter * 12, kaDriveVoltSecondsSquaredPerMeter * 12),
+//          LinearSystemId.identifyVelocitySystem(kvDriveVoltSecondsSquaredPerMeter * 12, kaDriveVoltSecondsSquaredPerMeter * 12),
+          // Sim Values
+          LinearSystemId.identifyVelocitySystem(2, 1.24),
           DCMotor.getFalcon500(1),
           kDriveMotorGearRatio
   );
@@ -92,6 +99,31 @@ public class SwerveModule extends SubsystemBase {
 
 
     if(RobotBase.isSimulation()) {
+      switch (moduleNumber) {
+        case 3:
+          simulationTurnEncoder = new Encoder(15, 14);
+          simulationThrottleEncoder = new Encoder(0, 1);
+          break;
+        case 2:
+          simulationTurnEncoder = new Encoder(13, 12);
+          simulationThrottleEncoder = new Encoder(2, 3);
+          break;
+        case 1:
+          simulationTurnEncoder = new Encoder(11, 10);
+          simulationThrottleEncoder = new Encoder(4, 5);
+          break;
+        case 0:
+          simulationTurnEncoder = new Encoder(9, 8);
+          simulationThrottleEncoder = new Encoder(6, 7);
+          break;
+      }
+
+      simulationTurnEncoder.setDistancePerPulse(kTurningEncoderDistancePerPulse);
+      simulationThrottleEncoder.setDistancePerPulse(kDriveEncoderDistancePerPulse);
+
+      simulationTurnEncoderSim = new EncoderSim(simulationTurnEncoder);
+      simulationThrottleEncoderSim = new EncoderSim(simulationThrottleEncoder);
+
       m_driveMotorSim = new TalonSRX(driveMotor.getDeviceID());
       m_turnMotorSim = new TalonSRX(turnMotor.getDeviceID());
 
@@ -126,11 +158,12 @@ public class SwerveModule extends SubsystemBase {
 //      return m_turnMotor.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
       return m_angleEncoder.getAbsolutePosition();
     else
-	  try {
-		return m_turnMotorSim.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningSimEncoderDistancePerPulse;
-	  } catch (Exception e) {
-	    return 0;
-	  }
+      try {
+//        return m_turnMotorSim.getSelectedSensorPosition() * Constants.ModuleConstants.kTurningSimEncoderDistancePerPulse;
+        return Units.radiansToDegrees(simulationTurnEncoder.getDistance());
+      } catch (Exception e) {
+        return 0;
+      }
   }
 
   /**
@@ -151,7 +184,8 @@ public class SwerveModule extends SubsystemBase {
     if(RobotBase.isReal())
       return m_driveMotor.getSelectedSensorVelocity() * Constants.ModuleConstants.kDriveEncoderDistancePerPulse * 10;
     else
-      return m_driveMotorSim.getSelectedSensorVelocity() * Constants.ModuleConstants.kDriveSimEncoderDistancePerPulse * 10;
+//      return m_driveMotorSim.getSelectedSensorVelocity() * Constants.ModuleConstants.kDriveSimEncoderDistancePerPulse * 10;
+      return simulationThrottleEncoder.getRate();
   }
 
   /**
@@ -238,18 +272,26 @@ public class SwerveModule extends SubsystemBase {
     moduleRotationSimModel.update(0.02);
     moduleThrottleSimModel.update(0.02);
 
-    simTurnEncoderDistance += moduleRotationSimModel.getAngularVelocityRadPerSec() * 0.02;
-    simThrottleEncoderDistance += moduleThrottleSimModel.getAngularVelocityRadPerSec() * 0.02;
+//    simTurnEncoderDistance += moduleRotationSimModel.getAngularVelocityRadPerSec() * 0.02;
+//    simThrottleEncoderDistance += moduleThrottleSimModel.getAngularVelocityRadPerSec() * 0.02;
 
-    Unmanaged.feedEnable(20);
+//    Unmanaged.feedEnable(20);
 //    m_turnMotor.getSimCollection().setQuadratureRawPosition((int) (simTurnEncoderDistance / kTurningEncoderDistancePerPulse));
 //    m_turnMotor.getSimCollection().setQuadratureVelocity((int) (moduleRotationSimModel.getAngularVelocityRadPerSec() / kTurningEncoderDistancePerPulse * 10));
 //    m_driveMotor.getSimCollection().setQuadratureRawPosition((int) (simThrottleEncoderDistance / kDriveEncoderDistancePerPulse));
 //    m_driveMotor.getSimCollection().setQuadratureVelocity((int) (moduleThrottleSimModel.getAngularVelocityRadPerSec() / kDriveEncoderDistancePerPulse * 10));
-    m_turnMotorSim.getSimCollection().setQuadratureRawPosition((int) (simTurnEncoderDistance / kTurningEncoderDistancePerPulse));
-    m_turnMotorSim.getSimCollection().setQuadratureVelocity((int) (moduleRotationSimModel.getAngularVelocityRadPerSec() / kTurningEncoderDistancePerPulse * 10));
-    m_driveMotorSim.getSimCollection().setQuadratureRawPosition((int) (simThrottleEncoderDistance / kDriveSimEncoderDistancePerPulse));
-    m_driveMotorSim.getSimCollection().setQuadratureVelocity((int) (moduleThrottleSimModel.getAngularVelocityRadPerSec() / kDriveSimEncoderDistancePerPulse / 10));
+//    m_turnMotorSim.getSimCollection().setQuadratureRawPosition((int) (simTurnEncoderDistance / kTurningEncoderDistancePerPulse));
+//    m_turnMotorSim.getSimCollection().setQuadratureVelocity((int) (moduleRotationSimModel.getAngularVelocityRadPerSec() / kTurningEncoderDistancePerPulse * 10));
+//    m_driveMotorSim.getSimCollection().setQuadratureRawPosition((int) (simThrottleEncoderDistance / kDriveSimEncoderDistancePerPulse));
+//    m_driveMotorSim.getSimCollection().setQuadratureVelocity((int) (moduleThrottleSimModel.getAngularVelocityRadPerSec() / kDriveSimEncoderDistancePerPulse / 10));
+
+    simTurnEncoderDistance += moduleRotationSimModel.getAngularVelocityRadPerSec() * 0.02;
+    simulationTurnEncoderSim.setDistance(simTurnEncoderDistance);
+    simulationTurnEncoderSim.setRate(moduleRotationSimModel.getAngularVelocityRadPerSec());
+
+    simThrottleEncoderDistance += moduleThrottleSimModel.getAngularVelocityRadPerSec() * 0.02;
+    simulationThrottleEncoderSim.setDistance(simThrottleEncoderDistance);
+    simulationThrottleEncoderSim.setRate(moduleThrottleSimModel.getAngularVelocityRadPerSec());
 
 //    System.out.println("Module " + mModuleNumber + " State: " + getState());
   }
