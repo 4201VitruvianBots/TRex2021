@@ -59,14 +59,14 @@ public class AutoNavSlalom extends SequentialCommandGroup {
                 new SetDriveNeutralMode(swerveDrive, true)
         );
 
-        var trajectory = TrajectoryGenerator.generateTrajectory(Arrays.asList(waypoints.clone()), config);
+        Trajectory trajectory = TrajectoryGenerator.generateTrajectory(Arrays.asList(waypoints.clone()), config);
 
-        var trajectoryStates = new ArrayList<Pose2d>();
+        ArrayList<Pose2d> trajectoryStates = new ArrayList<Pose2d>();
         trajectoryStates.addAll(trajectory.getStates().stream()
                 .map(state -> state.poseMeters)
                 .collect(Collectors.toList()));
 
-        addCommands(TrajectoryUtils.generateSwerveCommand(swerveDrive, trajectory, swerveDrive::getHeadingToTarget));
+        addCommands(TrajectoryUtils.generateSwerveCommand(swerveDrive, trajectory, () -> new Rotation2d()));
 
 //        for (int i = 0; i < waypoints.length - 1; i++) {
 //                if (i != 0) {

@@ -23,7 +23,8 @@ public class TestAuto extends SequentialCommandGroup {
     public TestAuto(SwerveDrive swerveDrive, FieldSim fieldSim) {
         Pose2d[] waypoints = {
                 new Pose2d(Units.inchesToMeters(30), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
-                new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(0))),
+                new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(30), new Rotation2d(Units.degreesToRadians(45))),
+                new Pose2d(Units.inchesToMeters(90), Units.inchesToMeters(90), new Rotation2d(Units.degreesToRadians(90))),
         };
         Pose2d startPosition = waypoints[0];
 
