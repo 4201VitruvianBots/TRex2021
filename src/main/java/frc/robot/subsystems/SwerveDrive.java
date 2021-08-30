@@ -40,10 +40,10 @@ public class SwerveDrive extends SubsystemBase {
      * 3 is Back Right
      */
     private SwerveModule[] mSwerveModules = new SwerveModule[] {
-            new SwerveModule(0, new TalonFX(Constants.frontLeftTurningMotor), new TalonFX(Constants.frontLeftDriveMotor), new CANCoder(Constants.frontLeftCANCoder), -359.824, true, false),
-            new SwerveModule(1, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), new CANCoder(Constants.frontRightCANCoder),  -286.260, true, false), //true
-            new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), new CANCoder(Constants.backLeftCANCoder), -196.523, true, false),
-            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), new CANCoder(Constants.backRightCANCoder), -167.959, true, false) //true
+            new SwerveModule(0, new TalonFX(Constants.frontLeftTurningMotor), new TalonFX(Constants.frontLeftDriveMotor), new CANCoder(Constants.frontLeftCANCoder), -267.715, true, false),
+            new SwerveModule(1, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), new CANCoder(Constants.frontRightCANCoder),  -266.572, true, false), //true
+            new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), new CANCoder(Constants.backLeftCANCoder), -153.896, true, false),
+            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), new CANCoder(Constants.backRightCANCoder), -169.365, true, false) //true
     };
 
     PowerDistributionPanel m_pdp;
