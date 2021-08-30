@@ -26,18 +26,26 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants.  This class should not be used for any other purpose.  All constants should be
- * declared globally (i.e. public static).  Do not put anything functional in this class.
+ * The Constants class provides a convenient place for teams to hold robot-wide
+ * numerical or boolean constants. This class should not be used for any other
+ * purpose. All constants should be declared globally (i.e. public static). Do
+ * not put anything functional in this class.
  *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
+ * <p>
+ * It is advised to statically import this class (or one of its inner classes)
+ * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants {
     // USB PORTS
     public static final int leftJoystick = 0;
     public static final int rightJoystick = 1;
     public static final int xBoxController = 2;
+
+    // PWM PORTS
+    public static final int LeftShooterHoodServo = 0;
+    public static final int RightShooterHoodServo = 1;
+    public static final double minHoodValue = 0;
+    public static final double maxHoodValue = 270;
 
     // CAN ADDRESSES
     public static final int frontLeftDriveMotor = 20;
@@ -56,49 +64,42 @@ public final class Constants {
 
     public static final class DriveConstants {
         public static final double kTrackWidth = Units.inchesToMeters(30);
-        //Distance between centers of right and left wheels on robot. Meters?
+        // Distance between centers of right and left wheels on robot. Meters?
         public static final double kWheelBase = Units.inchesToMeters(30);
-        //Distance between front and back wheels on robot. Meters?
+        // Distance between front and back wheels on robot. Meters?
 
-        public static Translation2d[] modulePositions = {
-            new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)
-        };
+        public static Translation2d[] modulePositions = { new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+                new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+                new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+                new Translation2d(-kWheelBase / 2, -kTrackWidth / 2) };
 
-        public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-            modulePositions[0],
-            modulePositions[1],
-            modulePositions[2],
-            modulePositions[3]
-        );
+        public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(modulePositions[0],
+                modulePositions[1], modulePositions[2], modulePositions[3]);
 
         public static final boolean kGyroReversed = false;
 
         public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(14);
-//        public static final double kMaxSpeedMetersPerSecond = 3;
-
+        // public static final double kMaxSpeedMetersPerSecond = 3;
 
         public static final double kMaxChassisRotationSpeed = 10 * Math.PI;
 
     }
 
     public static final class ModuleConstants {
-        public static final double kDriveMotorGearRatio = 8.16; //6.89 to 1
-        public static final double kTurningMotorGearRatio = 12.8; //12 to 1
+        public static final double kDriveMotorGearRatio = 8.16; // 6.89 to 1
+        public static final double kTurningMotorGearRatio = 12.8; // 12 to 1
         public static final int kEncoderCPR = 4096;
-        public static final double kWheelDiameterMeters = Units.inchesToMeters(4); //10.16 cm
+        public static final double kWheelDiameterMeters = Units.inchesToMeters(4); // 10.16 cm
         public static final double kMaxModuleAngularSpeedRadiansPerSecond = 11.5;
 
-        public static final double kDriveEncoderDistancePerPulse =
-                (kWheelDiameterMeters * Math.PI) / ((double) kEncoderCPR * kDriveMotorGearRatio);
+        public static final double kDriveEncoderDistancePerPulse = (kWheelDiameterMeters * Math.PI)
+                / ((double) kEncoderCPR * kDriveMotorGearRatio);
 
         public static final double kDriveSimEncoderDistancePerPulse = kDriveEncoderDistancePerPulse / 2;
 
-//        public static final double kTurningEncoderDistancePerPulse =
-//                // Assumes the encoders are on a 1:1 reduction with the module shaft.
-//                (360.0) / (kEncoderCPR * kTurningMotorGearRatio);
+        // public static final double kTurningEncoderDistancePerPulse =
+        // // Assumes the encoders are on a 1:1 reduction with the module shaft.
+        // (360.0) / (kEncoderCPR * kTurningMotorGearRatio);
         public static final double kTurningEncoderDistancePerPulse =
                 // Assumes the encoders are on a 1:1 reduction with the module shaft.
                 (360.0) / kEncoderCPR;
@@ -135,10 +136,9 @@ public final class Constants {
         public static final double kPYController = 1;
         public static final double kPThetaController = 3.5;
 
-        //Constraint for the motion profiled robot angle controller
-        public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-                new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond * 10,
-                        kMaxAngularSpeedRadiansPerSecondSquared * 10);
+        // Constraint for the motion profiled robot angle controller
+        public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
+                kMaxAngularSpeedRadiansPerSecond * 10, kMaxAngularSpeedRadiansPerSecondSquared * 10);
 
     }
 
@@ -148,9 +148,11 @@ public final class Constants {
     public static final int intakePistonReverse = 1; // 3
     public static final int climbPistonAForward = 2;
     public static final int climbPistonAReverse = 3;
+
     public static enum IntakeStates {
         INTAKE_EMPTY, INTAKE_ONE_BALL, INTAKE_FOUR_BALLS, INTAKE_FIVE_BALLS
     }
+
     public static final int flywheelMotorA = 40;
     public static final int flywheelMotorB = 41;
     public static final int turretEncoder = 61;
@@ -181,13 +183,14 @@ public final class Constants {
         motorConfig.motionCruiseVelocity = ModuleConstants.kTurningEncoderDistancePerPulse * 11.5;
         motorConfig.motionAcceleration = ModuleConstants.kTurningEncoderDistancePerPulse * 11.5;
 
-        SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true,25, 40, 0.1);
+        SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true, 25, 40, 0.1);
         motorConfig.supplyCurrLimit = supplyCurrentLimit;
 
         motorConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
 
         return motorConfig;
     }
+
     private static TalonSRXConfiguration generateTurnSimMotorConfig() {
         TalonSRXConfiguration motorConfig = new TalonSRXConfiguration();
 
@@ -213,7 +216,7 @@ public final class Constants {
         motorConfig.slot0.kI = 0.0;
         motorConfig.slot0.kD = 0.0;
 
-        SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true,35, 60, 0.1);
+        SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true, 35, 60, 0.1);
         motorConfig.supplyCurrLimit = supplyCurrentLimit;
 
         motorConfig.openloopRamp = 0.25;
