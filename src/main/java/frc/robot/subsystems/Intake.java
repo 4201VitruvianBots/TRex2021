@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -26,17 +29,17 @@ public class Intake extends SubsystemBase {
     private boolean intaking = false;
 
     // Intake motor setup
-    private CANSparkMax intakeMotor =  new CANSparkMax(Constants.intakeMotor, MotorType.kBrushless);
+    private TalonFX intakeMotor =  new TalonFX(Constants.intakeMotor);
 //  private CANEncoder intakeEncoder = intakeMotor.getEncoder();
 //  private CANPIDController canPidController = intakeMotor.getPIDController();
 
-    DoubleSolenoid intakePiston = new DoubleSolenoid(Constants.pcmOne, Constants.intakePistonForward, Constants.intakePistonReverse);
+    //DoubleSolenoid intakePiston = new DoubleSolenoid(Constants.pcmOne, Constants.intakePistonForward, Constants.intakePistonReverse);
 
     public Intake() {
         // Configure motors
 
-        intakeMotor.restoreFactoryDefaults();
-        intakeMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        intakeMotor.configFactoryDefault();
+        intakeMotor.setNeutralMode(NeutralMode.Brake);
         intakeMotor.setInverted(false);
 
 //    canPidController.setFF(kFF);
@@ -59,15 +62,16 @@ public class Intake extends SubsystemBase {
         intaking = state;
     }
     public boolean getIntakePistonExtendStatus(){
-        return intakePiston.get() == DoubleSolenoid.Value.kForward ? true : false;
+        return false;
+        //return intakePiston.get() == DoubleSolenoid.Value.kForward ? true : false;
     }
 
     public void setIntakePiston(boolean state){
-        intakePiston.set(state ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse);
+        //intakePiston.set(state ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse);
     }
 
     public void setIntakePercentOutput(double value){
-        intakeMotor.set(value);
+        intakeMotor.set(ControlMode.PercentOutput, value);
     }
 
 //  public double getRPM(){

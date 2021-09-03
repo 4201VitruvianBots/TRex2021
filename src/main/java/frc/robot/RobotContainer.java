@@ -191,7 +191,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.1));
 
       // Left Button : Run shooter, carousel, and uptake
-      xBoxButtons[4].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900, true));
+      xBoxButtons[4].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900, true)); 
       xBoxButtons[4].whileHeld(new FeedShooter(m_uptake, m_indexer, m_shooter));
 
     }else{

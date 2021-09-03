@@ -30,6 +30,7 @@ public class SetCaroselOutput extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     m_carosel = carosel;
     m_output = output;
+    timer = new Timer();
     addRequirements(carosel);
   }
 

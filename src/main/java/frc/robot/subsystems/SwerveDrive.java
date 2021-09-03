@@ -302,7 +302,7 @@ public class SwerveDrive extends SubsystemBase {
 //                target = target.unaryMinus();
 
             setHeadingToTargetHeading(target);
-            System.out.println("Target Heading: " + getHeadingToTarget());
+            //System.out.println("Target Heading: " + getHeadingToTarget());
         }
 
         // This method will be called once per scheduler run

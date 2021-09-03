@@ -6,21 +6,24 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Uptake extends SubsystemBase {
 
-  private TalonFX uptakeMotor = new TalonFX(Constants.uptakeMotor);
+  private CANSparkMax uptakeMotor = new CANSparkMax(Constants.uptakeMotor, MotorType.kBrushless);
 
   /** Creates a new ExampleSubsystem. */
   public Uptake() {
-    uptakeMotor.configFactoryDefault();
+    uptakeMotor.restoreFactoryDefaults();
     uptakeMotor.setInverted(false);
   }
 
   public void setPercentOutput(double output) {
-    uptakeMotor.set(ControlMode.PercentOutput, output);
+    uptakeMotor.set(output);
   }
 
   @Override
