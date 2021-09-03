@@ -252,7 +252,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 
   public void disabledInit() {
     setInitializationState(true);
-    m_swerveDrive.setSwerveDriveNeutralMode(true);
+    m_swerveDrive.setSwerveDriveNeutralMode(false); // Coast
     m_FieldSim.disabledInit();
   }
 
@@ -264,7 +264,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     if(RobotBase.isReal()) {
       // m_swerveDrive.resetEncoders();
       m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
-      m_swerveDrive.setSwerveDriveNeutralMode(false);
+      m_swerveDrive.setSwerveDriveNeutralMode(true); // Brake
     } else {
       m_swerveDrive.resetEncoders();
       m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
@@ -279,6 +279,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     if (RobotBase.isReal()) {
       m_swerveDrive.resetEncoders();
       m_swerveDrive.resetOdometry(m_swerveDrive.getPose(), m_FieldSim.getRobotPose().getRotation());
+      m_swerveDrive.setSwerveDriveNeutralMode(true); // Brake
     } else {
       m_FieldSim.initSim();
       m_swerveDrive.resetEncoders();
