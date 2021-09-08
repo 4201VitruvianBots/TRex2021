@@ -33,7 +33,7 @@ public class Intake extends SubsystemBase {
 //  private CANEncoder intakeEncoder = intakeMotor.getEncoder();
 //  private CANPIDController canPidController = intakeMotor.getPIDController();
 
-    //DoubleSolenoid intakePiston = new DoubleSolenoid(Constants.pcmOne, Constants.intakePistonForward, Constants.intakePistonReverse);
+    DoubleSolenoid intakePiston = new DoubleSolenoid(Constants.pcmOne, Constants.intakePistonForward, Constants.intakePistonReverse);
 
     public Intake() {
         // Configure motors
@@ -62,12 +62,11 @@ public class Intake extends SubsystemBase {
         intaking = state;
     }
     public boolean getIntakePistonExtendStatus(){
-        return false;
-        //return intakePiston.get() == DoubleSolenoid.Value.kForward ? true : false;
+        return intakePiston.get() == DoubleSolenoid.Value.kForward ? true : false;
     }
 
     public void setIntakePiston(boolean state){
-        //intakePiston.set(state ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse);
+        intakePiston.set(state ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse);
     }
 
     public void setIntakePercentOutput(double value){

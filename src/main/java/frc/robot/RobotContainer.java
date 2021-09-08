@@ -61,7 +61,7 @@ public class RobotContainer {
   private final Turret m_turret = new Turret(m_swerveDrive);
   private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
   private final Shooter m_shooter = new Shooter(m_vision, pdp);
-  private final Climber m_climber = new Climber();
+  // private final Climber m_climber = new Climber();
 
   private FieldSim m_FieldSim;
   private SimulationReferencePose m_referencePose;
