@@ -8,9 +8,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
@@ -18,12 +16,8 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Units;
-import edu.wpi.first.wpiutil.math.numbers.N2;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -87,12 +81,13 @@ public final class Constants {
     public static final class ModuleConstants {
         public static final double kDriveMotorGearRatio = 8.16; //6.89 to 1
         public static final double kTurningMotorGearRatio = 12.8; //12 to 1
-        public static final int kEncoderCPR = 4096;
+        public static final int kFalconEncoderCPR = 2048;
+        public static final int kCANCoderCPR = 4096;
         public static final double kWheelDiameterMeters = Units.inchesToMeters(4); //10.16 cm
         public static final double kMaxModuleAngularSpeedRadiansPerSecond = 11.5;
 
         public static final double kDriveEncoderDistancePerPulse =
-                (kWheelDiameterMeters * Math.PI) / ((double) kEncoderCPR * kDriveMotorGearRatio);
+                (kWheelDiameterMeters * Math.PI) / ((double) kFalconEncoderCPR * kDriveMotorGearRatio);
 
         public static final double kDriveSimEncoderDistancePerPulse = kDriveEncoderDistancePerPulse / 2;
 
@@ -101,7 +96,7 @@ public final class Constants {
 //                (360.0) / (kEncoderCPR * kTurningMotorGearRatio);
         public static final double kTurningEncoderDistancePerPulse =
                 // Assumes the encoders are on a 1:1 reduction with the module shaft.
-                (360.0) / kEncoderCPR;
+                (360.0) / kCANCoderCPR;
 
         public static final double kTurningSimEncoderDistancePerPulse = kTurningEncoderDistancePerPulse / 2;
 
