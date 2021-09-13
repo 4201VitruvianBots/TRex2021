@@ -41,10 +41,10 @@ public class Shooter extends SubsystemBase {
     private final double kV = 0.0708;
     private final double kA = 0.0239;
     // shooter motors
-    private final TalonFX[] shooterMotors = {
-            new TalonFX(Constants.flywheelMotorA),
-            new TalonFX(Constants.flywheelMotorB),
-    };
+    // private final TalonFX[] shooterMotors = {
+    //         new TalonFX(Constants.flywheelMotorA),
+    //         new TalonFX(Constants.flywheelMotorB),
+    // };
     private final Vision m_vision;
     public int kI_Zone = 100;
     public int kAllowableError = 50;
@@ -59,7 +59,7 @@ public class Shooter extends SubsystemBase {
 
     public Shooter(Vision vision, PowerDistributionPanel pdp) {
         // setup shooterMotors
-        for (TalonFX outtakeMotor : shooterMotors) {
+        /*for (TalonFX outtakeMotor : shooterMotors) {
             outtakeMotor.configFactoryDefault();
             outtakeMotor.setNeutralMode(NeutralMode.Coast);
             outtakeMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 0, 0));
@@ -77,7 +77,7 @@ public class Shooter extends SubsystemBase {
         shooterMotors[0].configAllowableClosedloopError(0, kAllowableError);
         shooterMotors[0].configClosedloopRamp(0.2);
         shooterMotors[1].configClosedloopRamp(0);
-        shooterMotors[1].configOpenloopRamp(0);
+        shooterMotors[1].configOpenloopRamp(0);*/
 
         m_vision = vision;
         // parameters
@@ -88,11 +88,11 @@ public class Shooter extends SubsystemBase {
     //Self-explanatory commands
 
     public double getMotorInputCurrent(int motorIndex) {
-        return shooterMotors[motorIndex].getSupplyCurrent();
+        return 0;//shooterMotors[motorIndex].getSupplyCurrent();
     }
 
     public void setPower(double output) {
-        shooterMotors[0].set(ControlMode.PercentOutput, output);
+        //shooterMotors[0].set(ControlMode.PercentOutput, output);
     }
 
     public void setRPM(double setpoint) {
@@ -108,14 +108,14 @@ public class Shooter extends SubsystemBase {
     }
 
     private void updateRPMSetpoint() {
-        if (setpoint >= 0)
-            shooterMotors[0].set(ControlMode.Velocity, setpoint);
-        else
+        // if (setpoint >= 0)
+        //     shooterMotors[0].set(ControlMode.Velocity, setpoint);
+        // else
             setPower(0);
     }
 
     public void setTestRPM() {
-        shooterMotors[0].set(ControlMode.Velocity, RPMtoFalconUnits(rpmOutput));
+        // shooterMotors[0].set(ControlMode.Velocity, RPMtoFalconUnits(rpmOutput));
     }
 
     public double getTestRPM() {
@@ -127,7 +127,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean encoderAtSetpoint(int motorIndex) {
-        return (Math.abs(shooterMotors[motorIndex].getClosedLoopError()) < 100.0);
+        return false;//(Math.abs(shooterMotors[motorIndex].getClosedLoopError()) < 100.0);
     }
 
     /**
@@ -136,11 +136,11 @@ public class Shooter extends SubsystemBase {
      *@return the rmp of the selected motor
      */
     public double getRPM(int motorIndex) {
-        return falconUnitsToRPM(shooterMotors[motorIndex].getSelectedSensorVelocity());
+        return 0;//falconUnitsToRPM(shooterMotors[motorIndex].getSelectedSensorVelocity());
     }
 
     public double getRotations(int motorIndex) {
-        return (shooterMotors[motorIndex].getSelectedSensorPosition() / 2048.0) * gearRatio;
+        return 0;//(shooterMotors[motorIndex].getSelectedSensorPosition() / 2048.0) * gearRatio;
     }
     public double falconUnitsToRPM(double sensorUnits) {
         return (sensorUnits / 2048.0) * 60.0 * gearRatio;
@@ -167,7 +167,7 @@ public class Shooter extends SubsystemBase {
 
     private void updateShuffleboard() {
         SmartDashboard.putNumber("Flywheel RPM", getRPM(0));
-        SmartDashboard.putNumber("Motor Velocity", shooterMotors[0].getSelectedSensorVelocity());
+        // SmartDashboard.putNumber("Motor Velocity", shooterMotors[0].getSelectedSensorVelocity());
         setRPM(SmartDashboard.getNumber("Flywheel Setpoint", 0));
 //        setpoint = SmartDashboard.getNumber("Flywheel Encoder Units Setpoint", 0);
 
@@ -185,12 +185,12 @@ public class Shooter extends SubsystemBase {
         rpmOutput = SmartDashboardTab.getNumber("Shooter", "RPM Output", 0);
         rpmTolerance = SmartDashboardTab.getNumber("Shooter", "Flywheel RPM Tolerance", 0);
 
-        shooterMotors[0].config_kF(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kF", 0));
-        shooterMotors[0].config_kP(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kP", 0));
-        shooterMotors[0].config_kI(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kI", 0));
-        shooterMotors[0].config_IntegralZone(0, (int) SmartDashboardTab.getNumber("Shooter", "Flywheel kI_Zone", 0));
-        shooterMotors[0].config_kD(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kD", 0));
-        shooterMotors[0].configAllowableClosedloopError(0, (int) SmartDashboardTab.getNumber("Shooter", "Flywheel kAllowableError", 0));
+        // shooterMotors[0].config_kF(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kF", 0));
+        // shooterMotors[0].config_kP(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kP", 0));
+        // shooterMotors[0].config_kI(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kI", 0));
+        // shooterMotors[0].config_IntegralZone(0, (int) SmartDashboardTab.getNumber("Shooter", "Flywheel kI_Zone", 0));
+        // shooterMotors[0].config_kD(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kD", 0));
+        // shooterMotors[0].configAllowableClosedloopError(0, (int) SmartDashboardTab.getNumber("Shooter", "Flywheel kAllowableError", 0));
     }
 
 
