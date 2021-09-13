@@ -169,6 +169,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     if(RobotBase.isReal()) {
       leftJoystick.invertRawAxis(1, true);
       rightJoystick.invertRawAxis(0, true);
+      rightJoystick.setAxisDeadband(0, 0.05);
       xBoxController.invertRawAxis(1, true);
       xBoxController.invertRawAxis(5, true);
       for (int i = 0; i < leftButtons.length; i++)
@@ -187,8 +188,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxButtons[1].whenReleased(new SetIntakePiston(m_intake, false));
 
       // Right Button : run intake and carousel
-      xBoxButtons[5].whileHeld(new SetIntake(m_intake, 0.2));
-      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.1));
+      xBoxButtons[5].whileHeld(new SetIntake(m_intake, 1));
+      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.5));
 
       // Left Button : Run shooter, carousel, and uptake
       xBoxButtons[4].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900, true)); 
