@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -29,6 +30,7 @@ import frc.robot.commands.shooter.SetUptake;
 import frc.robot.commands.shooter.TestShooter;
 import frc.robot.commands.shooter.FeedShooter;
 import frc.robot.commands.shooter.RapidFireSetpoint;
+import frc.robot.commands.turret.SetTurretRobotRelativeAngle;
 import frc.robot.commands.turret.ToggleTurretControlMode;
 import frc.robot.commands.turret.ZeroTurretEncoder;
 import frc.robot.commands.climber.EnableClimbMode;
@@ -182,19 +184,23 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
         xBoxPOVButtons[i] = new POVButton(xBoxController, (i * 45));
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
+
+      xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 1800, true)); // A button: Flywheel low speed
+      // xBoxButtons[1].whileHeld(); // X button: activate climber
+      xBoxButtons[2].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 2400, true)); // B button: Flywheel medium speed
+      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900, true)); // Y Button: Flywheel hih speed;
       
-      // X : Extend intake
-      xBoxButtons[1].whenPressed(new SetIntakePiston(m_intake, true));
-      xBoxButtons[1].whenReleased(new SetIntakePiston(m_intake, false));
+      m_turret.setDefaultCommand(new InstantCommand().andThen(() -> m_turret.setRobotCentricSetpoint(xBoxController.getDirectionDegrees())));
+      // Left xBox joystick: turret
 
-      // Right Button : run intake and carousel
-      xBoxButtons[5].whileHeld(new SetIntake(m_intake, 1));
-      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.5));
+      xBoxButtons[4].whenPressed(new SetIntakePiston(m_intake, true));  // Left bumper: Extend intake
+      xBoxButtons[4].whenReleased(new SetIntakePiston(m_intake, false)); // Left bumper: Retract intake
 
-      // Left Button : Run shooter, carousel, and uptake
-      xBoxButtons[4].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900, true)); 
-      xBoxButtons[4].whileHeld(new FeedShooter(m_uptake, m_indexer, m_shooter));
+    xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.50)); // Right bumper: Spin Carousel
 
+    xBoxLeftTrigger.whileHeld(new SetIntake(m_intake, 1)); // Left trigger: intake
+    xBoxRightTrigger.whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 0, true)); // Right trigger: Release shooter
+      
     }else{
       //Invert raw axis of X, Y, and rotation inputs to match WPILib convention
       testController.invertRawAxis(1, true);
