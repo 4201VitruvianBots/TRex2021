@@ -44,8 +44,8 @@ public class Turret extends SubsystemBase {
     int kMotionAcceleration = kCruiseVelocity * 10;
     // setup variables
     double[][] restrictedMovement = {{270, 300}, {60, 90}};
-    double minAngle = -90;  // -135;
-    double maxAngle = 90;   // 195;
+    double minAngle = -90;
+    double maxAngle = 90;
     double gearRatio = 18.0 / 120.0;
     private double setpoint = 0; //angle
     private int controlMode = 1;
@@ -115,7 +115,7 @@ public class Turret extends SubsystemBase {
     }
 
     public double getError() {
-        return 0 - getTurretAngle();
+        return getSetpoint() - getTurretAngle();
     }
 
     public boolean isRestricted() {

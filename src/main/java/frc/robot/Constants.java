@@ -70,7 +70,7 @@ public final class Constants {
 
         public static final boolean kGyroReversed = false;
 
-        public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(14);
+        public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(12);
 //        public static final double kMaxSpeedMetersPerSecond = 3;
 
 
@@ -123,7 +123,7 @@ public final class Constants {
     public static final class AutoConstants {
         public static final double kMaxSpeedMetersPerSecond = DriveConstants.kMaxSpeedMetersPerSecond;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-        public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI / 3;
+        public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI / 5;
         public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI / 2;
 
         public static final double kPXController = 1;
@@ -170,7 +170,7 @@ public final class Constants {
         TalonFXConfiguration motorConfig = new TalonFXConfiguration();
 
         motorConfig.slot0.kF = 0.0;
-        motorConfig.slot0.kP = 0.6;
+        motorConfig.slot0.kP = 0.5;
         motorConfig.slot0.kI = 0.0;
         motorConfig.slot0.kD = 12.0;
         motorConfig.motionCruiseVelocity = ModuleConstants.kTurningEncoderDistancePerPulse * 11.5;

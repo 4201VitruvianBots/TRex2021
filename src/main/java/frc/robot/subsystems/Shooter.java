@@ -32,21 +32,21 @@ public class Shooter extends SubsystemBase {
      */
 
     // PID loop constants
-    private final double kF = 0.618;  // 0.054      //  Gree: 0.0475;
-    private final double kP = 7.25e-9;      //  0.4       //  0.00047
-    private final double kI = 0.0;                    //  0.0000287
-    private final double kD = 0.0;
+    private final double kF = 0.0523;  // 0.054      //  Gree: 0.0475;
+    private final double kP = 0.25;      //  0.4       //  0.00047
+    private final double kI = 0.00008;                    //  0.0000287
+    private final double kD = 7;
 
     private final double kS = 0.618;
     private final double kV = 0.0708;
     private final double kA = 0.0239;
     // shooter motors
-    // private final TalonFX[] shooterMotors = {
-    //         new TalonFX(Constants.flywheelMotorA),
-    //         new TalonFX(Constants.flywheelMotorB),
-    // };
+    private final TalonFX[] shooterMotors = {
+            new TalonFX(Constants.flywheelMotorA),
+            new TalonFX(Constants.flywheelMotorB)
+    };
     private final Vision m_vision;
-    public int kI_Zone = 100;
+    public int kI_Zone = 400;
     public int kAllowableError = 50;
     // constants
     public double rpmOutput;
@@ -59,7 +59,7 @@ public class Shooter extends SubsystemBase {
 
     public Shooter(Vision vision, PowerDistributionPanel pdp) {
         // setup shooterMotors
-        /*for (TalonFX outtakeMotor : shooterMotors) {
+        for (TalonFX outtakeMotor : shooterMotors) {
             outtakeMotor.configFactoryDefault();
             outtakeMotor.setNeutralMode(NeutralMode.Coast);
             outtakeMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 0, 0));
@@ -77,7 +77,7 @@ public class Shooter extends SubsystemBase {
         shooterMotors[0].configAllowableClosedloopError(0, kAllowableError);
         shooterMotors[0].configClosedloopRamp(0.2);
         shooterMotors[1].configClosedloopRamp(0);
-        shooterMotors[1].configOpenloopRamp(0);*/
+        shooterMotors[1].configOpenloopRamp(0);
 
         m_vision = vision;
         // parameters
@@ -97,6 +97,7 @@ public class Shooter extends SubsystemBase {
 
     public void setRPM(double setpoint) {
         this.setpoint = RPMtoFalconUnits(setpoint);
+        System.out.println("Set rpm to "+this.setpoint);
     }
 
     public double getSetpoint() {
@@ -168,7 +169,7 @@ public class Shooter extends SubsystemBase {
     private void updateShuffleboard() {
         SmartDashboard.putNumber("Flywheel RPM", getRPM(0));
         // SmartDashboard.putNumber("Motor Velocity", shooterMotors[0].getSelectedSensorVelocity());
-        setRPM(SmartDashboard.getNumber("Flywheel Setpoint", 0));
+        // setRPM(SmartDashboard.getNumber("Flywheel Setpoint", 0));
 //        setpoint = SmartDashboard.getNumber("Flywheel Encoder Units Setpoint", 0);
 
 //        SmartDashboardTab.putNumber("Shooter", "RPM Primary", getRPM(0));
@@ -201,16 +202,28 @@ public class Shooter extends SubsystemBase {
         updateShuffleboard();
 //        updatePIDValues();
 
-        if ((Math.abs(getSetpoint() - getRPM(0)) < getRPMTolerance()) && m_vision.hasTarget() &&
-                (Math.abs(m_vision.getTargetX()) < 1) && !timerStart) {
+        // if ((Math.abs(getSetpoint() - getRPM(0)) < getRPMTolerance()) && m_vision.hasTarget() &&
+        //         (Math.abs(m_vision.getTargetX()) < 1) && !timerStart) {
+        //     timerStart = true;
+        //     timeStamp = Timer.getFPGATimestamp();
+        // } else if (((Math.abs(getSetpoint() - getRPM(0)) > getRPMTolerance()) || !m_vision.hasTarget() ||
+        //         (Math.abs(m_vision.getTargetX()) > 1)) && timerStart) {
+        //     timeStamp = 0;
+        //     timerStart = false;
+        // }
+        if ((Math.abs(getSetpoint() - getRPM(0)) < getRPMTolerance()) && !timerStart) {
             timerStart = true;
             timeStamp = Timer.getFPGATimestamp();
-        } else if (((Math.abs(getSetpoint() - getRPM(0)) > getRPMTolerance()) || !m_vision.hasTarget() ||
-                (Math.abs(m_vision.getTargetX()) > 1)) && timerStart) {
+        } else if (((Math.abs(getSetpoint() - getRPM(0)) > getRPMTolerance())) && timerStart) {
             timeStamp = 0;
             timerStart = false;
         }
 
+        SmartDashboardTab.putNumber("Shooter", "RPM", setpoint);
+
+        System.out.println("setpoint: "+setpoint);
+
         canShoot = timeStamp != 0 && Math.abs(Timer.getFPGATimestamp() - timeStamp) > 0.1;
+
     }
 }

@@ -42,8 +42,8 @@ public class SwerveDrive extends SubsystemBase {
     private SwerveModule[] mSwerveModules = new SwerveModule[] {
             new SwerveModule(0, new TalonFX(Constants.frontLeftTurningMotor), new TalonFX(Constants.frontLeftDriveMotor), new CANCoder(Constants.frontLeftCANCoder), -267.715, true, false),
             new SwerveModule(1, new TalonFX(Constants.frontRightTurningMotor), new TalonFX(Constants.frontRightDriveMotor), new CANCoder(Constants.frontRightCANCoder),  -266.572, true, false), //true
-            new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), new CANCoder(Constants.backLeftCANCoder), -153.896, true, false),
-            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), new CANCoder(Constants.backRightCANCoder), -169.365, true, false) //true
+            new SwerveModule(2, new TalonFX(Constants.backLeftTurningMotor), new TalonFX(Constants.backLeftDriveMotor), new CANCoder(Constants.backLeftCANCoder), -154.600, true, false),
+            new SwerveModule(3, new TalonFX(Constants.backRightTurningMotor), new TalonFX(Constants.backRightDriveMotor), new CANCoder(Constants.backRightCANCoder), -166.816, true, false) //true
     };
 
     PowerDistributionPanel m_pdp;
@@ -156,6 +156,8 @@ public class SwerveDrive extends SubsystemBase {
         return m_odometry.getPoseMeters();
     }
 
+    SlewRateLimiter xLimit = new SlewRateLimiter(kMaxSpeedMetersPerSecond * 10);
+    SlewRateLimiter yLimit = new SlewRateLimiter(kMaxSpeedMetersPerSecond * 10);
     /**
      * Method to drive the robot using joystick info.
      *
@@ -169,6 +171,9 @@ public class SwerveDrive extends SubsystemBase {
         xSpeed *= kMaxSpeedMetersPerSecond;
         ySpeed *= kMaxSpeedMetersPerSecond;
         rot *= kMaxChassisRotationSpeed;
+
+        xSpeed = xLimit.calculate(xSpeed);
+        ySpeed = yLimit.calculate(ySpeed);
 
         //If pidTurn is getting a value override the drivers steering control
         if (enablePidTurn) {

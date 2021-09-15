@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
@@ -185,13 +186,12 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
 
-      xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 1800, true)); // A button: Flywheel low speed
-      // xBoxButtons[1].whileHeld(); // X button: activate climber
-      xBoxButtons[2].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 2400, true)); // B button: Flywheel medium speed
-      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900, true)); // Y Button: Flywheel hih speed;
+      xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 1800, false)); // A button: Flywheel low speed
+      // xBoxButtons[2].whileHeld(); // X button: activate climber
+      xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 2400, false)); // B button: Flywheel medium speed
+      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900, false)); // Y Button: Flywheel hih speed;
       
-      m_turret.setDefaultCommand(new InstantCommand().andThen(() -> m_turret.setRobotCentricSetpoint(xBoxController.getDirectionDegrees())));
-      // Left xBox joystick: turret
+      // Left xBox joystick: turret (in DefaultCommand)
 
       xBoxButtons[4].whenPressed(new SetIntakePiston(m_intake, true));  // Left bumper: Extend intake
       xBoxButtons[4].whenReleased(new SetIntakePiston(m_intake, false)); // Left bumper: Retract intake
@@ -199,7 +199,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.50)); // Right bumper: Spin Carousel
 
     xBoxLeftTrigger.whileHeld(new SetIntake(m_intake, 1)); // Left trigger: intake
-    xBoxRightTrigger.whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 0, true)); // Right trigger: Release shooter
+    xBoxRightTrigger.whileHeld(new SetUptake(m_uptake, 0.5)); // Right trigger: Release shooter
       
     }else{
       //Invert raw axis of X, Y, and rotation inputs to match WPILib convention
@@ -219,6 +219,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
               () -> testController.getRawAxis(0), //left x
               () -> 45)); //right x
     }
+
+
   }
 
   /**
