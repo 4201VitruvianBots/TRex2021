@@ -186,10 +186,10 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
 
-      xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 1800, false)); // A button: Flywheel low speed
+      xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 1800, true)); // A button: Flywheel low speed
       // xBoxButtons[2].whileHeld(); // X button: activate climber
-      xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 2400, false)); // B button: Flywheel medium speed
-      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900, false)); // Y Button: Flywheel hih speed;
+      xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 2400, true)); // B button: Flywheel medium speed
+      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900, true)); // Y Button: Flywheel high speed
       
       // Left xBox joystick: turret (in DefaultCommand)
 
@@ -199,7 +199,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.50)); // Right bumper: Spin Carousel
 
     xBoxLeftTrigger.whileHeld(new SetIntake(m_intake, 1)); // Left trigger: intake
-    xBoxRightTrigger.whileHeld(new SetUptake(m_uptake, 0.5)); // Right trigger: Release shooter
+    xBoxRightTrigger.whileHeld(new SetUptake(m_uptake, 0.5)); // Right trigger: uptake
       
     }else{
       //Invert raw axis of X, Y, and rotation inputs to match WPILib convention

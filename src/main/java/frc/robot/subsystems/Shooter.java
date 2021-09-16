@@ -88,11 +88,11 @@ public class Shooter extends SubsystemBase {
     //Self-explanatory commands
 
     public double getMotorInputCurrent(int motorIndex) {
-        return 0;//shooterMotors[motorIndex].getSupplyCurrent();
+        return shooterMotors[motorIndex].getSupplyCurrent();
     }
 
     public void setPower(double output) {
-        //shooterMotors[0].set(ControlMode.PercentOutput, output);
+        shooterMotors[0].set(ControlMode.PercentOutput, output);
     }
 
     public void setRPM(double setpoint) {
@@ -109,14 +109,14 @@ public class Shooter extends SubsystemBase {
     }
 
     private void updateRPMSetpoint() {
-        // if (setpoint >= 0)
-        //     shooterMotors[0].set(ControlMode.Velocity, setpoint);
-        // else
+        if (setpoint >= 0)
+            shooterMotors[0].set(ControlMode.Velocity, setpoint);
+        else
             setPower(0);
     }
 
     public void setTestRPM() {
-        // shooterMotors[0].set(ControlMode.Velocity, RPMtoFalconUnits(rpmOutput));
+        shooterMotors[0].set(ControlMode.Velocity, RPMtoFalconUnits(rpmOutput));
     }
 
     public double getTestRPM() {
@@ -128,7 +128,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean encoderAtSetpoint(int motorIndex) {
-        return false;//(Math.abs(shooterMotors[motorIndex].getClosedLoopError()) < 100.0);
+        return (Math.abs(shooterMotors[motorIndex].getClosedLoopError()) < 100.0);
     }
 
     /**
@@ -137,11 +137,11 @@ public class Shooter extends SubsystemBase {
      *@return the rmp of the selected motor
      */
     public double getRPM(int motorIndex) {
-        return 0;//falconUnitsToRPM(shooterMotors[motorIndex].getSelectedSensorVelocity());
+        return falconUnitsToRPM(shooterMotors[motorIndex].getSelectedSensorVelocity());
     }
 
     public double getRotations(int motorIndex) {
-        return 0;//(shooterMotors[motorIndex].getSelectedSensorPosition() / 2048.0) * gearRatio;
+        return (shooterMotors[motorIndex].getSelectedSensorPosition() / 2048.0) * gearRatio;
     }
     public double falconUnitsToRPM(double sensorUnits) {
         return (sensorUnits / 2048.0) * 60.0 * gearRatio;
@@ -218,10 +218,6 @@ public class Shooter extends SubsystemBase {
             timeStamp = 0;
             timerStart = false;
         }
-
-        SmartDashboardTab.putNumber("Shooter", "RPM", setpoint);
-
-        System.out.println("setpoint: "+setpoint);
 
         canShoot = timeStamp != 0 && Math.abs(Timer.getFPGATimestamp() - timeStamp) > 0.1;
 
