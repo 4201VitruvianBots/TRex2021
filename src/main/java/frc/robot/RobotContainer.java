@@ -186,19 +186,21 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
 
-      xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 1800, true)); // A button: Flywheel low speed
+      xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 2000, true)); // A button: Flywheel low speed
       // xBoxButtons[2].whileHeld(); // X button: activate climber
-      xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 2400, true)); // B button: Flywheel medium speed
-      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900, true)); // Y Button: Flywheel high speed
+      xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3000, true)); // B button: Flywheel medium speed
+      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 4000, true)); // Y Button: Flywheel high speed
       
       // Left xBox joystick: turret (in DefaultCommand)
 
       xBoxButtons[4].whenPressed(new SetIntakePiston(m_intake, true));  // Left bumper: Extend intake
       xBoxButtons[4].whenReleased(new SetIntakePiston(m_intake, false)); // Left bumper: Retract intake
 
-    xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.50)); // Right bumper: Spin Carousel
+    xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.6)); // Right bumper: Spin Carousel
 
-    xBoxLeftTrigger.whileHeld(new SetIntake(m_intake, 1)); // Left trigger: intake
+    xBoxLeftTrigger.whileHeld(new SetIntake(m_intake, 1)); // Left trigger: intake & carousel
+    xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, 0.6));
+    
     xBoxRightTrigger.whileHeld(new SetUptake(m_uptake, 0.5)); // Right trigger: uptake
       
     }else{
