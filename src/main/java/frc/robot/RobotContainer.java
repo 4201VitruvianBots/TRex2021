@@ -34,7 +34,10 @@ import frc.robot.commands.shooter.RapidFireSetpoint;
 import frc.robot.commands.turret.SetTurretRobotRelativeAngle;
 import frc.robot.commands.turret.ToggleTurretControlMode;
 import frc.robot.commands.turret.ZeroTurretEncoder;
+import frc.robot.commands.climber.DisableClimbMode;
 import frc.robot.commands.climber.EnableClimbMode;
+import frc.robot.commands.climber.ExtendClimber;
+import frc.robot.commands.climber.RetractClimber;
 import frc.robot.commands.swerve.SetSwerveDriveWithAngle;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimulationReferencePose;
@@ -187,11 +190,15 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
 
       xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 2000, true)); // A button: Flywheel low speed
-      // xBoxButtons[2].whileHeld(); // X button: activate climber
+      // xBoxButtons[2].whenPressed(new EnableClimbMode(m_climber, m_turret)); // X button: activate climber
+      // xBoxButtons[2].whenReleased(new DisableClimbMode(m_climber, m_turret));
       xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3000, true)); // B button: Flywheel medium speed
       xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 4000, true)); // Y Button: Flywheel high speed
       
-      // Left xBox joystick: turret (in DefaultCommand)
+      // Left xBox joystick: turret (in teleopPeriodic)
+
+      // xBoxPOVButtons[0].whenPressed(new ExtendClimber(m_climber))//POV up: climber up
+      // xBoxPOVButtons[4].whenPressed(new RetractClimber(m_climber))//POV down: climber down
 
       xBoxButtons[4].whenPressed(new SetIntakePiston(m_intake, true));  // Left bumper: Extend intake
       xBoxButtons[4].whenReleased(new SetIntakePiston(m_intake, false)); // Left bumper: Retract intake
