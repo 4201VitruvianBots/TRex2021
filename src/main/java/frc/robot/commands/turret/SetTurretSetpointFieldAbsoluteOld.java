@@ -64,7 +64,6 @@ public class SetTurretSetpointFieldAbsoluteOld extends CommandBase {
         if (!m_climber.getClimbState()) {
             if (m_turret.getControlMode() == 1) {
                 if ((Math.pow(m_xInput.getAsDouble(), 2) + Math.pow(m_yInput.getAsDouble(), 2)) >= Math.pow(deadZone, 2)) {
-                    m_vision.ledsOn();
                     m_vision.setLastValidTargetTime();
                     joystickMoved = true;
                     if (!directionTripped) {
@@ -100,7 +99,7 @@ public class SetTurretSetpointFieldAbsoluteOld extends CommandBase {
                 } else if (m_vision.getValidTarget() && !joystickMoved) {
                     usingVisionSetpoint = true;
                     if (!turning) {
-                        setpoint = m_turret.getTurretAngle() + m_vision.getTargetX();
+                        setpoint = m_turret.getTurretAngle() + m_vision.getGoalX();
 
                         if (setpoint > m_turret.getMaxAngle()) {
                             setpoint -= 360;

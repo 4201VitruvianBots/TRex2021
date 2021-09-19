@@ -29,8 +29,6 @@ public class SetTurretSetpointFieldAbsoluteWithVisionOld extends CommandBase {
   private final double deadZone = 0.1;
   private Timer timer = new Timer();
   boolean timeout = false;
-  boolean limelightDisabled = false;
-  boolean limelightMovementDisabled = false;
   boolean movedJoystick = false;
 
   /**
@@ -59,11 +57,6 @@ public class SetTurretSetpointFieldAbsoluteWithVisionOld extends CommandBase {
   @Override
   public void execute() {
     if(m_turret.getControlMode() == 1) {
-      if(limelightDisabled)
-        m_vision.ledsOff(); //TODO: make this automatically go towards where it thinks the target is.
-      else
-        m_vision.ledsOn();
-
       if ((Math.pow(m_xInput.getAsDouble(), 2) + Math.pow(m_yInput.getAsDouble(), 2)) >= Math.pow(deadZone, 2)) {
 
         if(!directionTripped) {
@@ -94,32 +87,16 @@ public class SetTurretSetpointFieldAbsoluteWithVisionOld extends CommandBase {
         }
         movedJoystick = true;
       } else if (m_vision.hasTarget()){
-        setpoint = m_turret.getTurretAngle() + m_vision.getTargetX();
+        setpoint = m_turret.getTurretAngle() + m_vision.getGoalX();
 
         if(setpoint > m_turret.getMaxAngle())
           setpoint -= 360;
         else if(setpoint < m_turret.getMinAngle())
           setpoint += 360;
-
-        if (timeout) {
-          timer.stop();
-          timer.reset();
-          timeout = false;
-        }
-      } else { //if you can't see the target for x seconds, then disable the limelight
-        timer.start();
-        timeout = true;
-        if (timer.get() > 1) { //change value if needed
-          timer.stop();
-          timer.reset();
-          timeout = false;
-          limelightDisabled = true;
-        }
       }
 
       if(movedJoystick){
         movedJoystick = false;
-        limelightDisabled = false;
       }
 
       m_turret.setRobotCentricSetpoint(setpoint);

@@ -46,8 +46,7 @@ public class AutoUseVisionCorrection extends CommandBase {
             if (m_vision.getValidTarget()) {
                 usingVisionSetpoint = true;
                 if (!turning) {
-                    m_vision.ledsOn();
-                    setpoint = m_turret.getTurretAngle() + m_vision.getTargetX();
+                    setpoint = m_turret.getTurretAngle() + m_vision.getGoalX();
 
                     if (setpoint > m_turret.getMaxAngle()) {
                         setpoint -= 360;
@@ -82,6 +81,6 @@ public class AutoUseVisionCorrection extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return (Math.abs(m_vision.getTargetX()) <= 3);
+        return (Math.abs(m_vision.getGoalX()) <= 3);
     }
 }

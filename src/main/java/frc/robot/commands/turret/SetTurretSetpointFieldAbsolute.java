@@ -62,7 +62,6 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
             if (m_turret.getControlMode() == 1) {
                 // TODO: Add fine adjustment mode when shooting?
                 if ((Math.pow(m_controller.getRawAxis(0), 2) + Math.pow(m_controller.getRawAxis(1), 2)) >= Math.pow(deadZone, 2)) {
-                    m_vision.ledsOn();
                     m_vision.setLastValidTargetTime();
                     joystickMoved = true;
 
@@ -115,8 +114,7 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
                 } else if (m_vision.hasTarget() && !joystickMoved) {
                     usingVisionSetpoint = true;
                     if (!turning) {
-                        m_vision.ledsOn();
-                        setpoint = m_turret.getTurretAngle() + m_vision.getTargetX();
+                        setpoint = m_turret.getTurretAngle() + m_vision.getGoalX();
 
                         if (setpoint > m_turret.getMaxAngle()) {
                             setpoint = m_turret.getMaxAngle();
@@ -132,7 +130,6 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
 //                            turning = true;
                         }
                     } else {
-                        m_vision.ledsOff();
                         if (m_turret.onTarget())
                             turning = false;
                     }
