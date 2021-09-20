@@ -32,6 +32,7 @@ import frc.robot.commands.shooter.TestShooter;
 import frc.robot.commands.shooter.FeedShooter;
 import frc.robot.commands.shooter.RapidFireSetpoint;
 import frc.robot.commands.turret.SetTurretRobotRelativeAngle;
+import frc.robot.commands.turret.SetTurretSetpointFieldAbsolute;
 import frc.robot.commands.turret.ToggleTurretControlMode;
 import frc.robot.commands.turret.ZeroTurretEncoder;
 import frc.robot.commands.climber.DisableClimbMode;
@@ -67,7 +68,7 @@ public class RobotContainer {
   private final Turret m_turret = new Turret(m_swerveDrive);
   private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
   private final Shooter m_shooter = new Shooter(m_vision, pdp);
-  // private final Climber m_climber = new Climber();
+  private final Climber m_climber = new Climber();
 
   private FieldSim m_FieldSim;
   private SimulationReferencePose m_referencePose;
@@ -163,6 +164,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 //            () -> testController.getRawAxis(1),
 //            1));
 //    }
+      m_turret.setDefaultCommand(new SetTurretSetpointFieldAbsolute(m_turret, m_swerveDrive, m_vision, m_shooter, xBoxController));
+
   }
 
   /**
