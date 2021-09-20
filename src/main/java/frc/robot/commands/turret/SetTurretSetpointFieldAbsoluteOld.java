@@ -124,7 +124,7 @@ public class SetTurretSetpointFieldAbsoluteOld extends CommandBase {
                     joystickMoved = false;
                 }
 
-                m_turret.setRobotCentricSetpoint(setpoint);
+                m_turret.setAbsoluteSetpoint(setpoint);
             } else {
                 m_turret.setPercentOutput(m_xInput.getAsDouble() * 0.2); //manual mode
             }

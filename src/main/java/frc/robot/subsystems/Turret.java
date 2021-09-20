@@ -12,9 +12,11 @@ import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,27 +28,26 @@ Subsystem for controlling the turret
  */
 
 public class Turret extends SubsystemBase {
-    private final int encoderUnitsPerRotation = 4096;
+    private final int encoderUnitsPerRotation = 42;
     private final SwerveDrive m_swerveDrive;
     // setup motor and encoder variables
     CANSparkMax turretMotor = new CANSparkMax(Constants.turretMotor, MotorType.kBrushless);
     CANEncoder encoder = turretMotor.getEncoder();
     CANPIDController pidController = turretMotor.getPIDController();
     // Turret PID gains
-    double kF = 0.07;     //0.05
-    double kP = 0.2;    //0.155
-    double kI = 0.0015;    //0.00075
-    double kD = 0.0;  //0.00766
-    int kI_Zone = 900;    //900 // 254: 1/kP?
-    int kMaxIAccum = 1000000;//kI_Zone *3; //500000;    //900
-    int kErrorBand = 50;//degreesToEncoderUnits(0.5);
+    double kF = 0.006;
+    double kP = 0.04;
+    double kI = 0.0004;
+    double kD = 0.2;
+    int kI_Zone = 4;
+    int kErrorBand = 1;//degreesToEncoderUnits(0.5);
     int kCruiseVelocity = 14000;
     int kMotionAcceleration = kCruiseVelocity * 10;
     // setup variables
     double[][] restrictedMovement = {{270, 300}, {60, 90}};
     double minAngle = -90;
     double maxAngle = 90;
-    double gearRatio = 18.0 / 120.0;
+    double gearRatio = 28.0 / 120.0;    // TODO: Ratio is correct, but values are wrong
     private double setpoint = 0; //angle
     private int controlMode = 1;
     private boolean initialHome;
@@ -56,7 +57,7 @@ public class Turret extends SubsystemBase {
         this.m_swerveDrive = swerveDrive;
         // Setup turret motors
         turretMotor.restoreFactoryDefaults();
-        turretMotor.setInverted(false);
+        turretMotor.setInverted(true);
         turretMotor.setIdleMode(IdleMode.kBrake);
 
         // Setup PID Controller
@@ -68,8 +69,13 @@ public class Turret extends SubsystemBase {
         pidController.setSmartMotionMaxVelocity(maxVel, 0); // Formerly 1.1e4
         double maxAccel = 1e6;
         pidController.setSmartMotionMaxAccel(maxAccel, 0); // Formerly 1e6
-        pidController.setSmartMotionAllowedClosedLoopError(1, 0);
+        pidController.setSmartMotionAllowedClosedLoopError(kErrorBand, 0);
         pidController.setIZone(kI_Zone);
+
+        resetEncoder();
+        setAbsoluteSetpoint(0);
+
+        initShuffleboard();
     }
 
     // self-explanatory commands
@@ -89,7 +95,7 @@ public class Turret extends SubsystemBase {
         return encoderUnitsToDegrees(encoder.getPosition());
     }
 
-    public double getFieldRelativeAngle() {
+    public double getRobotRelativeAngle() {
         return getTurretAngle() - m_swerveDrive.getHeadingDegrees();
     }
 
@@ -134,13 +140,11 @@ public class Turret extends SubsystemBase {
         turretMotor.set(output);
     }
 
-    // ???
-    public void setRobotCentricSetpoint(double setpoint) {
+    public void setAbsoluteSetpoint(double setpoint) {
         this.setpoint = setpoint;
     }
 
-    // ???
-    public void setFieldCentricSetpoint(double setpoint) {
+    public void setRobotCentricSetpoint(double setpoint) {
         setpoint -= m_swerveDrive.getHeadingDegrees();
 
         if (setpoint > getMaxAngle())
@@ -152,7 +156,8 @@ public class Turret extends SubsystemBase {
     }
 
     public void setClosedLoopPosition() {
-        turretMotor.set(degreesToEncoderUnits(getSetpoint()));
+        double angle = getSetpoint() > maxAngle ?  maxAngle : (getSetpoint() < minAngle ? minAngle : setpoint);
+        pidController.setReference(degreesToEncoderUnits(angle), ControlType.kPosition);
     }
 
 //    public void setSetpointOutput(double setpoint) {
@@ -187,29 +192,44 @@ public class Turret extends SubsystemBase {
     }
 
     private void initShuffleboard() {
-        // Unstable. Don''t use until WPILib fixes this
-        Shuffleboard.getTab("Turret").addNumber("Turret Motor Output Current", turretMotor::getOutputCurrent);
-        Shuffleboard.getTab("Turret").addNumber("Turret Robot Relative Angle", this::getTurretAngle);
-        Shuffleboard.getTab("Turret").addNumber("Turret Field Relative Angle", this::getFieldRelativeAngle);
-        Shuffleboard.getTab("Turret").addNumber("Turret Setpoint", this::getSetpoint);
-        Shuffleboard.getTab("Turret").addNumber("Turret Error", this::getError);
-//        Shuffleboard.getTab("Turret").addNumber("Turret IAccum", turretMotor::getIntegralAccumulator); can't find CANSparkmax equivalent
-        Shuffleboard.getTab("Turret").addBoolean("Home", this::getTurretHome);
+        SmartDashboardTab.putNumber("Turret", "Turret Setpoint", getSetpoint());
+        SmartDashboardTab.putNumber("Turret", "Turret Absolute Relative Angle", getTurretAngle());
+        SmartDashboardTab.putNumber("Turret", "Turret Error", getError());
+        SmartDashboardTab.putNumber("Turret", "Turret kF", kF);
+        SmartDashboardTab.putNumber("Turret", "Turret kP", kP);
+        SmartDashboardTab.putNumber("Turret", "Turret kI", kI);
+        SmartDashboardTab.putNumber("Turret", "Turret kD", kD);
+        SmartDashboardTab.putNumber("Turret", "Turret kI_Zone", kI_Zone);
+        SmartDashboardTab.putNumber("Turret", "Turret kAllowableError", kErrorBand);
+//        Shuffleboard.getTab("Turret").addBoolean("Home", this::getTurretHome);
     }
 
     // set smartdashboard
     private void updateSmartdashboard() {
-        SmartDashboard.putNumber("Turret Angle", getFieldRelativeAngle());
-        Shuffleboard.getTab("Turret").addNumber("Turret Motor Output Current", turretMotor::getOutputCurrent);
-        Shuffleboard.getTab("Turret").addNumber("Turret Robot Relative Angle", this::getTurretAngle);
-        Shuffleboard.getTab("Turret").addNumber("Turret Field Relative Angle", this::getFieldRelativeAngle);
-        Shuffleboard.getTab("Turret").addNumber("Turret Setpoint", this::getSetpoint);
-        Shuffleboard.getTab("Turret").addNumber("Turret Error", this::getError);
+        SmartDashboard.putNumber("Turret Angle", getRobotRelativeAngle());
+        SmartDashboardTab.putNumber("Turret", "Turret Motor Output Current", turretMotor.getOutputCurrent());
+        SmartDashboardTab.putNumber("Turret","Turret Absolute Angle", getTurretAngle());
+//        SmartDashboardTab.putNumber("Turret","Turret Setpoint", getSetpoint());
+        SmartDashboardTab.putNumber("Turret","Turret Error", getError());
 //        SmartDashboardTab.putNumber("Turret", "Turret Controller Setpoint", turretMotor.getClosedLoopTarget());  cannot understand what the getClosedLoopTarget is refering to. and can't find CANSparkmax equivalent
         SmartDashboardTab.putString("Turret", "Turret Control Mode", String.valueOf(this.getControlMode()));
 //        SmartDashboardTab.putNumber("Turret", "Turret IAccum", turretMotor.getIntegralAccumulator()); can't find CANSparkmax equivalent
         SmartDashboardTab.putBoolean("Turret", "Home", getTurretHome());
 
+        SmartDashboardTab.putNumber("Turret","Turret Encoder Counts", encoder.getPosition());
+
+        setpoint = SmartDashboardTab.getNumber("Turret", "Turret Setpoint", getSetpoint());
+        kF = SmartDashboardTab.getNumber("Turret", "Turret kF", kF);
+        kP = SmartDashboardTab.getNumber("Turret", "Turret kP", kP);
+        kI = SmartDashboardTab.getNumber("Turret", "Turret kI", kI);
+        kD = SmartDashboardTab.getNumber("Turret", "Turret kD", kD);
+        kI_Zone = (int)SmartDashboardTab.getNumber("Turret", "Turret kI_Zone", kI_Zone);
+        kErrorBand = (int)SmartDashboardTab.getNumber("Turret", "Turret kAllowableError", kErrorBand);
+        pidController.setFF(kF);
+        pidController.setP(kP);
+        pidController.setI(kI);
+        pidController.setIZone(kI_Zone);
+        pidController.setD(kD);
         try {
             SmartDashboardTab.putString("DriveTrain", "Turret Command", this.getCurrentCommand().getName());
         } catch (Exception e) {
@@ -236,7 +256,7 @@ public class Turret extends SubsystemBase {
             if (getTurretHome())
                 initialHome = true;
 
-//        updateSmartdashboard();
+        updateSmartdashboard();
     }
 
     public double getTurretSimAngle(){
