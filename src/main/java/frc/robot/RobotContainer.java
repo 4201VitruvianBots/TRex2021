@@ -181,6 +181,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       rightJoystick.setAxisDeadband(0, 0.05);
       xBoxController.invertRawAxis(1, true);
       xBoxController.invertRawAxis(5, true);
+      xBoxController.setAxisDeadband(0, 0.1);
+      xBoxController.setAxisDeadband(1, 0.1);
       for (int i = 0; i < leftButtons.length; i++)
         leftButtons[i] = new JoystickButton(leftJoystick, (i + 1));
       for (int i = 0; i < rightButtons.length; i++)

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.*;
+import frc.vitruvianlib.utils.JoystickWrapper;
 
 /**
  * An example command that uses an example subsystem.
@@ -31,7 +32,7 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
      * Creates a new ExampleCommand.
      */
     public SetTurretSetpointFieldAbsolute(Turret turretSubsystem, SwerveDrive swerveDriveSubsystem, Vision visionSubsystem,
-                                          Shooter shooter, Joystick controller) {
+                                          Shooter shooter, JoystickWrapper controller) {
         m_turret = turretSubsystem;
         m_swerveDrive = swerveDriveSubsystem;
         m_vision = visionSubsystem;
@@ -64,17 +65,10 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
                 m_vision.setLastValidTargetTime();
                 joystickMoved = true;
 
-                if (m_controller.getRawAxis(0) >= 0)
-                    setpoint = -Math.toDegrees(Math.atan2(-m_controller.getRawAxis(0), m_controller.getRawAxis(1)));
-                else
-                    setpoint = Math.toDegrees(Math.atan2(m_controller.getRawAxis(0), m_controller.getRawAxis(1)));
+                setpoint = Math.toDegrees(Math.atan2(m_controller.getRawAxis(0), -m_controller.getRawAxis(1)));
 
-                if (setpoint > m_turret.getMaxAngle())
-                    setpoint = m_turret.getMaxAngle();
+                setpoint = Math.min(Math.max(setpoint, m_turret.getMinAngle()), m_turret.getMaxAngle());
 
-                if (setpoint < m_turret.getMinAngle())
-                    setpoint = m_turret.getMinAngle();
-                
                 if (m_vision.hasTarget() && Math.abs(m_vision.getFilteredTargetX()) < 20) {
                     m_controller.setRumble(GenericHID.RumbleType.kLeftRumble, 0.4);
                     m_controller.setRumble(GenericHID.RumbleType.kRightRumble, 0.4);
@@ -115,6 +109,7 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
             }
 //                SmartDashboardTab.putNumber("Turret", "Angle Setpoint", setpoint);
             m_turret.setRobotCentricSetpoint(setpoint);
+            System.out.println("Turret Setpoint: " + setpoint);
 //                m_turret.setFieldCentricSetpoint(setpoint);
         } else {
             m_turret.setPercentOutput(m_controller.getRawAxis(0) * 0.2); //manual mode
