@@ -211,7 +211,7 @@ public class SwerveModule extends SubsystemBase {
         double percentOutput = outputState.speedMetersPerSecond / Constants.DriveConstants.kMaxSpeedMetersPerSecond;
         m_driveMotor.set(ControlMode.PercentOutput, percentOutput);
       } else {
-        double velocityOutput = outputState.speedMetersPerSecond * kDriveEncoderDistancePerPulse;
+        double velocityOutput = outputState.speedMetersPerSecond / (kDriveEncoderDistancePerPulse * 10.0);
         m_driveMotor.set(ControlMode.Velocity, velocityOutput, DemandType.ArbitraryFeedForward, m_driveFeedforward.calculate(outputState.speedMetersPerSecond));
       }
 
@@ -225,7 +225,7 @@ public class SwerveModule extends SubsystemBase {
         double percentOutput = outputState.speedMetersPerSecond / Constants.DriveConstants.kMaxSpeedMetersPerSecond;
         m_driveMotorSim.set(ControlMode.PercentOutput, percentOutput);
       } else {
-        double velocityOutput = outputState.speedMetersPerSecond * kDriveSimEncoderDistancePerPulse;
+        double velocityOutput = outputState.speedMetersPerSecond / (kDriveSimEncoderDistancePerPulse * 10.0);
         m_driveMotorSim.set(ControlMode.Velocity, velocityOutput, DemandType.ArbitraryFeedForward, m_driveFeedforward.calculate(outputState.speedMetersPerSecond));
       }
 
