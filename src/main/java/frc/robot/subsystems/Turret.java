@@ -75,7 +75,7 @@ public class Turret extends SubsystemBase {
         resetEncoder();
         setAbsoluteSetpoint(0);
 
-        initShuffleboard();
+        // initShuffleboard();
     }
 
     // self-explanatory commands
@@ -218,18 +218,18 @@ public class Turret extends SubsystemBase {
 
         SmartDashboardTab.putNumber("Turret","Turret Encoder Counts", encoder.getPosition());
 
-        setpoint = SmartDashboardTab.getNumber("Turret", "Turret Setpoint", getSetpoint());
-        kF = SmartDashboardTab.getNumber("Turret", "Turret kF", kF);
-        kP = SmartDashboardTab.getNumber("Turret", "Turret kP", kP);
-        kI = SmartDashboardTab.getNumber("Turret", "Turret kI", kI);
-        kD = SmartDashboardTab.getNumber("Turret", "Turret kD", kD);
-        kI_Zone = (int)SmartDashboardTab.getNumber("Turret", "Turret kI_Zone", kI_Zone);
-        kErrorBand = (int)SmartDashboardTab.getNumber("Turret", "Turret kAllowableError", kErrorBand);
-        pidController.setFF(kF);
-        pidController.setP(kP);
-        pidController.setI(kI);
-        pidController.setIZone(kI_Zone);
-        pidController.setD(kD);
+        // setpoint = SmartDashboardTab.getNumber("Turret", "Turret Setpoint", getSetpoint());
+        // kF = SmartDashboardTab.getNumber("Turret", "Turret kF", kF);
+        // kP = SmartDashboardTab.getNumber("Turret", "Turret kP", kP);
+        // kI = SmartDashboardTab.getNumber("Turret", "Turret kI", kI);
+        // kD = SmartDashboardTab.getNumber("Turret", "Turret kD", kD);
+        // kI_Zone = (int)SmartDashboardTab.getNumber("Turret", "Turret kI_Zone", kI_Zone);
+        // kErrorBand = (int)SmartDashboardTab.getNumber("Turret", "Turret kAllowableError", kErrorBand);
+        // pidController.setFF(kF);
+        // pidController.setP(kP);
+        // pidController.setI(kI);
+        // pidController.setIZone(kI_Zone);
+        // pidController.setD(kD);
         try {
             SmartDashboardTab.putString("DriveTrain", "Turret Command", this.getCurrentCommand().getName());
         } catch (Exception e) {
