@@ -55,7 +55,7 @@ public class Shooter extends SubsystemBase {
     private boolean timerStart;
     private double timeStamp;
     private boolean canShoot;
-    public double gearRatio = 1.5;
+    public double gearRatio = 1.0;
 
     public Shooter(Vision vision, PowerDistributionPanel pdp) {
         // setup shooterMotors
