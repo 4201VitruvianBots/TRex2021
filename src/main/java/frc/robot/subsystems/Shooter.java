@@ -104,7 +104,7 @@ public class Shooter extends SubsystemBase {
         return setpoint;
     }
 
-    public boolean canShoot() {
+    public boolean getCanShoot() {
         return canShoot;
     }
 
@@ -219,7 +219,7 @@ public class Shooter extends SubsystemBase {
             timerStart = false;
         }
 
-        canShoot = timeStamp != 0 && Math.abs(Timer.getFPGATimestamp() - timeStamp) > 0.1;
+        canShoot = timerStart && Math.abs(Timer.getFPGATimestamp() - timeStamp) > 0.1;
 
     }
 }

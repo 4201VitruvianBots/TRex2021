@@ -17,20 +17,18 @@ import frc.robot.subsystems.Vision;
 public class SetRpmSetpoint extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Shooter m_shooter;
-  private final Vision m_vision;
   private double m_RPM;
   private boolean m_reset;
   /**
    * Creates a new ExampleCommand.
    *
    */
-  public SetRpmSetpoint(Shooter shooter, Vision vision, double RPM, boolean reset) {
+  public SetRpmSetpoint(Shooter shooter, double RPM, boolean reset) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooter = shooter;
     m_RPM = RPM;
-    m_vision = vision;
     m_reset = reset; // For if the setpoint should remain at that value after command finishes
-//  addRequirements(shooter);
+    addRequirements(shooter);
   }
 
   // Called when the command is initially scheduled.
@@ -41,7 +39,6 @@ public class SetRpmSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_vision.setLastValidTargetTime();
     m_shooter.setRPM(m_RPM);
   }
 
@@ -49,7 +46,7 @@ public class SetRpmSetpoint extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     if (m_reset) {
-      m_shooter.setRPM(-1);
+      m_shooter.setRPM(0);
     }
   }
 
