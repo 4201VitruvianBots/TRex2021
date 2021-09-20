@@ -56,6 +56,7 @@ public class Shooter extends SubsystemBase {
     private double timeStamp;
     private boolean canShoot;
     public double gearRatio = 1.0;
+    private boolean percentOutput = false;
 
     public Shooter(Vision vision, PowerDistributionPanel pdp) {
         // setup shooterMotors
@@ -91,8 +92,15 @@ public class Shooter extends SubsystemBase {
         return shooterMotors[motorIndex].getSupplyCurrent();
     }
 
-    public void setPower(double output) {
+    public void setPercentOutput(double output) {
+        if (setpoint > 0) {
+            percentOutput = true;
+        }
         shooterMotors[0].set(ControlMode.PercentOutput, output);
+    }
+
+    public void setControlState(boolean state) {
+        percentOutput = state;
     }
 
     public void setRPM(double setpoint) {
@@ -109,10 +117,13 @@ public class Shooter extends SubsystemBase {
     }
 
     private void updateRPMSetpoint() {
-        if (setpoint >= 0)
-            shooterMotors[0].set(ControlMode.Velocity, setpoint);
-        else
-            setPower(0);
+        // if (shooterMotors[0].getControlMode() != ControlMode.PercentOutput) {
+        if (!percentOutput) {
+            if (setpoint >= 0)
+                shooterMotors[0].set(ControlMode.Velocity, setpoint);
+            else
+                setPercentOutput(0);
+        }
     }
 
     public void setTestRPM() {

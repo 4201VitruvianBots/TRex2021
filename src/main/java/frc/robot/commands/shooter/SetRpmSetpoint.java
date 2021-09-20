@@ -34,6 +34,7 @@ public class SetRpmSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_shooter.setControlState(false);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -46,7 +47,7 @@ public class SetRpmSetpoint extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     if (m_reset) {
-      m_shooter.setRPM(0);
+      m_shooter.setPercentOutput(0);
     }
   }
 

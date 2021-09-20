@@ -209,7 +209,7 @@ public class Turret extends SubsystemBase {
         SmartDashboard.putNumber("Turret Angle", getRobotRelativeAngle());
         SmartDashboardTab.putNumber("Turret", "Turret Motor Output Current", turretMotor.getOutputCurrent());
         SmartDashboardTab.putNumber("Turret","Turret Absolute Angle", getTurretAngle());
-//        SmartDashboardTab.putNumber("Turret","Turret Setpoint", getSetpoint());
+       SmartDashboardTab.putNumber("Turret","Turret Setpoint", getSetpoint());
         SmartDashboardTab.putNumber("Turret","Turret Error", getError());
 //        SmartDashboardTab.putNumber("Turret", "Turret Controller Setpoint", turretMotor.getClosedLoopTarget());  cannot understand what the getClosedLoopTarget is refering to. and can't find CANSparkmax equivalent
         SmartDashboardTab.putString("Turret", "Turret Control Mode", String.valueOf(this.getControlMode()));

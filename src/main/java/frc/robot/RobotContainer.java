@@ -111,7 +111,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    m_autoChooser.addDefault("Drive Straight", CommandSelector.DRIVE_STRAIGHT.ordinal());
+    m_autoChooser.setDefaultOption("Drive Straight", CommandSelector.DRIVE_STRAIGHT.ordinal());
     for (Enum commandEnum : CommandSelector.values())
       if (commandEnum != CommandSelector.DRIVE_STRAIGHT)
         m_autoChooser.addOption(commandEnum.toString(), commandEnum.ordinal());
@@ -206,10 +206,10 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxButtons[4].whenPressed(new SetIntakePiston(m_intake, true));  // Left bumper: Extend intake
       xBoxButtons[4].whenReleased(new SetIntakePiston(m_intake, false)); // Left bumper: Retract intake
 
-      // xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.6)); // Right bumper: Spin Carousel
+      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.6)); // Right bumper: Spin Carousel
 
       xBoxLeftTrigger.whileHeld(new SetIntake(m_intake, 1)); // Left trigger: intake & carousel
-      xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, 0.6));
+      xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, 1));
       
       xBoxRightTrigger.whileHeld(new RapidFireSetpoint(m_shooter, m_indexer, m_uptake)); // Right trigger: uptake & carousel (if canShoot)
       

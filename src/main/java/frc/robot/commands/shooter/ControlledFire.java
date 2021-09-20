@@ -75,7 +75,7 @@ public class ControlledFire extends CommandBase {
   public void end(boolean interrupted) {
     m_intake.setIntakePercentOutput(0);
     m_indexer.setIndexerOutput(0);
-    m_shooter.setPower(0);
+    m_shooter.setPercentOutput(0);
   }
 
   // Returns true when the command should end.
