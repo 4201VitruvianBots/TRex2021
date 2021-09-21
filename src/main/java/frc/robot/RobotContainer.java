@@ -164,8 +164,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 //            () -> testController.getRawAxis(1),
 //            1));
 //    }
-      m_turret.setDefaultCommand(new SetTurretSetpointFieldAbsolute(m_turret, m_swerveDrive, m_vision, m_shooter, xBoxController));
-
+      m_turret.setDefaultCommand(new SetTurretSetpointFieldAbsolute(m_turret, m_swerveDrive, m_vision, xBoxController));
   }
 
   /**
@@ -295,9 +294,15 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
   }
 
   public void teleOpPeriodic() {
-    // if (xBoxController.getRawAxis(0) != 0 || xBoxController.getRawAxis(1) != 0) {
-    //   m_turret.setRobotCentricSetpoint(xBoxController.getDirectionDegrees());
-    // }
+
+    // Rumble if there is a valid target and you are in the target
+    if (m_shooter.getCanShoot() && m_vision.hasTarget() && Math.abs(m_vision.getGoalX()) < 1) {
+      xBoxController.setRumble(GenericHID.RumbleType.kLeftRumble, 0.8);
+      xBoxController.setRumble(GenericHID.RumbleType.kRightRumble, 0.8);
+    } else {
+      xBoxController.setRumble(GenericHID.RumbleType.kLeftRumble, 0);
+      xBoxController.setRumble(GenericHID.RumbleType.kRightRumble, 0);
+    }
   }
 
   public void autonomousInit() {
