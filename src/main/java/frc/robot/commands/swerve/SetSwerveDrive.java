@@ -8,8 +8,11 @@
 package frc.robot.commands.swerve;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Vision;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 /**
@@ -18,18 +21,23 @@ import java.util.function.DoubleSupplier;
 public class SetSwerveDrive extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final SwerveDrive m_swerveDrive;
+  private final Intake m_intake;
+  private final Vision m_vision;
   private final DoubleSupplier m_throttleInput, m_strafeInput, m_rotationInput;
-
+  private final boolean m_isFieldRelative;
   /**
    * Creates a new ExampleCommand.
    *
    * @param swerveDriveSubsystem The subsystem used by this command.
    */
-  public SetSwerveDrive(SwerveDrive swerveDriveSubsystem, DoubleSupplier throttleInput, DoubleSupplier strafeInput, DoubleSupplier rotationInput) {
+  public SetSwerveDrive(SwerveDrive swerveDriveSubsystem, Intake intake, Vision vision, DoubleSupplier throttleInput, DoubleSupplier strafeInput, DoubleSupplier rotationInput, boolean isFieldRelative) {
     m_swerveDrive = swerveDriveSubsystem;
+    m_intake = intake;
+    m_vision = vision;
     m_throttleInput = throttleInput;
     m_strafeInput = strafeInput;
     m_rotationInput = rotationInput;
+    m_isFieldRelative = isFieldRelative;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerveDriveSubsystem);
   }
@@ -46,7 +54,18 @@ public class SetSwerveDrive extends CommandBase {
     double strafe = Math.abs(m_strafeInput.getAsDouble()) > 0.05 ? m_strafeInput.getAsDouble() : 0;
     double rotation = Math.abs(m_rotationInput.getAsDouble()) > 0.05 ? m_rotationInput.getAsDouble() : 0;
 
-    m_swerveDrive.drive(throttle, strafe, rotation,false, false);    // Forward/Back Trottle, Left/Right Strafe, Left/Right Turn
+    if(m_intake.getIntakingState()) {
+      throttle *= -1;
+      strafe *= -1;
+      rotation *= -1;
+
+      double setpoint = m_swerveDrive.getHeadingDegrees() + 180;
+      if (m_vision.getIntakingPowercellCount() > 0)
+        setpoint += m_vision.getIntakingPowercellAngles()[0];
+      m_swerveDrive.setAngleSetpoint(setpoint, true);
+    }
+
+    m_swerveDrive.drive(throttle, strafe, rotation,m_isFieldRelative, false);    // Forward/Back Trottle, Left/Right Strafe, Left/Right Turn
 //    if(RobotBase.isReal())
 //      m_swerveDrive.drive(m_leftY.getAsDouble(), m_leftX.getAsDouble(),m_rightX.getAsDouble(),false);
 //    else
@@ -56,6 +75,7 @@ public class SetSwerveDrive extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    m_swerveDrive.setAngleSetpoint(0, false);
   }
 
   // Returns true when the command should end.

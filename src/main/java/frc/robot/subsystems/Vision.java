@@ -22,6 +22,9 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.net.PortForwarder;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 /*
 Subsystem for interacting with our vision system
  */
@@ -90,6 +93,7 @@ public class Vision extends SubsystemBase {
 
 		// Init vision NetworkTables
 		oak_1 = NetworkTableInstance.getDefault().getTable("OAK-1");
+		oak_d_i = NetworkTableInstance.getDefault().getTable("OAK-I");
 
 		//initShuffleboard();
 	}
@@ -131,7 +135,6 @@ public class Vision extends SubsystemBase {
 		lastValidTargetTime = Timer.getFPGATimestamp();
 	}
 
-
 	// Calculate target distance based on field dimensions and the angle from the camera to the target
 	public double getTargetDistance() {
 		//TODO: Update
@@ -168,16 +171,32 @@ public class Vision extends SubsystemBase {
 		return data[highestIndex]; // Final distance in feet
 	}
 
-	// Read ball position data from OpenSight (Raspberry Pi)
-//    public double getPowerCellX() {
-//        // TODO: Calculate degrees from pixels?
-//        // return openSight.getEntry("found-x").getDouble(0) * 5.839; // 5.839 pixels per degree
-//        return openSight.getEntry("found-x").getDouble(0);
-//    }
+	public int getIntakingPowercellCount() {
+		return (int)oak_d_i.getEntry("powercells_detected").getDouble(0);
+	}
 
-//	public boolean hasPowerCell() {
-//		return openSight.getEntry("found").getBoolean(false);
-//	}
+	public double[][] getIntakingPowercellCoords() {
+		Number [] defaultValue = {0, 0};
+		double[][] powercell_coords = new double[getIntakingPowercellCount()][2];
+		for(int i = 0; i < getIntakingPowercellCount(); i++) {
+			var entry = oak_d_i.getSubTable("powercell_coords").getEntry(String.valueOf(i)).getNumberArray(defaultValue);
+			powercell_coords[i][0] = entry[0].doubleValue();
+			powercell_coords[i][1] = entry[1].doubleValue();
+		}
+
+		return powercell_coords;
+	}
+
+	public double[] getIntakingPowercellAngles() {
+		Number [] defaultValue = {0};
+		double[] powercell_angles = new double[getIntakingPowercellCount()];
+		for(int i = 0; i < getIntakingPowercellCount(); i++) {
+			var entry = oak_d_i.getEntry("powercell_angles").getNumberArray(defaultValue);
+			powercell_angles[i] = entry[i].doubleValue();
+		}
+
+		return powercell_angles;
+	}
 
 	private void initShuffleboard() {
 		// Unstable. Don''t use until WPILib fixes this

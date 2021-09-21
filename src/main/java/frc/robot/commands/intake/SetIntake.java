@@ -33,13 +33,15 @@ public class SetIntake extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        m_intake.setIntakingState(true);
+
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         m_intake.setIntakePercentOutput(m_output);
+
+        m_intake.setIntakingState(m_intake.getIntakePistonExtendStatus());
     }
 
     // Called once the command ends or is interrupted.
