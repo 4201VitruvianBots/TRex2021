@@ -59,9 +59,11 @@ public class SetSwerveDrive extends CommandBase {
       strafe *= -1;
       rotation *= -1;
 
-      double setpoint = m_swerveDrive.getHeadingDegrees() + 180;
-      if (m_vision.getIntakingPowercellCount() > 0)
-        setpoint += m_vision.getIntakingPowercellAngles()[0];
+      double setpoint = m_swerveDrive.getHeadingDegrees();
+      if (m_vision.getIntakingPowercellCount() > 0) {
+        double powercellAngle = m_vision.getIntakingPowercellAngles()[0];
+        setpoint -= Math.abs(powercellAngle) > 15 ? 1 : 0;
+      }
       m_swerveDrive.setAngleSetpoint(setpoint, true);
     }
 
