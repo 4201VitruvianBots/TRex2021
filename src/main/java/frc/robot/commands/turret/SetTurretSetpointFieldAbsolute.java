@@ -58,7 +58,7 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
                 joystickMoved = true;
                 usingVisionSetpoint = false;
 
-                setpoint = Math.toDegrees(Math.atan2(m_controller.getRawAxis(0), -m_controller.getRawAxis(1)));
+                setpoint = Math.toDegrees(Math.atan2(m_controller.getRawAxis(0), m_controller.getRawAxis(1)));
             } else if (m_vision.hasTarget() && !operatorControl) {
                 // if camera has vision target, use that
                 usingVisionSetpoint = true;
@@ -70,7 +70,10 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
                 joystickMoved = false;
             }
             setpoint = Math.min(Math.max(setpoint, m_turret.getMinAngle()), m_turret.getMaxAngle());
+
+            m_turret.setRobotCentricSetpoint(setpoint);
         } else {
+
             m_turret.setPercentOutput(m_controller.getRawAxis(0) * 0.2); //manual mode
         }
     }

@@ -11,6 +11,7 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -59,6 +60,8 @@ public class Turret extends SubsystemBase {
         turretMotor.restoreFactoryDefaults();
         turretMotor.setInverted(true);
         turretMotor.setIdleMode(IdleMode.kBrake);
+        // turretMotor.setSoftLimit(SoftLimitDirection.kForward, (float)0.25);
+        // turretMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)-0.25);
 
         // Setup PID Controller
         pidController.setFF(kF);

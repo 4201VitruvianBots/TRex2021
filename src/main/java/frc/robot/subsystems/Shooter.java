@@ -105,7 +105,6 @@ public class Shooter extends SubsystemBase {
 
     public void setRPM(double setpoint) {
         this.setpoint = RPMtoFalconUnits(setpoint);
-        System.out.println("Set rpm to "+this.setpoint);
     }
 
     public double getSetpoint() {

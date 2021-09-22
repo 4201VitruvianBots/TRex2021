@@ -172,8 +172,8 @@ public class SwerveDrive extends SubsystemBase {
         ySpeed *= kMaxSpeedMetersPerSecond;
         rot *= kMaxChassisRotationSpeed;
 
-        xSpeed = xLimit.calculate(xSpeed);
-        ySpeed = yLimit.calculate(ySpeed);
+        // xSpeed = xLimit.calculate(xSpeed);
+        // ySpeed = yLimit.calculate(ySpeed);
 
         //If pidTurn is getting a value override the drivers steering control
         if (enablePidTurn) {
