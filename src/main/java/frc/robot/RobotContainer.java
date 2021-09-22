@@ -207,10 +207,10 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxButtons[4].whenPressed(new SetIntakePiston(m_intake, true));  // Left bumper: Extend intake
       xBoxButtons[4].whenReleased(new SetIntakePiston(m_intake, false)); // Left bumper: Retract intake
 
-      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.5)); // Right bumper: Spin Carousel
+      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.77)); // Right bumper: Spin Carousel
 
       xBoxLeftTrigger.whileHeld(new SetIntake(m_intake, 1)); // Left trigger: intake & carousel
-      xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, 0.5));
+      xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, 0.77));
       
       xBoxRightTrigger.whileHeld(new RapidFireSetpoint(m_shooter, m_indexer, m_uptake)); // Right trigger: uptake & carousel (if canShoot)
       
