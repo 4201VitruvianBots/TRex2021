@@ -74,7 +74,7 @@ public final class Constants {
 //        public static final double kMaxSpeedMetersPerSecond = 3;
 
 
-        public static final double kMaxChassisRotationSpeed = 10 * Math.PI;
+        public static final double kMaxChassisRotationSpeed = Math.PI * 1.5;
 
     }
 

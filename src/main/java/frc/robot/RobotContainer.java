@@ -286,7 +286,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     if(RobotBase.isReal()) {
       // m_swerveDrive.resetEncoders();
       m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
-      m_swerveDrive.setSwerveDriveNeutralMode(true); // Brake
+      m_swerveDrive.setSwerveDriveNeutralMode(false); // Coast
     } else {
       m_swerveDrive.resetEncoders();
       m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
