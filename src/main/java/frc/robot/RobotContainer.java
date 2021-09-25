@@ -174,7 +174,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    if(RobotBase.isReal()) {
+    if (RobotBase.isReal()) {
       leftJoystick.invertRawAxis(1, true);
       rightJoystick.invertRawAxis(0, true);
       rightJoystick.setAxisDeadband(0, 0.05);
@@ -194,27 +194,25 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
 
       xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, 2000, true)); // A button: Flywheel low speed
-      // xBoxButtons[2].whenPressed(new EnableClimbMode(m_climber, m_turret)); // X button: activate climber
+      // xBoxButtons[2].whenPressed(new EnableClimbMode(m_climber, m_turret)); // X button: enable climber
       // xBoxButtons[2].whenReleased(new DisableClimbMode(m_climber, m_turret));
       xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, 3000, true)); // B button: Flywheel medium speed
       xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, 4000, true)); // Y Button: Flywheel high speed
-      
-      // Left xBox joystick: turret (in teleopPeriodic)
 
       // xBoxPOVButtons[0].whenPressed(new ExtendClimber(m_climber))//POV up: climber up
       // xBoxPOVButtons[4].whenPressed(new RetractClimber(m_climber))//POV down: climber down
 
-      xBoxButtons[4].whenPressed(new SetIntakePiston(m_intake, true));  // Left bumper: Extend intake
-      xBoxButtons[4].whenReleased(new SetIntakePiston(m_intake, false)); // Left bumper: Retract intake
-
       xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.77)); // Right bumper: Spin Carousel
+      xBoxButtons[4].whileHeld(new SetCaroselOutput(m_indexer, -0.77)); // Left bumper: Reverse Carousel;
 
+      xBoxLeftTrigger.whenPressed(new SetIntakePiston(m_intake, true));  // Left bumper: Extend intake
+      xBoxLeftTrigger.whenReleased(new SetIntakePiston(m_intake, false)); // Left bumper: Retract intake
       xBoxLeftTrigger.whileHeld(new SetIntake(m_intake, 1)); // Left trigger: intake & carousel
       xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, 0.77));
-      
+
       xBoxRightTrigger.whileHeld(new RapidFireSetpoint(m_shooter, m_indexer, m_uptake)); // Right trigger: uptake & carousel (if canShoot)
       
-    }else{
+    } else {
       //Invert raw axis of X, Y, and rotation inputs to match WPILib convention
       testController.invertRawAxis(1, true);
       testController.invertRawAxis(0, true);
