@@ -7,11 +7,8 @@
 
 package frc.robot.commands.shooter;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.ShooterHood;
 
 /**
  * An example command that uses an example subsystem.
@@ -19,7 +16,6 @@ import frc.robot.subsystems.ShooterHood;
 public class SetHood extends CommandBase {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
   private final Shooter m_shooter;
-  private final ShooterHood m_ShooterHood;
   private final int m_ShootingPosition;
   private final double TrenchHoodAngle = 30;
   private final double LineHoodAngle = 32;
@@ -32,9 +28,8 @@ public class SetHood extends CommandBase {
    * Creates a new ExampleCommand.
    *
    */
-  public SetHood(Shooter shooter, ShooterHood shooterHood, int ShooterPosition) {
+  public SetHood(Shooter shooter, int ShooterPosition) {
     // Use addRequirements() here to declare subsystem dependencies.
-    m_ShooterHood = shooterHood;
     m_shooter = shooter;
     m_ShootingPosition = ShooterPosition;
     addRequirements(shooter);
@@ -51,17 +46,17 @@ public class SetHood extends CommandBase {
     switch (m_ShootingPosition) {
       case 0:
         // Shooting from the trench
-        m_ShooterHood.setHoodAngle(TrenchHoodAngle);
+        m_shooter.setHoodAngle(TrenchHoodAngle);
         m_shooter.setRPM(TrenchRPM);
         break;
       case 1:
         // Shooting from the initiation line
-        m_ShooterHood.setHoodAngle(LineHoodAngle);
+        m_shooter.setHoodAngle(LineHoodAngle);
         m_shooter.setRPM(LineRPM);
         break;
       case 2:
         // Shooting from the initiation line
-        m_ShooterHood.setHoodAngle(TargetHoodAngle);
+        m_shooter.setHoodAngle(TargetHoodAngle);
         m_shooter.setRPM(TargetRPM);
         break;
       default:
@@ -73,7 +68,7 @@ public class SetHood extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_shooter.setPower(0);
-    m_ShooterHood.setHoodAngle(0);
+    m_shooter.setHoodAngle(0);
   }
 
   // Returns true when the command should end.
