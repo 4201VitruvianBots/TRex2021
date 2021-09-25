@@ -166,7 +166,7 @@ public class Shooter extends SubsystemBase {
 
     public void setHoodAngle(double angle) {
         hoodServos[0].setAngle(angle);
-        hoodServos[1].setAngle(-angle);
+        hoodServos[1].setAngle(270-angle);
     }
     public void setHoodAngleToSmartDashboardValue() {
         double angle = SmartDashboard.getNumber("Hood Angle Setpoint", 0);
