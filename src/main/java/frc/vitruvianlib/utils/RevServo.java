@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 public class RevServo extends PWM {
-    private static final double kMaxServoAngle = -135;
-    private static final double kMinServoAngle = 135;
+    private static final double kMaxServoAngle = 270;
+    private static final double kMinServoAngle = 0;
 
     protected static final double kDefaultMaxServoPWM = 2.5;
     protected static final double kDefaultMinServoPWM = 0.5;
