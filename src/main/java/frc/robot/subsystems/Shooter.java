@@ -34,16 +34,16 @@ public class Shooter extends SubsystemBase {
      */
 
     // PID loop constants
-    private final double kF = 0.618;  // 0.054      //  Gree: 0.0475;
-    private final double kP = 7.25e-9;      //  0.4       //  0.00047
-    private final double kI = 0.0;                    //  0.0000287
-    private final double kD = 0.0;
+    private final double kF = 0.0523;  // 0.054      //  Gree: 0.0475;
+    private final double kP = 0.25;      //  0.4       //  0.00047
+    private final double kI = 0.00008;                    //  0.0000287
+    private final double kD = 7;
 
     private final double kS = 0.618;
     private final double kV = 0.0708;
     private final double kA = 0.0239;
 
-    public int kI_Zone = 100;
+    public int kI_Zone = 400;
     public int kAllowableError = 50;
     // constants
     public double rpmOutput;
@@ -52,7 +52,8 @@ public class Shooter extends SubsystemBase {
     private boolean timerStart;
     private double timeStamp;
     private boolean canShoot;
-    public double gearRatio = 1.5;
+    public double gearRatio = 1.0;
+    private boolean percentOutput = false;
 
     private final Vision m_vision;
     // shooter motors
@@ -101,8 +102,15 @@ public class Shooter extends SubsystemBase {
         return shooterMotors[motorIndex].getSupplyCurrent();
     }
 
-    public void setPower(double output) {
+    public void setPercentOutput(double output) {
+        if (setpoint > 0) {
+            percentOutput = true;
+        }
         shooterMotors[0].set(ControlMode.PercentOutput, output);
+    }
+
+    public void setControlState(boolean state) {
+        percentOutput = state;
     }
 
     public void setRPM(double setpoint) {
@@ -113,15 +121,18 @@ public class Shooter extends SubsystemBase {
         return setpoint;
     }
 
-    public boolean canShoot() {
+    public boolean getCanShoot() {
         return canShoot;
     }
 
     private void updateRPMSetpoint() {
-        if (setpoint >= 0)
-            shooterMotors[0].set(ControlMode.Velocity, setpoint);
-        else
-            setPower(0);
+        // if (shooterMotors[0].getControlMode() != ControlMode.PercentOutput) {
+        if (!percentOutput) {
+            if (setpoint >= 0)
+                shooterMotors[0].set(ControlMode.Velocity, setpoint);
+            else
+                setPercentOutput(0);
+        }
     }
 
     public void setTestRPM() {
@@ -190,10 +201,8 @@ public class Shooter extends SubsystemBase {
 
     private void updateShuffleboard() {
         SmartDashboard.putNumber("Flywheel RPM", getRPM(0));
-        SmartDashboard.putNumber("Motor Velocity", shooterMotors[0].getSelectedSensorVelocity());
-        SmartDashboard.putNumber("Hood Angle", getHoodAngle());
-
-        setRPM(SmartDashboard.getNumber("Flywheel Setpoint", 0));
+        // SmartDashboard.putNumber("Motor Velocity", shooterMotors[0].getSelectedSensorVelocity());
+        // setRPM(SmartDashboard.getNumber("Flywheel Setpoint", 0));
 //        setpoint = SmartDashboard.getNumber("Flywheel Encoder Units Setpoint", 0);
 
 //        SmartDashboardTab.putNumber("Shooter", "RPM Primary", getRPM(0));
@@ -210,12 +219,12 @@ public class Shooter extends SubsystemBase {
         rpmOutput = SmartDashboardTab.getNumber("Shooter", "RPM Output", 0);
         rpmTolerance = SmartDashboardTab.getNumber("Shooter", "Flywheel RPM Tolerance", 0);
 
-        shooterMotors[0].config_kF(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kF", 0));
-        shooterMotors[0].config_kP(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kP", 0));
-        shooterMotors[0].config_kI(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kI", 0));
-        shooterMotors[0].config_IntegralZone(0, (int) SmartDashboardTab.getNumber("Shooter", "Flywheel kI_Zone", 0));
-        shooterMotors[0].config_kD(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kD", 0));
-        shooterMotors[0].configAllowableClosedloopError(0, (int) SmartDashboardTab.getNumber("Shooter", "Flywheel kAllowableError", 0));
+        // shooterMotors[0].config_kF(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kF", 0));
+        // shooterMotors[0].config_kP(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kP", 0));
+        // shooterMotors[0].config_kI(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kI", 0));
+        // shooterMotors[0].config_IntegralZone(0, (int) SmartDashboardTab.getNumber("Shooter", "Flywheel kI_Zone", 0));
+        // shooterMotors[0].config_kD(0, SmartDashboardTab.getNumber("Shooter", "Flywheel kD", 0));
+        // shooterMotors[0].configAllowableClosedloopError(0, (int) SmartDashboardTab.getNumber("Shooter", "Flywheel kAllowableError", 0));
     }
 
 
@@ -226,16 +235,24 @@ public class Shooter extends SubsystemBase {
         updateShuffleboard();
 //        updatePIDValues();
 
-        if ((Math.abs(getSetpoint() - getRPM(0)) < getRPMTolerance()) && m_vision.hasTarget() &&
-                (Math.abs(m_vision.getTargetX()) < 1) && !timerStart) {
+        // if ((Math.abs(getSetpoint() - getRPM(0)) < getRPMTolerance()) && m_vision.hasTarget() &&
+        //         (Math.abs(m_vision.getTargetX()) < 1) && !timerStart) {
+        //     timerStart = true;
+        //     timeStamp = Timer.getFPGATimestamp();
+        // } else if (((Math.abs(getSetpoint() - getRPM(0)) > getRPMTolerance()) || !m_vision.hasTarget() ||
+        //         (Math.abs(m_vision.getTargetX()) > 1)) && timerStart) {
+        //     timeStamp = 0;
+        //     timerStart = false;
+        // }
+        if ((Math.abs(getSetpoint() - getRPM(0)) < getRPMTolerance()) && !timerStart) {
             timerStart = true;
             timeStamp = Timer.getFPGATimestamp();
-        } else if (((Math.abs(getSetpoint() - getRPM(0)) > getRPMTolerance()) || !m_vision.hasTarget() ||
-                (Math.abs(m_vision.getTargetX()) > 1)) && timerStart) {
+        } else if (((Math.abs(getSetpoint() - getRPM(0)) > getRPMTolerance())) && timerStart) {
             timeStamp = 0;
             timerStart = false;
         }
 
-        canShoot = timeStamp != 0 && Math.abs(Timer.getFPGATimestamp() - timeStamp) > 0.1;
+        canShoot = timerStart && Math.abs(Timer.getFPGATimestamp() - timeStamp) > 0.1;
+
     }
 }

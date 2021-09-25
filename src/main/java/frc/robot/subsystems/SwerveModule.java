@@ -116,7 +116,7 @@ public class SwerveModule extends SubsystemBase {
       }
 
       simulationTurnEncoder.setDistancePerPulse(kTurningEncoderDistancePerPulse);
-      simulationThrottleEncoder.setDistancePerPulse(kDriveEncoderDistancePerPulse);
+      simulationThrottleEncoder.setDistancePerPulse(kDriveSimEncoderDistancePerPulse);
 
       simulationTurnEncoderSim = new EncoderSim(simulationTurnEncoder);
       simulationThrottleEncoderSim = new EncoderSim(simulationThrottleEncoder);
@@ -211,9 +211,8 @@ public class SwerveModule extends SubsystemBase {
         double percentOutput = outputState.speedMetersPerSecond / Constants.DriveConstants.kMaxSpeedMetersPerSecond;
         m_driveMotor.set(ControlMode.PercentOutput, percentOutput);
       } else {
-        double velocityOutput = outputState.speedMetersPerSecond / kDriveEncoderDistancePerPulse;
-        m_driveMotor.set(ControlMode.Velocity, velocityOutput, DemandType.ArbitraryFeedForward,
-            m_driveFeedforward.calculate(outputState.speedMetersPerSecond));
+        double velocityOutput = outputState.speedMetersPerSecond / (kDriveEncoderDistancePerPulse * 10.0);
+        m_driveMotor.set(ControlMode.Velocity, velocityOutput, DemandType.ArbitraryFeedForward, m_driveFeedforward.calculate(outputState.speedMetersPerSecond));
       }
 
       // Prevent rotating module if speed is less then 1%. Prevents Jittering.
@@ -227,9 +226,8 @@ public class SwerveModule extends SubsystemBase {
         double percentOutput = outputState.speedMetersPerSecond / Constants.DriveConstants.kMaxSpeedMetersPerSecond;
         m_driveMotorSim.set(ControlMode.PercentOutput, percentOutput);
       } else {
-        double velocityOutput = outputState.speedMetersPerSecond / kDriveSimEncoderDistancePerPulse;
-        m_driveMotorSim.set(ControlMode.Velocity, velocityOutput, DemandType.ArbitraryFeedForward,
-            m_driveFeedforward.calculate(outputState.speedMetersPerSecond));
+        double velocityOutput = outputState.speedMetersPerSecond / (kDriveSimEncoderDistancePerPulse * 10.0);
+        m_driveMotorSim.set(ControlMode.Velocity, velocityOutput, DemandType.ArbitraryFeedForward, m_driveFeedforward.calculate(outputState.speedMetersPerSecond));
       }
 
       // Prevent rotating module if speed is less then 1%. Prevents Jittering.

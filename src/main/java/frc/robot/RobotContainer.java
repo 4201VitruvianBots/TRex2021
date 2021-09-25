@@ -10,7 +10,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -29,9 +31,14 @@ import frc.robot.commands.shooter.SetUptake;
 import frc.robot.commands.shooter.TestShooter;
 import frc.robot.commands.shooter.FeedShooter;
 import frc.robot.commands.shooter.RapidFireSetpoint;
+import frc.robot.commands.turret.SetTurretRobotRelativeAngle;
+import frc.robot.commands.turret.SetTurretSetpointFieldAbsolute;
 import frc.robot.commands.turret.ToggleTurretControlMode;
 import frc.robot.commands.turret.ZeroTurretEncoder;
+import frc.robot.commands.climber.DisableClimbMode;
 import frc.robot.commands.climber.EnableClimbMode;
+import frc.robot.commands.climber.ExtendClimber;
+import frc.robot.commands.climber.RetractClimber;
 import frc.robot.commands.swerve.SetSwerveDriveWithAngle;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimulationReferencePose;
@@ -104,7 +111,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    m_autoChooser.addDefault("Drive Straight", CommandSelector.DRIVE_STRAIGHT.ordinal());
+    m_autoChooser.setDefaultOption("Drive Straight", CommandSelector.DRIVE_STRAIGHT.ordinal());
     for (Enum commandEnum : CommandSelector.values())
       if (commandEnum != CommandSelector.DRIVE_STRAIGHT)
         m_autoChooser.addOption(commandEnum.toString(), commandEnum.ordinal());
@@ -157,6 +164,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 //            () -> testController.getRawAxis(1),
 //            1));
 //    }
+      m_turret.setDefaultCommand(new SetTurretSetpointFieldAbsolute(m_turret, m_swerveDrive, m_vision, xBoxController));
   }
 
   /**
@@ -169,8 +177,11 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     if(RobotBase.isReal()) {
       leftJoystick.invertRawAxis(1, true);
       rightJoystick.invertRawAxis(0, true);
+      rightJoystick.setAxisDeadband(0, 0.05);
       xBoxController.invertRawAxis(1, true);
       xBoxController.invertRawAxis(5, true);
+      xBoxController.setAxisDeadband(0, 0.1);
+      xBoxController.setAxisDeadband(1, 0.1);
       for (int i = 0; i < leftButtons.length; i++)
         leftButtons[i] = new JoystickButton(leftJoystick, (i + 1));
       for (int i = 0; i < rightButtons.length; i++)
@@ -181,19 +192,28 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
         xBoxPOVButtons[i] = new POVButton(xBoxController, (i * 45));
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
+
+      xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, 2000, true)); // A button: Flywheel low speed
+      // xBoxButtons[2].whenPressed(new EnableClimbMode(m_climber, m_turret)); // X button: activate climber
+      // xBoxButtons[2].whenReleased(new DisableClimbMode(m_climber, m_turret));
+      xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, 3000, true)); // B button: Flywheel medium speed
+      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, 4000, true)); // Y Button: Flywheel high speed
       
-      // X : Extend intake
-      xBoxButtons[1].whenPressed(new SetIntakePiston(m_intake, true));
-      xBoxButtons[1].whenReleased(new SetIntakePiston(m_intake, false));
+      // Left xBox joystick: turret (in teleopPeriodic)
 
-      // Right Button : run intake and carousel
-      xBoxButtons[5].whileHeld(new SetIntake(m_intake, 0.2));
-      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.1));
+      // xBoxPOVButtons[0].whenPressed(new ExtendClimber(m_climber))//POV up: climber up
+      // xBoxPOVButtons[4].whenPressed(new RetractClimber(m_climber))//POV down: climber down
 
-      // Left Button : Run shooter, carousel, and uptake
-      xBoxButtons[4].whileHeld(new SetRpmSetpoint(m_shooter, m_vision, 3900, true));
-      xBoxButtons[4].whileHeld(new FeedShooter(m_uptake, m_indexer, m_shooter));
+      xBoxButtons[4].whenPressed(new SetIntakePiston(m_intake, true));  // Left bumper: Extend intake
+      xBoxButtons[4].whenReleased(new SetIntakePiston(m_intake, false)); // Left bumper: Retract intake
 
+      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.77)); // Right bumper: Spin Carousel
+
+      xBoxLeftTrigger.whileHeld(new SetIntake(m_intake, 1)); // Left trigger: intake & carousel
+      xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, 0.77));
+      
+      xBoxRightTrigger.whileHeld(new RapidFireSetpoint(m_shooter, m_indexer, m_uptake)); // Right trigger: uptake & carousel (if canShoot)
+      
     }else{
       //Invert raw axis of X, Y, and rotation inputs to match WPILib convention
       testController.invertRawAxis(1, true);
@@ -212,6 +232,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
               () -> testController.getRawAxis(0), //left x
               () -> 45)); //right x
     }
+
+
   }
 
   /**
@@ -252,7 +274,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 
   public void disabledInit() {
     setInitializationState(true);
-    m_swerveDrive.setSwerveDriveNeutralMode(true);
+    m_swerveDrive.setSwerveDriveNeutralMode(false); // Coast
     m_FieldSim.disabledInit();
   }
 
@@ -264,7 +286,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     if(RobotBase.isReal()) {
       // m_swerveDrive.resetEncoders();
       m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
-      m_swerveDrive.setSwerveDriveNeutralMode(false);
+      m_swerveDrive.setSwerveDriveNeutralMode(false); // Coast
     } else {
       m_swerveDrive.resetEncoders();
       m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
@@ -273,12 +295,21 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 
   public void teleOpPeriodic() {
 
+    // Rumble if there is a valid target and you are in the target
+    if (m_shooter.getCanShoot() && m_vision.hasTarget() && Math.abs(m_vision.getGoalX()) < 1) {
+      xBoxController.setRumble(GenericHID.RumbleType.kLeftRumble, 0.8);
+      xBoxController.setRumble(GenericHID.RumbleType.kRightRumble, 0.8);
+    } else {
+      xBoxController.setRumble(GenericHID.RumbleType.kLeftRumble, 0);
+      xBoxController.setRumble(GenericHID.RumbleType.kRightRumble, 0);
+    }
   }
 
   public void autonomousInit() {
     if (RobotBase.isReal()) {
       m_swerveDrive.resetEncoders();
       m_swerveDrive.resetOdometry(m_swerveDrive.getPose(), m_FieldSim.getRobotPose().getRotation());
+      m_swerveDrive.setSwerveDriveNeutralMode(true); // Brake
     } else {
       m_FieldSim.initSim();
       m_swerveDrive.resetEncoders();

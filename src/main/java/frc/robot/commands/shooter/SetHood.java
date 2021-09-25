@@ -67,7 +67,7 @@ public class SetHood extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_shooter.setPower(0);
+    m_shooter.setPercentOutput(0);
     m_shooter.setHoodAngle(0);
   }
 

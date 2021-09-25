@@ -46,7 +46,7 @@ public class FeedShooter extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (m_shooter.canShoot()) { // Only runs  uptake and indexer if the shooter is able to shoot
+        if (m_shooter.getCanShoot()) { // Only runs  uptake and indexer if the shooter is able to shoot
             m_uptake.setPercentOutput(1);
             m_indexer.setIndexerOutput(0.2);
         } else { // Sets output to 0 if the shooter can no longer shoot

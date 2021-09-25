@@ -79,7 +79,7 @@ public class ControlledFireNew extends CommandBase {
     public void end(boolean interrupted) {
         m_indexer.setIndexerOutput(0);
 //        m_indexer.setKickerOutput(0);
-        m_shooter.setPower(0);
+        m_shooter.setPercentOutput(0);
     }
 
     // Returns true when the command should end.

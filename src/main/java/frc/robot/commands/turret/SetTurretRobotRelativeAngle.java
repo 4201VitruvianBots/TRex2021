@@ -26,7 +26,7 @@ public class SetTurretRobotRelativeAngle extends CommandBase {
     @Override
     public void initialize() {
         startTime = Timer.getFPGATimestamp();
-        m_turret.setRobotCentricSetpoint(m_setpoint);
+        m_turret.setAbsoluteSetpoint(m_setpoint);
     }
 
     // Called every time the scheduler runs while the command is scheduled.

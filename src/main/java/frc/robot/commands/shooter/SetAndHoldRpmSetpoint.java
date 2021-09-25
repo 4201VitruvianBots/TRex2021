@@ -39,7 +39,6 @@ public class SetAndHoldRpmSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_vision.ledsOn();
     m_vision.setLastValidTargetTime();
     m_shooter.setRPM(m_RPM);
   }

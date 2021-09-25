@@ -43,9 +43,9 @@ public class Indexer extends SubsystemBase {
     public Indexer() {
         // Motor and PID controller setup
         master.restoreFactoryDefaults();
-        master.setInverted(false);
+        master.setInverted(true);
 
-        master.setIdleMode(IdleMode.kBrake);
+        master.setIdleMode(IdleMode.kCoast);
 
         pidController.setFF(kF);
         pidController.setP(kP);
