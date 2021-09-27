@@ -193,11 +193,11 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
 
-      xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, 2000, true)); // A button: Flywheel low speed
+      xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, 3000, true)); // A button: Flywheel low speed
       // xBoxButtons[2].whenPressed(new EnableClimbMode(m_climber, m_turret)); // X button: enable climber
       // xBoxButtons[2].whenReleased(new DisableClimbMode(m_climber, m_turret));
-      xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, 3000, true)); // B button: Flywheel medium speed
-      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, 4000, true)); // Y Button: Flywheel high speed
+      xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, 3300, true)); // B button: Flywheel medium speed
+      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, 3600, true)); // Y Button: Flywheel high speed
 
       // xBoxPOVButtons[0].whenPressed(new ExtendClimber(m_climber))//POV up: climber up
       // xBoxPOVButtons[4].whenPressed(new RetractClimber(m_climber))//POV down: climber down
@@ -295,8 +295,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 
     // Rumble if there is a valid target and you are in the target
     if (m_shooter.getCanShoot() && m_vision.hasTarget() && Math.abs(m_vision.getGoalX()) < 1) {
-      xBoxController.setRumble(GenericHID.RumbleType.kLeftRumble, 0.8);
-      xBoxController.setRumble(GenericHID.RumbleType.kRightRumble, 0.8);
+      xBoxController.setRumble(GenericHID.RumbleType.kLeftRumble, 0.4);
+      xBoxController.setRumble(GenericHID.RumbleType.kRightRumble, 0.4);
     } else {
       xBoxController.setRumble(GenericHID.RumbleType.kLeftRumble, 0);
       xBoxController.setRumble(GenericHID.RumbleType.kRightRumble, 0);
