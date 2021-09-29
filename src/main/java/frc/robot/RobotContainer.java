@@ -82,6 +82,8 @@ public class RobotContainer {
 
   private final SelectCommand m_autoCommand;
 
+  private boolean batteryForward = true;
+
   static JoystickWrapper leftJoystick = new JoystickWrapper(Constants.leftJoystick);
   static JoystickWrapper rightJoystick = new JoystickWrapper(Constants.rightJoystick);
   static JoystickWrapper xBoxController = new JoystickWrapper(Constants.xBoxController);
@@ -178,8 +180,9 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
    */
   private void configureButtonBindings() {
     if (RobotBase.isReal()) {
-      leftJoystick.invertRawAxis(1, true);
-      rightJoystick.invertRawAxis(0, true);
+      leftJoystick.invertRawAxis(1, batteryForward);
+      leftJoystick.invertRawAxis(0, !batteryForward);
+      // rightJoystick.invertRawAxis(0, true);
       rightJoystick.setAxisDeadband(0, 0.05);
       xBoxController.invertRawAxis(1, true);
       xBoxController.invertRawAxis(5, true);
