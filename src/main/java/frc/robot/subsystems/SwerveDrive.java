@@ -28,9 +28,9 @@ import frc.robot.Constants;
 import static frc.robot.Constants.DriveConstants.*;
 
 public class SwerveDrive extends SubsystemBase {
-    static double kP = 0.005;
+    static double kP = 0.001;
     static double kI = 0;
-    static double kD = 0.00025;
+    static double kD = 0.00125;
 
     /**
      * Just like a graph's quadrants
@@ -74,8 +74,8 @@ public class SwerveDrive extends SubsystemBase {
     public SwerveDrive(PowerDistributionPanel pdp) {
         m_pdp = pdp;
 
-        turnPidController.setTolerance(0.2);
-        turnPidController.enableContinuousInput(-180, 180);
+        turnPidController.setTolerance(2);
+        // turnPidController.enableContinuousInput(-180, 180);
 
         SmartDashboardTab.putData("SwerveDrive","swerveDriveSubsystem", this);
         if (RobotBase.isSimulation()) {
@@ -177,7 +177,8 @@ public class SwerveDrive extends SubsystemBase {
 
         //If pidTurn is getting a value override the drivers steering control
         if (enablePidTurn) {
-            rot = turnPidController.calculate(getHeadingDegrees());
+            rot = -turnPidController.calculate(getHeadingDegrees(), turnPidController.getGoal()) * kMaxChassisRotationSpeed;
+            // rot = -turnPidController.calculate(getHeadingDegrees()) * kMaxChassisRotationSpeed;
         }
 
         var swerveModuleStates = kDriveKinematics.toSwerveModuleStates(
@@ -195,11 +196,12 @@ public class SwerveDrive extends SubsystemBase {
 
     public void setAngleSetpoint(double angleSetpoint, boolean enabled) {
         enablePidTurn = enabled;
-//        double differance = angle - RobotContainer.swerve.getDegrees();
-//        if (differance > 180) {
-//            differance = (360 - differance) * -1;
-//        }
-        turnPidController.setGoal(angleSetpoint - getHeadingDegrees());
+        double differance = angleSetpoint - getHeadingDegrees();
+        if (differance > 180) {
+            differance = (360 - differance) * -1;
+        }
+        System.out.println("Setpoint: " + angleSetpoint +"\tDifference:" + differance);
+        turnPidController.setGoal(differance);
     }
 
     public void setSwerveDriveNeutralMode(boolean mode) {

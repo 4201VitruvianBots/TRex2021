@@ -63,7 +63,7 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
                 // if camera has vision target, use that
                 usingVisionSetpoint = true;
 
-//                setpoint = m_turret.getTurretAngle() + m_vision.getGoalX();
+               setpoint = m_turret.getTurretAngle() - m_vision.getGoalX();
             } else if (joystickMoved && !operatorControl) {
                 // Otherwise keep current position
                 setpoint = m_turret.getTurretAngle();

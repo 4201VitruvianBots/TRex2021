@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.autoCommands.*;
+import frc.robot.commands.swerve.SetAngleSetpoint;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.indexer.SetCaroselOutput;
@@ -164,7 +165,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 //            () -> testController.getRawAxis(1),
 //            1));
 //    }
-      m_turret.setDefaultCommand(new SetTurretSetpointFieldAbsolute(m_turret, m_swerveDrive, m_vision, xBoxController));
+      // m_turret.setDefaultCommand(new SetTurretSetpointFieldAbsolute(m_turret, m_swerveDrive, m_vision, xBoxController));
   }
 
   /**
@@ -193,6 +194,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
 
+      rightButtons[0].whileHeld(new SetAngleSetpoint(m_swerveDrive, () -> 45.0 * rightJoystick.getRawAxis(0)));
+
       xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, 3000, true)); // A button: Flywheel low speed
       // xBoxButtons[2].whenPressed(new EnableClimbMode(m_climber, m_turret)); // X button: enable climber
       // xBoxButtons[2].whenReleased(new DisableClimbMode(m_climber, m_turret));
@@ -202,13 +205,13 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       // xBoxPOVButtons[0].whenPressed(new ExtendClimber(m_climber))//POV up: climber up
       // xBoxPOVButtons[4].whenPressed(new RetractClimber(m_climber))//POV down: climber down
 
-      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.77)); // Right bumper: Spin Carousel
-      xBoxButtons[4].whileHeld(new SetCaroselOutput(m_indexer, -0.77)); // Left bumper: Reverse Carousel;
+      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 1.0)); // Right bumper: Spin Carousel
+      xBoxButtons[4].whileHeld(new SetCaroselOutput(m_indexer, -1.0)); // Left bumper: Reverse Carousel;
 
       xBoxLeftTrigger.whenPressed(new SetIntakePiston(m_intake, true));  // Left bumper: Extend intake
       xBoxLeftTrigger.whenReleased(new SetIntakePiston(m_intake, false)); // Left bumper: Retract intake
       xBoxLeftTrigger.whileHeld(new SetIntake(m_intake, 1)); // Left trigger: intake & carousel
-      xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, 0.77));
+      xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, 1.0));
 
       xBoxRightTrigger.whileHeld(new RapidFireSetpoint(m_shooter, m_indexer, m_uptake)); // Right trigger: uptake & carousel (if canShoot)
       

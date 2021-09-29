@@ -51,7 +51,7 @@ public class RapidFireSetpoint extends CommandBase {
   public void execute() {
 
     if(m_shooter.getCanShoot() || Timer.getFPGATimestamp()-startTime>0.25) {
-      m_indexer.setIndexerOutput(0.77);
+      m_indexer.setIndexerOutput(1.0);
       m_uptake.setPercentOutput(1);
     }
   }
