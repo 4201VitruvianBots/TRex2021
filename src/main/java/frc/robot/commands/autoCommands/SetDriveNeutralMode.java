@@ -1,7 +1,5 @@
 package frc.robot.commands.autoCommands;
 
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrive;
 
@@ -28,7 +26,7 @@ public class SetDriveNeutralMode extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        m_swerveDrive.setSwerveDriveNeutralMode(m_mode);
+        m_swerveDrive.setDriveNeutralMode(m_mode);
     }
 
     // Called every time the scheduler runs while the command is scheduled.

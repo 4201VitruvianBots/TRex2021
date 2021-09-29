@@ -10,9 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -20,26 +18,11 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.autoCommands.*;
 import frc.robot.commands.swerve.SetAngleSetpoint;
 import frc.robot.commands.swerve.SetSwerveDrive;
-import frc.robot.commands.indexer.FeedAll;
 import frc.robot.commands.indexer.SetCaroselOutput;
-import frc.robot.commands.intake.ControlledIntake;
 import frc.robot.commands.intake.SetIntake;
 import frc.robot.commands.intake.SetIntakePiston;
-import frc.robot.commands.intake.ToggleIntakePistons;
-import frc.robot.commands.intake.SetIntakePiston;
 import frc.robot.commands.shooter.SetRpmSetpoint;
-import frc.robot.commands.shooter.SetUptake;
-import frc.robot.commands.shooter.TestShooter;
-import frc.robot.commands.shooter.FeedShooter;
 import frc.robot.commands.shooter.RapidFireSetpoint;
-import frc.robot.commands.turret.SetTurretRobotRelativeAngle;
-import frc.robot.commands.turret.SetTurretSetpointFieldAbsolute;
-import frc.robot.commands.turret.ToggleTurretControlMode;
-import frc.robot.commands.turret.ZeroTurretEncoder;
-import frc.robot.commands.climber.DisableClimbMode;
-import frc.robot.commands.climber.EnableClimbMode;
-import frc.robot.commands.climber.ExtendClimber;
-import frc.robot.commands.climber.RetractClimber;
 import frc.robot.commands.swerve.SetSwerveDriveWithAngle;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimulationReferencePose;
@@ -275,7 +258,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 
   public void disabledInit() {
     setInitializationState(true);
-    m_swerveDrive.setSwerveDriveNeutralMode(false); // Coast
+    m_swerveDrive.setDriveNeutralMode(false); // Coast
+    m_swerveDrive.setTurnNeutralMode(false); // Coast
     m_FieldSim.disabledInit();
   }
 
@@ -287,7 +271,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     if(RobotBase.isReal()) {
       // m_swerveDrive.resetEncoders();
       m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
-      m_swerveDrive.setSwerveDriveNeutralMode(false); // Coast
+      m_swerveDrive.setDriveNeutralMode(false); // Coast
+      m_swerveDrive.setTurnNeutralMode(true); // Brake
     } else {
       m_swerveDrive.resetEncoders();
       m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
@@ -310,7 +295,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     if (RobotBase.isReal()) {
       m_swerveDrive.resetEncoders();
       m_swerveDrive.resetOdometry(m_swerveDrive.getPose(), m_FieldSim.getRobotPose().getRotation());
-      m_swerveDrive.setSwerveDriveNeutralMode(true); // Brake
+      m_swerveDrive.setDriveNeutralMode(true); // Brake
+      m_swerveDrive.setTurnNeutralMode(true); // Brake
     } else {
       m_FieldSim.initSim();
       m_swerveDrive.resetEncoders();

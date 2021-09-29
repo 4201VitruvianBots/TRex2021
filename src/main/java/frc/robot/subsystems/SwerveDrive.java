@@ -10,7 +10,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANEncoder;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.wpilibj.*;
@@ -204,11 +203,14 @@ public class SwerveDrive extends SubsystemBase {
         turnPidController.setGoal(differance);
     }
 
-    public void setSwerveDriveNeutralMode(boolean mode) {
+    public void setDriveNeutralMode(boolean mode) {
         for(int i = 0; i < mSwerveModules.length; i++)
-            mSwerveModules[i].setBrakeMode(mode);
+            mSwerveModules[i].setDriveBrakeMode(mode);
     }
-
+    public void setTurnNeutralMode(boolean mode) {
+        for(int i = 0; i < mSwerveModules.length; i++)
+            mSwerveModules[i].setTurnBrakeMode(mode);
+    }
     /**
      * Sets the swerve ModuleStates.
      *

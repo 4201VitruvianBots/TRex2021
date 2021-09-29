@@ -241,10 +241,14 @@ public class SwerveModule extends SubsystemBase {
     m_lastAngle = angle;
   }
 
-  public void setBrakeMode(boolean mode) { // True is brake, false is coast
+  public void setDriveBrakeMode(boolean mode) { // True is brake, false is coast
     m_driveMotor.setNeutralMode(mode ? NeutralMode.Brake : NeutralMode.Coast);
-    m_turnMotor.setNeutralMode(NeutralMode.Brake);
   }
+
+  public void setTurnBrakeMode(boolean mode) { // True is brake, false is coast
+    m_turnMotor.setNeutralMode(mode ? NeutralMode.Brake : NeutralMode.Coast);
+  }
+
   public Pose2d getPose() {
     return swerveModulePose;
   }
