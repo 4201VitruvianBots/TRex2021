@@ -79,8 +79,8 @@ public final class Constants {
     }
 
     public static final class ModuleConstants {
-        public static final double kDriveMotorGearRatio = 8.16; //6.89 to 1
-        public static final double kTurningMotorGearRatio = 12.8; //12 to 1
+        public static final double kDriveMotorGearRatio = 6.89; //6.89 to 1
+        public static final double kTurningMotorGearRatio = 12; //12 to 1
         public static final int kFalconEncoderCPR = 2048;
         public static final int kCANCoderCPR = 4096;
         public static final double kWheelDiameterMeters = Units.inchesToMeters(4); //10.16 cm

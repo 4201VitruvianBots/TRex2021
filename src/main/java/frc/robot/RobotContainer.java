@@ -61,20 +61,21 @@ public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   private final PowerDistributionPanel pdp = new PowerDistributionPanel();
-  private final Indexer m_indexer = new Indexer();
-  private final Intake m_intake = new Intake();
-  private final Uptake m_uptake = new Uptake();
+ // private final Indexer m_indexer = new Indexer();
+  //private final Intake m_intake = new Intake();
+  //private final Uptake m_uptake = new Uptake();
   private final SwerveDrive m_swerveDrive = new SwerveDrive(pdp);
-  private final Turret m_turret = new Turret(m_swerveDrive);
-  private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
-  private final Shooter m_shooter = new Shooter(m_vision, pdp);
-  private final Climber m_climber = new Climber();
+  //private final Turret m_turret = new Turret(m_swerveDrive);
+  //private final Vision m_vision = new Vision(m_swerveDrive, m_turret);
+  //private final Shooter m_shooter = new Shooter(m_vision, pdp);
+  //private final Climber m_climber = new Climber();
 
   private FieldSim m_FieldSim;
   private SimulationReferencePose m_referencePose;
 
   private enum CommandSelector {
-    DRIVE_STRAIGHT
+    DRIVE_STRAIGHT,
+    BARREL
   }
 
   SendableChooser<Integer> m_autoChooser = new SendableChooser();
@@ -140,8 +141,10 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     init = state;
   }
 
+
+  
   public void initializeSubsystems() {
-    m_FieldSim = new FieldSim(m_swerveDrive, m_turret, m_shooter);
+   // m_FieldSim = new FieldSim(m_swerveDrive, m_turret, m_shooter);
     m_referencePose = new SimulationReferencePose(m_FieldSim);
 
 //    m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
@@ -164,7 +167,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 //            () -> testController.getRawAxis(1),
 //            1));
 //    }
-      m_turret.setDefaultCommand(new SetTurretSetpointFieldAbsolute(m_turret, m_swerveDrive, m_vision, xBoxController));
+      //m_turret.setDefaultCommand(new SetTurretSetpointFieldAbsolute(m_turret, m_swerveDrive, m_vision, xBoxController));
   }
 
   /**
@@ -193,6 +196,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
 
+/*
+
       xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, 3000, true)); // A button: Flywheel low speed
       // xBoxButtons[2].whenPressed(new EnableClimbMode(m_climber, m_turret)); // X button: enable climber
       // xBoxButtons[2].whenReleased(new DisableClimbMode(m_climber, m_turret));
@@ -212,6 +217,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 
       xBoxRightTrigger.whileHeld(new RapidFireSetpoint(m_shooter, m_indexer, m_uptake)); // Right trigger: uptake & carousel (if canShoot)
       
+*/
+
     } else {
       //Invert raw axis of X, Y, and rotation inputs to match WPILib convention
       testController.invertRawAxis(1, true);
@@ -273,7 +280,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
   public void disabledInit() {
     setInitializationState(true);
     m_swerveDrive.setSwerveDriveNeutralMode(false); // Coast
-    m_FieldSim.disabledInit();
+    // m_FieldSim.disabledInit();
   }
 
   public void robotPeriodic() {
@@ -283,17 +290,20 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
   public void teleOpInit() {
     if(RobotBase.isReal()) {
       // m_swerveDrive.resetEncoders();
-      m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
+     // m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
       m_swerveDrive.setSwerveDriveNeutralMode(false); // Coast
     } else {
       m_swerveDrive.resetEncoders();
-      m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
+      //m_swerveDrive.resetOdometry(m_FieldSim.getRobotPose(), m_FieldSim.getRobotPose().getRotation());
     }
   }
 
   public void teleOpPeriodic() {
 
     // Rumble if there is a valid target and you are in the target
+
+/*
+
     if (m_shooter.getCanShoot() && m_vision.hasTarget() && Math.abs(m_vision.getGoalX()) < 1) {
       xBoxController.setRumble(GenericHID.RumbleType.kLeftRumble, 0.4);
       xBoxController.setRumble(GenericHID.RumbleType.kRightRumble, 0.4);
@@ -301,8 +311,9 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxController.setRumble(GenericHID.RumbleType.kLeftRumble, 0);
       xBoxController.setRumble(GenericHID.RumbleType.kRightRumble, 0);
     }
+  
+*/
   }
-
   public void autonomousInit() {
     if (RobotBase.isReal()) {
       m_swerveDrive.resetEncoders();
