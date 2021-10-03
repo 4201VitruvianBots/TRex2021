@@ -14,6 +14,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ControlType;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -29,12 +30,14 @@ Subsystem for controlling the turret
  */
 
 public class Turret extends SubsystemBase {
-    private final int encoderUnitsPerRotation = 42;
     private final SwerveDrive m_swerveDrive;
+
     // setup motor and encoder variables
     CANSparkMax turretMotor = new CANSparkMax(Constants.turretMotor, MotorType.kBrushless);
     CANEncoder encoder = turretMotor.getEncoder();
     CANPIDController pidController = turretMotor.getPIDController();
+    DigitalInput turretHomeSensor = new DigitalInput(Constants.turretHomeSensor);
+
     // Turret PID gains
     double kF = 0.006;
     double kP = 0.04;
@@ -44,10 +47,11 @@ public class Turret extends SubsystemBase {
     int kErrorBand = 1;//degreesToEncoderUnits(0.5);
     int kCruiseVelocity = 14000;
     int kMotionAcceleration = kCruiseVelocity * 10;
+
     // setup variables
-    double[][] restrictedMovement = {{270, 300}, {60, 90}};
-    double minAngle = -90;
-    double maxAngle = 90;
+    double minAngle = -45;
+    double maxAngle = 45;
+    private final int encoderUnitsPerRotation = 42;
     double gearRatio = 28.0 / 120.0;    // TODO: Ratio is correct, but values are wrong
     private double setpoint = 0; //angle
     private int controlMode = 1;
@@ -127,18 +131,6 @@ public class Turret extends SubsystemBase {
         return getSetpoint() - getTurretAngle();
     }
 
-    public boolean isRestricted() {
-        boolean value = false;
-        for (double[] i : restrictedMovement) {
-            if (i[0] < i[1]) {
-                value = (this.getTurretAngle() > i[0] && this.getTurretAngle() < i[1]);
-            } else {
-                value = (this.getTurretAngle() > i[1] && this.getTurretAngle() < i[0]);
-            }
-        }
-        return value;
-    }
-
     public void setPercentOutput(double output) {
         turretMotor.set(output);
     }
@@ -159,13 +151,9 @@ public class Turret extends SubsystemBase {
     }
 
     public void setClosedLoopPosition() {
-        double angle = getSetpoint() > maxAngle ?  maxAngle : (getSetpoint() < minAngle ? minAngle : setpoint);
-        pidController.setReference(degreesToEncoderUnits(angle), ControlType.kPosition);
+        double angle = Math.max(Math.min(getSetpoint(), maxAngle),  minAngle);
+        pidController.setReference(degreesToEncoderUnits(angle), ControlType.kSmartMotion);
     }
-
-//    public void setSetpointOutput(double setpoint) {
-//        turretMotor.set(ControlMode.MotionMagic, degreesToEncoderUnits(setpoint));
-//    }
 
     public int degreesToEncoderUnits(double degrees) {
         return (int) (degrees * (1.0 / gearRatio) * (encoderUnitsPerRotation / 360.0));
@@ -180,16 +168,10 @@ public class Turret extends SubsystemBase {
         return Math.abs(pidController.getSmartMotionAllowedClosedLoopError(1)) < kErrorBand; //not sure if this is the correct slot
     }
 
-    // ???
-//    public void clearIAccum() {
-//        turretMotor.setIntegralAccumulator(0);
-//    }
-
     private boolean getTurretLatch() {
         return turretHomeSensorLatch;
     }
 
-    // ???
     private void setTurretLatch(boolean state) {
         turretHomeSensorLatch = state;
     }
@@ -271,7 +253,6 @@ public class Turret extends SubsystemBase {
                 m_swerveDrive.getPose().getY(),
                 new Rotation2d(Math.toRadians(getTurretSimAngle())));
     }
-
 
     @Override
     public void simulationPeriodic() {
