@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.autoCommands.*;
+import frc.robot.commands.shooter.SetUptakeOutput;
 import frc.robot.commands.swerve.SetAngleSetpoint;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.indexer.SetCaroselOutput;
@@ -190,6 +191,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 
       xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 1.0)); // Right bumper: Spin Carousel
       xBoxButtons[4].whileHeld(new SetCaroselOutput(m_indexer, -1.0)); // Left bumper: Reverse Carousel;
+      xBoxButtons[4].whileHeld(new SetUptakeOutput(m_uptake, -0.75)); // Left bumper: Reverse Uptake;
 
       xBoxLeftTrigger.whenPressed(new SetIntakePiston(m_intake, true));  // Left bumper: Extend intake
       xBoxLeftTrigger.whenReleased(new SetIntakePiston(m_intake, false)); // Left bumper: Retract intake

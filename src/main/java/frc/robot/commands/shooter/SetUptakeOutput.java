@@ -14,7 +14,7 @@ import frc.robot.subsystems.Uptake;
 /**
  * An example command that uses an example subsystem.
  */
-public class SetUptake extends CommandBase {
+public class SetUptakeOutput extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Uptake m_uptake;
   private double time, m_output;
@@ -24,7 +24,7 @@ public class SetUptake extends CommandBase {
    *
    * @param RobotContainer.m_shooter The subsystem used by this command.
    */
-  public SetUptake(Uptake uptake, double output) {
+  public SetUptakeOutput(Uptake uptake, double output) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_uptake = uptake;
     m_output = output;
