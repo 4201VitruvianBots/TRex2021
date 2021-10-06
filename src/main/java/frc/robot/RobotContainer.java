@@ -59,7 +59,8 @@ public class RobotContainer {
   private SimulationReferencePose m_referencePose;
 
   private enum CommandSelector {
-    DRIVE_STRAIGHT
+    DRIVE_STRAIGHT,
+    TEST_SUBSYSTEMS
   }
 
   SendableChooser<Integer> m_autoChooser = new SendableChooser();
@@ -97,7 +98,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
    */
   public RobotContainer() {
     m_autoChooser.setDefaultOption("Drive Straight", CommandSelector.DRIVE_STRAIGHT.ordinal());
-    for (Enum commandEnum : CommandSelector.values())
+    for (CommandSelector commandEnum : CommandSelector.values())
       if (commandEnum != CommandSelector.DRIVE_STRAIGHT)
         m_autoChooser.addOption(commandEnum.toString(), commandEnum.ordinal());
 
@@ -106,7 +107,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     m_autoCommand = new SelectCommand(
             Map.ofEntries(
 //                    entry(CommandSelector.SHOOT_AND_DRIVE_BACK, new ShootAndDriveBack(m_driveTrain,m_intake,m_indexer,m_turret,m_shooter,m_vision)),
-                    entry(CommandSelector.DRIVE_STRAIGHT, new DriveStraight(m_swerveDrive))
+                    entry(CommandSelector.DRIVE_STRAIGHT, new DriveStraight(m_swerveDrive)),
+                    entry(CommandSelector.TEST_SUBSYSTEMS, new TestSubsystems(m_shooter, m_uptake, m_intake, m_indexer))
 //                        entry(CommandSelector.TEST_SEQUENTIAL_REVERSE_AUTO, new TestSequentialSwitching(m_driveTrain))
             ),
             this::selectCommand
@@ -193,8 +195,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxButtons[4].whileHeld(new SetCaroselOutput(m_indexer, -1.0)); // Left bumper: Reverse Carousel;
       xBoxButtons[4].whileHeld(new SetUptakeOutput(m_uptake, -0.75)); // Left bumper: Reverse Uptake;
 
-      xBoxLeftTrigger.whenPressed(new SetIntakePiston(m_intake, true));  // Left bumper: Extend intake
-      xBoxLeftTrigger.whenReleased(new SetIntakePiston(m_intake, false)); // Left bumper: Retract intake
+      xBoxLeftTrigger.whenPressed(new SetIntakePiston(m_intake, true));  // Left trigger: Extend intake
+      xBoxLeftTrigger.whenReleased(new SetIntakePiston(m_intake, false)); // Left trigger: Retract intake
       xBoxLeftTrigger.whileHeld(new SetIntake(m_intake, 1)); // Left trigger: intake & carousel
       xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, 1.0));
 
