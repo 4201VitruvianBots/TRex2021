@@ -36,7 +36,7 @@ public class Turret extends SubsystemBase {
     CANSparkMax turretMotor = new CANSparkMax(Constants.turretMotor, MotorType.kBrushless);
     CANEncoder encoder = turretMotor.getEncoder();
     CANPIDController pidController = turretMotor.getPIDController();
-    DigitalInput turretHomeSensor = new DigitalInput(Constants.turretHomeSensor);
+    // DigitalInput turretHomeSensor = new DigitalInput(Constants.turretHomeSensor);
 
     // Turret PID gains
     double kF = 0.006;

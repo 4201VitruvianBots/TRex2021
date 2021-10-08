@@ -152,9 +152,9 @@ public final class Constants {
     public static final int turretMotor = 60;
     public static final int turretEncoder = 61;
 
-    public static final int turretHomeSensor = 0;
+    public static final int turretHomeSensor = 6;
     // Undetermined IDs
-    public static final int carouselMotor = 4201;
+    // public static final int carouselMotor = 4201;
 
     public static final int xEncoderPortA = 0;
     public static final int xEncoderPortB = 1;
