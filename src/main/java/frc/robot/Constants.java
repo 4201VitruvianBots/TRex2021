@@ -48,6 +48,8 @@ public final class Constants {
     public static final int backLeftCANCoder = 13;
     public static final int backRightCANCoder = 14;
 
+    public static final double indexerOutput = 0.4;
+
     public static final class DriveConstants {
         public static final double kTrackWidth = Units.inchesToMeters(30);
         //Distance between centers of right and left wheels on robot. Meters?

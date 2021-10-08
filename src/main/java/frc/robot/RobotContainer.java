@@ -191,14 +191,14 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       // xBoxPOVButtons[0].whenPressed(new ExtendClimber(m_climber))//POV up: climber up
       // xBoxPOVButtons[4].whenPressed(new RetractClimber(m_climber))//POV down: climber down
 
-      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 0.6)); // Right bumper: Spin Carousel
-      xBoxButtons[4].whileHeld(new SetCaroselOutput(m_indexer, -0.6)); // Left bumper: Reverse Carousel;
+      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, Constants.indexerOutput)); // Right bumper: Spin Carousel
+      xBoxButtons[4].whileHeld(new SetCaroselOutput(m_indexer, -Constants.indexerOutput)); // Left bumper: Reverse Carousel;
       xBoxButtons[4].whileHeld(new SetUptakeOutput(m_uptake, -0.75)); // Left bumper: Reverse Uptake;
 
       xBoxLeftTrigger.whenPressed(new SetIntakePiston(m_intake, true));  // Left trigger: Extend intake
       xBoxLeftTrigger.whenReleased(new SetIntakePiston(m_intake, false)); // Left trigger: Retract intake
       xBoxLeftTrigger.whileHeld(new SetIntake(m_intake, 1)); // Left trigger: intake & carousel
-      xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, 0.6));
+      xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, Constants.indexerOutput));
 
       xBoxRightTrigger.whileHeld(new RapidFireSetpoint(m_shooter, m_indexer, m_uptake)); // Right trigger: uptake & carousel (if canShoot)
       
