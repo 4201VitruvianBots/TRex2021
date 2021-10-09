@@ -21,11 +21,11 @@ import java.util.List;
 //import frc.vitruvianlib.utils.TrajectoryUtils;
 
 public class DriveForwardDistance extends SequentialCommandGroup {
-        public DriveForwardDistance(SwerveDrive swerveDrive, FieldSim fieldSim, double distance) { // Distance in meters
+        public DriveForwardDistance(SwerveDrive swerveDrive, double distance) { // Distance in meters
                 Pose2d startPosition = new Pose2d();
                 Pose2d endPosition = new Pose2d(distance, 0, new Rotation2d());
                 TrajectoryConfig configA = new TrajectoryConfig(Constants.AutoConstants.kMaxSpeedMetersPerSecond,
-                Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared * 5)
+                Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared)
                     // Add kinematics to ensure max speed is actually obeyed
                     .setKinematics(Constants.DriveConstants.kDriveKinematics);
                 configA.setReversed(false);
@@ -42,8 +42,8 @@ public class DriveForwardDistance extends SequentialCommandGroup {
                 Constants.DriveConstants.kDriveKinematics,
 
                 //Position controllers
-                        new PIDController(Constants.AutoConstants.kPXController, 0,0),
-                        new PIDController(Constants.AutoConstants.kPYController, 0,0),
+                new PIDController(Constants.AutoConstants.kPXController, 0, 0),
+                new PIDController(Constants.AutoConstants.kPYController, 0, 0),
                 new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
                         Constants.AutoConstants.kThetaControllerConstraints),
 
@@ -53,10 +53,9 @@ public class DriveForwardDistance extends SequentialCommandGroup {
         );
         
                 addCommands(
-                        new SetOdometry(swerveDrive, fieldSim, startPosition),
-                        new SetDriveNeutralMode(swerveDrive, true),
-                        driveForwardCommand,
-                        new InstantCommand(() -> swerveDrive.drive(0,0,0, false, false))
+                        new SetOdometry(swerveDrive, startPosition),
+                        // new SetDriveNeutralMode(swerveDrive, true),
+                        driveForwardCommand
                     );
         }
         
