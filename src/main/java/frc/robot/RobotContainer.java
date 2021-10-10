@@ -59,6 +59,7 @@ public class RobotContainer {
   private SimulationReferencePose m_referencePose;
 
   private enum CommandSelector {
+    S3G3S3,
     DRIVE_STRAIGHT,
     TEST_SUBSYSTEMS
   }
@@ -107,6 +108,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     m_autoCommand = new SelectCommand(
             Map.ofEntries(
 //                    entry(CommandSelector.SHOOT_AND_DRIVE_BACK, new ShootAndDriveBack(m_driveTrain,m_intake,m_indexer,m_turret,m_shooter,m_vision)),
+                    entry(CommandSelector.S3G3S3, new S3G3S3(m_swerveDrive, m_intake, m_indexer, m_shooter, m_turret, m_vision)),                    
                     entry(CommandSelector.DRIVE_STRAIGHT, new DriveStraight(m_swerveDrive)),
                     entry(CommandSelector.TEST_SUBSYSTEMS, new TestSubsystems(m_shooter, m_uptake, m_intake, m_indexer))
 //                        entry(CommandSelector.TEST_SEQUENTIAL_REVERSE_AUTO, new TestSequentialSwitching(m_driveTrain))

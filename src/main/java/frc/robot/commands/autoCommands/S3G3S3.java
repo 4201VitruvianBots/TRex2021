@@ -32,36 +32,44 @@ public class S3G3S3 extends SequentialCommandGroup {
         this.turret = turret;
         this.vision = vision;
         
+        // Initialization
         addCommands(
-            new ResetOdometry(swerveDrive),
-            new AutoUseVisionCorrection(turret, vision)
+            new ResetOdometry(swerveDrive)
         );
 
+        // Shoot our 3 preloaded cells
         shoot();
 
+        // Get 3 more and return
         addCommands(
+            // Drive backwards while intaking
             new ParallelDeadlineGroup(
                 new DriveBackwardDistance(swerveDrive, 3),
                 new TimedIntake(intake, indexer, 3)
-            ).andThen(() -> swerveDrive.drive(0, 0, 0, false, false))
-        );
+            )
+            .andThen(() -> intake.setIntakePiston(false)),
 
-        addCommands(
+            // Drive back and stop
             new DriveForwardDistance(swerveDrive, 3)
+            .andThen(() -> swerveDrive.drive(0, 0, 0, false, false))
         );
 
+        // Shoot our new power cells
         shoot();
     }
 
     // Routine to shoot from the Initiation line
     void shoot() {
         addCommands(
+            new AutoUseVisionCorrection(turret, vision),
             new SetAndHoldRpmSetpoint(shooter, vision, 3500),
+
             new ConditionalCommand(
                 new WaitCommand(0),
                 new WaitCommand(0.25),
                 shooter::getCanShoot
             ),
+
             new AutoRapidFireSetpoint(shooter, indexer, intake, 0.5).withTimeout(3),
             new SetAndHoldRpmSetpoint(shooter, vision, 0)
         );
