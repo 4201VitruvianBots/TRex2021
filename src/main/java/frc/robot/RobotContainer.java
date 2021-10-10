@@ -59,7 +59,9 @@ public class RobotContainer {
   private SimulationReferencePose m_referencePose;
 
   private enum CommandSelector {
-    DRIVE_STRAIGHT
+    S3G3S3,
+    DRIVE_STRAIGHT,
+    TEST_SUBSYSTEMS
   }
 
   SendableChooser<Integer> m_autoChooser = new SendableChooser();
@@ -97,7 +99,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
    */
   public RobotContainer() {
     m_autoChooser.setDefaultOption("Drive Straight", CommandSelector.DRIVE_STRAIGHT.ordinal());
-    for (Enum commandEnum : CommandSelector.values())
+    for (CommandSelector commandEnum : CommandSelector.values())
       if (commandEnum != CommandSelector.DRIVE_STRAIGHT)
         m_autoChooser.addOption(commandEnum.toString(), commandEnum.ordinal());
 
@@ -106,7 +108,9 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
     m_autoCommand = new SelectCommand(
             Map.ofEntries(
 //                    entry(CommandSelector.SHOOT_AND_DRIVE_BACK, new ShootAndDriveBack(m_driveTrain,m_intake,m_indexer,m_turret,m_shooter,m_vision)),
-                    entry(CommandSelector.DRIVE_STRAIGHT, new DriveStraight(m_swerveDrive))
+                    entry(CommandSelector.S3G3S3, new S3G3S3(m_swerveDrive, m_intake, m_indexer, m_shooter, m_turret, m_vision)),                    
+                    entry(CommandSelector.DRIVE_STRAIGHT, new DriveStraight(m_swerveDrive)),
+                    entry(CommandSelector.TEST_SUBSYSTEMS, new TestSubsystems(m_shooter, m_uptake, m_intake, m_indexer))
 //                        entry(CommandSelector.TEST_SEQUENTIAL_REVERSE_AUTO, new TestSequentialSwitching(m_driveTrain))
             ),
             this::selectCommand
@@ -189,14 +193,14 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       // xBoxPOVButtons[0].whenPressed(new ExtendClimber(m_climber))//POV up: climber up
       // xBoxPOVButtons[4].whenPressed(new RetractClimber(m_climber))//POV down: climber down
 
-      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, 1.0)); // Right bumper: Spin Carousel
-      xBoxButtons[4].whileHeld(new SetCaroselOutput(m_indexer, -1.0)); // Left bumper: Reverse Carousel;
+      xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, Constants.indexerOutput)); // Right bumper: Spin Carousel
+      xBoxButtons[4].whileHeld(new SetCaroselOutput(m_indexer, -Constants.indexerOutput)); // Left bumper: Reverse Carousel;
       xBoxButtons[4].whileHeld(new SetUptakeOutput(m_uptake, -0.75)); // Left bumper: Reverse Uptake;
 
-      xBoxLeftTrigger.whenPressed(new SetIntakePiston(m_intake, true));  // Left bumper: Extend intake
-      xBoxLeftTrigger.whenReleased(new SetIntakePiston(m_intake, false)); // Left bumper: Retract intake
+      xBoxLeftTrigger.whenPressed(new SetIntakePiston(m_intake, true));  // Left trigger: Extend intake
+      xBoxLeftTrigger.whenReleased(new SetIntakePiston(m_intake, false)); // Left trigger: Retract intake
       xBoxLeftTrigger.whileHeld(new SetIntake(m_intake, 1)); // Left trigger: intake & carousel
-      xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, 1.0));
+      xBoxLeftTrigger.whileHeld(new SetCaroselOutput(m_indexer, Constants.indexerOutput));
 
       xBoxRightTrigger.whileHeld(new RapidFireSetpoint(m_shooter, m_indexer, m_uptake)); // Right trigger: uptake & carousel (if canShoot)
       
@@ -251,9 +255,9 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 //          return null;
 //    return m_autoCommand;
 //        return new WaitCommand(0);
-//      return new TestAuto(m_swerveDrive, m_FieldSim);
+     return new TestAuto(m_swerveDrive, m_FieldSim);
 //    return new AutoNavBarrel(m_swerveDrive, m_FieldSim);
-      return new DriveStraight(m_swerveDrive);
+      // return new DriveStraight(m_swerveDrive);
       // return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
 //    return new AutoNavBounce(m_swerveDrive, m_FieldSim);
 //    return new DriveForwardDistance(m_swerveDrive, m_FieldSim, 5);

@@ -41,7 +41,7 @@ public class AccuracyChallenge extends SequentialCommandGroup {
             new SetOdometry(swerveDrive, new Pose2d()),
             new SetDriveNeutralMode(swerveDrive, true),
             new SetRPM(shooter, baseRPM),
-            new DriveForwardDistance(swerveDrive, fieldSim, distancesToDrive[index]).andThen(() -> swerveDrive.drive(0, 0, 0, false, false)),
+            new DriveForwardDistance(swerveDrive, distancesToDrive[index]).andThen(() -> swerveDrive.drive(0, 0, 0, false, false)),
             //new InstantCommand(() -> shooter.setIdealRPM()),
             new ControlledFireNew(shooter, indexer).withTimeout(3),
             new SetRPM(shooter, baseRPM),
