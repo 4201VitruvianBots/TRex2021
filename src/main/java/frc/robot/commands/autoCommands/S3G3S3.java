@@ -1,6 +1,7 @@
 package frc.robot.commands.autoCommands;
 
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.intake.AutoControlledIntake;
@@ -38,16 +39,12 @@ public class S3G3S3 extends SequentialCommandGroup {
 
         shoot();
 
-        parallel(
-            new TimedIntake(intake, indexer, 3),
-            new DriveBackwardDistance(swerveDrive, 3)
+        addCommands(
+            new ParallelDeadlineGroup(
+                new DriveBackwardDistance(swerveDrive, 3),
+                new TimedIntake(intake, indexer, 3)
+            ).andThen(() -> swerveDrive.drive(0, 0, 0, false, false))
         );
-        
-        // I can't tell which command to use
-        // parallel(
-        //     new AutoControlledIntake(intake, indexer),
-        //     new DriveBackwardDistance(swerveDrive, 3)
-        // );
 
         addCommands(
             new DriveForwardDistance(swerveDrive, 3)

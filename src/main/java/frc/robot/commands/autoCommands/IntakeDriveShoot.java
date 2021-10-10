@@ -26,7 +26,7 @@ public class IntakeDriveShoot extends SequentialCommandGroup {
             new SetIntakePiston(intake, true),
             new AutoControlledIntake(intake, indexer).withTimeout(4),
             new SetIntakePiston(intake, false),
-            new DriveForwardDistance(swerveDrive, fieldSim, Units.feetToMeters(20)),
+            new DriveForwardDistance(swerveDrive, Units.feetToMeters(20)),
             new ParallelCommandGroup(
                 new AutoUseVisionCorrection(turret, vision).withTimeout(1),
                 new SetRpmSetpoint(shooter, 2000, true).withTimeout(8),
