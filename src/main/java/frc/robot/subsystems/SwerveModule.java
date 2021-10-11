@@ -92,7 +92,7 @@ public class SwerveModule extends SubsystemBase {
 
     m_turnMotor.configFactoryDefault();
     m_turnMotor.configAllSettings(TurnMotorConfig);
-    m_turnMotor.configRemoteFeedbackFilter(m_angleEncoder, 0, 20);
+    m_turnMotor.configRemoteFeedbackFilter(m_angleEncoder.getDeviceID(), RemoteSensorSource.CANCoder, 0, 20);
     m_turnMotor.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0);
     m_turnMotor.setSelectedSensorPosition((getHeadingDegrees() - zeroOffset) / kTurningEncoderDistancePerPulse);
 //    m_turnMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
@@ -203,7 +203,9 @@ public class SwerveModule extends SubsystemBase {
    * @param state Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState state, boolean isOpenLoop) {
-    SwerveModuleState outputState = CTREModuleState.optimize(state, getState().angle);
+    // SwerveModuleState outputState = CTREModuleState.optimize(state, getState().angle);
+    SwerveModuleState outputState = state;
+    
     double angle = 0.0;
 
     if(RobotBase.isReal()) {

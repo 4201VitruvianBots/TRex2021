@@ -184,11 +184,11 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 
       rightButtons[0].whileHeld(new SetAngleSetpoint(m_swerveDrive, () -> 45.0 * rightJoystick.getRawAxis(0)));
 
-      xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, 3000, true)); // A button: Flywheel low speed
+      xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, 2750, true)); // A button: Flywheel low speed
       // xBoxButtons[2].whenPressed(new EnableClimbMode(m_climber, m_turret)); // X button: enable climber
       // xBoxButtons[2].whenReleased(new DisableClimbMode(m_climber, m_turret));
-      xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, 3300, true)); // B button: Flywheel medium speed
-      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, 3600, true)); // Y Button: Flywheel high speed
+      xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, 3700, true)); // B button: Flywheel medium speed
+      xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, 3800, true)); // Y Button: Flywheel high speed
 
       // xBoxPOVButtons[0].whenPressed(new ExtendClimber(m_climber))//POV up: climber up
       // xBoxPOVButtons[4].whenPressed(new RetractClimber(m_climber))//POV down: climber down
