@@ -195,7 +195,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 
       xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, Constants.indexerOutput)); // Right bumper: Spin Carousel
       xBoxButtons[4].whileHeld(new SetCaroselOutput(m_indexer, -Constants.indexerOutput)); // Left bumper: Reverse Carousel;
-      xBoxButtons[4].whileHeld(new SetUptakeOutput(m_uptake, -0.75)); // Left bumper: Reverse Uptake;
+      // xBoxButtons[4].whileHeld(new SetUptakeOutput(m_uptake, -0.75)); // Left bumper: Reverse Uptake;
 
       xBoxLeftTrigger.whenPressed(new SetIntakePiston(m_intake, true));  // Left trigger: Extend intake
       xBoxLeftTrigger.whenReleased(new SetIntakePiston(m_intake, false)); // Left trigger: Retract intake

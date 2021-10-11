@@ -47,8 +47,7 @@ public final class Constants {
     public static final int frontRightCANCoder = 12;
     public static final int backLeftCANCoder = 13;
     public static final int backRightCANCoder = 14;
-
-    public static final double indexerOutput = 0.4;
+    public static final double indexerOutput = 0.2;
 
     public static final class DriveConstants {
         public static final double kTrackWidth = Units.inchesToMeters(30);
