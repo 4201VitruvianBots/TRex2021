@@ -80,6 +80,7 @@ public class SwerveDrive extends SubsystemBase {
         if (RobotBase.isSimulation()) {
 
         }
+        mNavX.setAngleAdjustment(180);
     }
 
     public double getGyroRate() {
