@@ -13,12 +13,14 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.vitruvianlib.utils.RevServo;
 
 /*
 Subsystem for controlling to robot's shooter
@@ -40,12 +42,7 @@ public class Shooter extends SubsystemBase {
     private final double kS = 0.618;
     private final double kV = 0.0708;
     private final double kA = 0.0239;
-    // shooter motors
-    private final TalonFX[] shooterMotors = {
-            new TalonFX(Constants.flywheelMotorA),
-            new TalonFX(Constants.flywheelMotorB)
-    };
-    private final Vision m_vision;
+
     public int kI_Zone = 400;
     public int kAllowableError = 50;
     // constants
@@ -57,6 +54,19 @@ public class Shooter extends SubsystemBase {
     private boolean canShoot;
     public double gearRatio = 1.0;
     private boolean percentOutput = false;
+
+    private final Vision m_vision;
+    // shooter motors
+    private final TalonFX[] shooterMotors = {
+            new TalonFX(Constants.flywheelMotorA),
+            new TalonFX(Constants.flywheelMotorB),
+    };
+
+    private final RevServo[] hoodServos = {
+        new RevServo(Constants.LeftShooterHoodServo),
+        new RevServo(Constants.RightShooterHoodServo)
+    };
+
 
     public Shooter(Vision vision, PowerDistributionPanel pdp) {
         // setup shooterMotors
@@ -153,6 +163,19 @@ public class Shooter extends SubsystemBase {
     public double getRotations(int motorIndex) {
         return (shooterMotors[motorIndex].getSelectedSensorPosition() / 2048.0) * gearRatio;
     }
+
+    public void setHoodAngle(double angle) {
+        hoodServos[0].setAngle(angle);
+        hoodServos[1].setAngle(270-angle);
+    }
+    public void setHoodAngleToSmartDashboardValue() {
+        double angle = SmartDashboard.getNumber("Hood Angle Setpoint", 0);
+        setHoodAngle(angle);
+    }
+    public double getHoodAngle() {
+        return hoodServos[0].getAngle();
+    }
+
     public double falconUnitsToRPM(double sensorUnits) {
         return (sensorUnits / 2048.0) * 60.0 * gearRatio;
     }
