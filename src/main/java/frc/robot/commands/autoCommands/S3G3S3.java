@@ -71,7 +71,7 @@ public class S3G3S3 extends SequentialCommandGroup {
     // Routine to shoot from the Initiation line
     void shoot() {
         addCommands(
-            new AutoUseVisionCorrection(turret, vision),
+            new AutoUseVisionCorrection(turret, vision, -5),
             new SetAndHoldRpmSetpoint(shooter, vision, 3500),
 
             new ConditionalCommand(

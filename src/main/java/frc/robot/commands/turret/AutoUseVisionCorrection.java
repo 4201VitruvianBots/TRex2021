@@ -19,16 +19,24 @@ public class AutoUseVisionCorrection extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Turret m_turret;
     private final Vision m_vision;
-    boolean turning, usingVisionSetpoint;
     private double setpoint;
+    private double angleOffset;
     private double startTime;
 
     /**
      * Creates a new ExampleCommand.
      */
     public AutoUseVisionCorrection(Turret turretSubsystem, Vision visionSubsystem) {
+        this(turretSubsystem, visionSubsystem, 0);
+    }
+
+    /**
+     * Creates a new ExampleCommand.
+     */
+    public AutoUseVisionCorrection(Turret turretSubsystem, Vision visionSubsystem, double angleOffset) {
         m_turret = turretSubsystem;
         m_vision = visionSubsystem;
+        this.angleOffset = angleOffset;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(turretSubsystem);
     }
@@ -44,28 +52,9 @@ public class AutoUseVisionCorrection extends CommandBase {
     public void execute() {
         if (m_turret.getControlMode() == 1) {
             if (m_vision.getValidTarget()) {
-                usingVisionSetpoint = true;
-                if (!turning) {
-                    setpoint = m_turret.getTurretAngle() + m_vision.getGoalX();
-
-                    if (setpoint > m_turret.getMaxAngle()) {
-                        setpoint -= 360;
-                        if (setpoint < m_turret.getMinAngle())
-                            setpoint = m_turret.getMinAngle();
-                        turning = true;
-                    } else if (setpoint < m_turret.getMinAngle()) {
-                        setpoint += 360;
-                        if (setpoint > m_turret.getMaxAngle())
-                            setpoint = m_turret.getMaxAngle();
-                        turning = true;
-                    }
-                } else {
-                    if (m_turret.onTarget())
-                        turning = false;
-                }
+                setpoint = m_turret.getTurretAngle() + m_vision.getGoalX() + angleOffset;
             } else if (!m_vision.getValidTarget()) {
-                usingVisionSetpoint = false;
-                setpoint = m_turret.getTurretAngle();
+                setpoint = m_turret.getTurretAngle() + angleOffset;
             }
 
             m_turret.setRobotCentricSetpoint(setpoint);
