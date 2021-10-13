@@ -1,13 +1,15 @@
 package frc.robot.commands.autoCommands;
 
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.intake.AutoControlledIntake;
 import frc.robot.commands.intake.TimedIntake;
 import frc.robot.commands.shooter.AutoRapidFireSetpoint;
 import frc.robot.commands.shooter.SetAndHoldRpmSetpoint;
+import frc.robot.commands.swerve.ResetOdometry;
+import frc.robot.commands.swerve.SetModuleStates;
 import frc.robot.commands.turret.AutoUseVisionCorrection;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -31,10 +33,18 @@ public class S3G3S3 extends SequentialCommandGroup {
         this.shooter = shooter;
         this.turret = turret;
         this.vision = vision;
-        
+
+        var initialStates = new SwerveModuleState[]{
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState()
+        };
+
         // Initialization
         addCommands(
-            new ResetOdometry(swerveDrive)
+            new ResetOdometry(swerveDrive),
+            new SetModuleStates(swerveDrive, initialStates).andThen(new WaitCommand(0.1))
         );
 
         // Shoot our 3 preloaded cells
