@@ -140,15 +140,15 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 //            () -> rightJoystick.getRawAxis(0))); //right x
 
 //    if(RobotBase.isReal()) {
-      m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
-              () -> leftJoystick.getRawAxis(1), //left x
-              () -> -leftJoystick.getRawAxis(0), //left y
-              () -> rightJoystick.getRawAxis(0))); //right x
-//    } else {
 //      m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
-//              () -> testController.getRawAxis(1), //left y
-//              () -> testController.getRawAxis(0), //left x
-//              () -> testController.getRawAxis(2))); //right x
+//              () -> leftJoystick.getRawAxis(1), //left x
+//              () -> -leftJoystick.getRawAxis(0), //left y
+//              () -> rightJoystick.getRawAxis(0))); //right x
+//    } else {
+      m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
+              () -> testController.getRawAxis(1), //left y
+              () -> testController.getRawAxis(0), //left x
+              () -> testController.getRawAxis(2))); //right x
 //    m_swerveDrive.setDefaultCommand(new TestSwerveModule(m_swerveDrive,
 //            () -> testController.getRawAxis(0),
 //            () -> testController.getRawAxis(1),
@@ -261,7 +261,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 //      return new DriveStraight(m_swerveDrive);
     return new S3G3S3(m_swerveDrive, m_intake, m_indexer, m_shooter, m_turret, m_vision);
       // return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
-//    return new AutoNavBounce(m_swerveDrive, m_FieldSim);
+    return new AutoNavBounce(m_swerveDrive, m_FieldSim);
 //    return new DriveForwardDistance(m_swerveDrive, m_FieldSim, 5);
   }
 

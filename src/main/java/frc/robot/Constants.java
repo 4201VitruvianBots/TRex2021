@@ -100,7 +100,7 @@ public final class Constants {
                 // Assumes the encoders are on a 1:1 reduction with the module shaft.
                 (360.0) / kCANCoderCPR;
 
-        public static final double kTurningSimEncoderDistancePerPulse = kTurningEncoderDistancePerPulse / 2;
+        public static final double kTurningSimEncoderDistancePerPulse = kTurningEncoderDistancePerPulse;
 
         public static final double ksDriveVoltSecondsPerMeter = (0.667 / 12);
         public static final double kvDriveVoltSecondsSquaredPerMeter = (2.44 / 12);
