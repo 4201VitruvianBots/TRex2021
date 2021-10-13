@@ -44,13 +44,13 @@ public class S3G3S3 extends SequentialCommandGroup {
         addCommands(
             // Drive backwards while intaking
             new ParallelDeadlineGroup(
-                new DriveBackwardDistance(swerveDrive, 3),
+                new DriveBackwardDistance(swerveDrive, 5),
                 new TimedIntake(intake, indexer, 3)
             )
             .andThen(() -> intake.setIntakePiston(false)),
 
             // Drive back and stop
-            new DriveForwardDistance(swerveDrive, 3)
+            new DriveForwardDistance(swerveDrive, 5)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false))
         );
 

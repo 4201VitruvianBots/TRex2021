@@ -39,14 +39,10 @@ public class Turret extends SubsystemBase {
     // DigitalInput turretHomeSensor = new DigitalInput(Constants.turretHomeSensor);
 
     // Turret PID gains
-//    double kF = 0.00;
-//    double kP = 0.0;
-    double kI = 0.0000;
-    double kD = 0.0;
     double kF = 0.000006;
-    double kP = 0.00004;
-//    double kI = 0.00004;
-//    double kD = 0.002;
+    double kP = 0.00002;
+    double kI = 0.000;
+    double kD = 0.0;
     int kI_Zone = 4;
     int kErrorBand = 1;//degreesToEncoderUnits(0.5);
     int kCruiseVelocity = 14000;

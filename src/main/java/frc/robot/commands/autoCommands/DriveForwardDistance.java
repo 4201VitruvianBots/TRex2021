@@ -46,7 +46,7 @@ public class DriveForwardDistance extends SequentialCommandGroup {
                 new PIDController(Constants.AutoConstants.kPYController, 0, 0),
                 new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
                         Constants.AutoConstants.kThetaControllerConstraints),
-
+                        ()-> new Rotation2d(),
                 swerveDrive::setModuleStates,
 
                 swerveDrive
