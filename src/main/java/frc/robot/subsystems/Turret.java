@@ -39,20 +39,24 @@ public class Turret extends SubsystemBase {
     // DigitalInput turretHomeSensor = new DigitalInput(Constants.turretHomeSensor);
 
     // Turret PID gains
-    double kF = 0.006;
-    double kP = 0.04;
-    double kI = 0.0004;
-    double kD = 0.2;
+//    double kF = 0.00;
+//    double kP = 0.0;
+    double kI = 0.0000;
+    double kD = 0.0;
+    double kF = 0.000006;
+    double kP = 0.00004;
+//    double kI = 0.00004;
+//    double kD = 0.002;
     int kI_Zone = 4;
     int kErrorBand = 1;//degreesToEncoderUnits(0.5);
     int kCruiseVelocity = 14000;
     int kMotionAcceleration = kCruiseVelocity * 10;
 
     // setup variables
-    double minAngle = -45;
-    double maxAngle = 45;
+    double minAngle = -60;
+    double maxAngle = 60;
     private final int encoderUnitsPerRotation = 42;
-    double gearRatio = 28.0 / 120.0;    // TODO: Ratio is correct, but values are wrong
+    double gearRatio = 27.0 / 120.0;    // TODO: Ratio is correct, but values are wrong
     private double setpoint = 0; //angle
     private int controlMode = 1;
     private boolean initialHome;
@@ -64,6 +68,7 @@ public class Turret extends SubsystemBase {
         turretMotor.restoreFactoryDefaults();
         turretMotor.setInverted(true);
         turretMotor.setIdleMode(IdleMode.kBrake);
+        turretMotor.setSmartCurrentLimit(20, 20);
         // turretMotor.setSoftLimit(SoftLimitDirection.kForward, (float)0.25);
         // turretMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)-0.25);
 
@@ -80,9 +85,10 @@ public class Turret extends SubsystemBase {
         pidController.setIZone(kI_Zone);
 
         resetEncoder();
-        setAbsoluteSetpoint(0);
+        encoder.setPosition(0);
+//        setAbsoluteSetpoint(0);
 
-        // initShuffleboard();
+        initShuffleboard();
     }
 
     // self-explanatory commands
@@ -140,7 +146,7 @@ public class Turret extends SubsystemBase {
     }
 
     public void setRobotCentricSetpoint(double setpoint) {
-        setpoint -= m_swerveDrive.getHeadingDegrees();
+        setpoint -= m_swerveDrive.getHeadingDegrees() + m_swerveDrive.getHeadingOffset();
 
         if (setpoint > getMaxAngle())
             setpoint -= 360;
@@ -203,18 +209,18 @@ public class Turret extends SubsystemBase {
 
         SmartDashboardTab.putNumber("Turret","Turret Encoder Counts", encoder.getPosition());
 
-        // setpoint = SmartDashboardTab.getNumber("Turret", "Turret Setpoint", getSetpoint());
-        // kF = SmartDashboardTab.getNumber("Turret", "Turret kF", kF);
-        // kP = SmartDashboardTab.getNumber("Turret", "Turret kP", kP);
-        // kI = SmartDashboardTab.getNumber("Turret", "Turret kI", kI);
-        // kD = SmartDashboardTab.getNumber("Turret", "Turret kD", kD);
-        // kI_Zone = (int)SmartDashboardTab.getNumber("Turret", "Turret kI_Zone", kI_Zone);
-        // kErrorBand = (int)SmartDashboardTab.getNumber("Turret", "Turret kAllowableError", kErrorBand);
-        // pidController.setFF(kF);
-        // pidController.setP(kP);
-        // pidController.setI(kI);
-        // pidController.setIZone(kI_Zone);
-        // pidController.setD(kD);
+         setpoint = SmartDashboardTab.getNumber("Turret", "Turret Setpoint", getSetpoint());
+         kF = SmartDashboardTab.getNumber("Turret", "Turret kF", kF);
+         kP = SmartDashboardTab.getNumber("Turret", "Turret kP", kP);
+         kI = SmartDashboardTab.getNumber("Turret", "Turret kI", kI);
+         kD = SmartDashboardTab.getNumber("Turret", "Turret kD", kD);
+         kI_Zone = (int)SmartDashboardTab.getNumber("Turret", "Turret kI_Zone", kI_Zone);
+         kErrorBand = (int)SmartDashboardTab.getNumber("Turret", "Turret kAllowableError", kErrorBand);
+         pidController.setFF(kF);
+         pidController.setP(kP);
+         pidController.setI(kI);
+         pidController.setIZone(kI_Zone);
+         pidController.setD(kD);
         try {
             SmartDashboardTab.putString("DriveTrain", "Turret Command", this.getCurrentCommand().getName());
         } catch (Exception e) {

@@ -25,6 +25,7 @@ import frc.robot.commands.intake.SetIntakePiston;
 import frc.robot.commands.shooter.SetRpmSetpoint;
 import frc.robot.commands.shooter.RapidFireSetpoint;
 import frc.robot.commands.swerve.SetSwerveDriveWithAngle;
+import frc.robot.commands.turret.SetTurretSetpointFieldAbsolute;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimulationReferencePose;
 import frc.robot.subsystems.*;
@@ -153,7 +154,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 //            () -> testController.getRawAxis(1),
 //            1));
 //    }
-      // m_turret.setDefaultCommand(new SetTurretSetpointFieldAbsolute(m_turret, m_swerveDrive, m_vision, xBoxController));
+       m_turret.setDefaultCommand(new SetTurretSetpointFieldAbsolute(m_turret, m_swerveDrive, m_vision, xBoxController));
   }
 
   /**

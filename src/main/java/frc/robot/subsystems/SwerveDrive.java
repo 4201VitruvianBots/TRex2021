@@ -49,6 +49,7 @@ public class SwerveDrive extends SubsystemBase {
 
     private AHRS mNavX = new AHRS(SerialPort.Port.kMXP);
     int navXSim = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
+    private double m_headingOffset = 180;
 
     private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(kDriveKinematics, getRotation());
 //    private final SwerveDrivePoseEstimator m_odometry = new SwerveDrivePoseEstimator(
@@ -80,7 +81,7 @@ public class SwerveDrive extends SubsystemBase {
         if (RobotBase.isSimulation()) {
 
         }
-        mNavX.setAngleAdjustment(180);
+        mNavX.setAngleAdjustment(m_headingOffset);
     }
 
     public double getGyroRate() {
@@ -128,6 +129,9 @@ public class SwerveDrive extends SubsystemBase {
         }
     }
 
+    public double getHeadingOffset() {
+        return m_headingOffset;
+    }
     /**
      * Resets the drive encoders to currently read a position of 0.
      */
@@ -372,4 +376,5 @@ public class SwerveDrive extends SubsystemBase {
         currentTrajectory = trajectory;
         startTime = Timer.getFPGATimestamp();
     }
+
 }

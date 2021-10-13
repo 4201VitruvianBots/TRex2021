@@ -58,7 +58,8 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
                 joystickMoved = true;
                 usingVisionSetpoint = false;
 
-                setpoint = Math.toDegrees(Math.atan2(m_controller.getRawAxis(0), m_controller.getRawAxis(1)));
+                if(m_controller.getRawAxis(1) > 0)
+                    setpoint = Math.toDegrees(Math.atan2(m_controller.getRawAxis(0), m_controller.getRawAxis(1)));
             } else if (m_vision.hasTarget() && !operatorControl) {
                 // if camera has vision target, use that
                 usingVisionSetpoint = true;
