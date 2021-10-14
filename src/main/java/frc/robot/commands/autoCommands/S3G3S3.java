@@ -19,22 +19,22 @@ import frc.robot.subsystems.Turret;
 import frc.robot.subsystems.Vision;
 
 public class S3G3S3 extends SequentialCommandGroup {
-    SwerveDrive swerveDrive;
-    Intake intake;
-    Indexer indexer;
-    Shooter shooter;
-    Turret turret;
-    Vision vision;
+    SwerveDrive m_swerveDrive;
+    Intake m_intake;
+    Indexer m_indexer;
+    Shooter m_shooter;
+    Turret m_turret;
+    Vision m_vision;
 
     public S3G3S3(SwerveDrive swerveDrive, Intake intake, Indexer indexer, Shooter shooter, Turret turret, Vision vision) {
-        this.swerveDrive = swerveDrive;
-        this.intake = intake;
-        this.indexer = indexer;
-        this.shooter = shooter;
-        this.turret = turret;
-        this.vision = vision;
+        m_swerveDrive = swerveDrive;
+        m_intake = intake;
+        m_indexer = indexer;
+        m_shooter = shooter;
+        m_turret = turret;
+        m_vision = vision;
 
-        var initialStates = new SwerveModuleState[]{
+        SwerveModuleState[] initialStates = new SwerveModuleState[]{
             new SwerveModuleState(),
             new SwerveModuleState(),
             new SwerveModuleState(),
@@ -43,8 +43,8 @@ public class S3G3S3 extends SequentialCommandGroup {
 
         // Initialization
         addCommands(
-            new ResetOdometry(swerveDrive),
-            new SetModuleStates(swerveDrive, initialStates).andThen(new WaitCommand(0.1))
+            new ResetOdometry(m_swerveDrive),
+            new SetModuleStates(m_swerveDrive, initialStates).andThen(new WaitCommand(0.1))
         );
 
         // Shoot our 3 preloaded cells
@@ -54,14 +54,14 @@ public class S3G3S3 extends SequentialCommandGroup {
         addCommands(
             // Drive backwards while intaking
             new ParallelDeadlineGroup(
-                new DriveBackwardDistance(swerveDrive, 5),
-                new TimedIntake(intake, indexer, 3)
+                new DriveBackwardDistance(m_swerveDrive, 5),
+                new TimedIntake(m_intake, m_indexer, 3)
             )
-            .andThen(() -> intake.setIntakePiston(false)),
+            .andThen(() -> m_intake.setIntakePiston(false)),
 
             // Drive back and stop
-            new DriveForwardDistance(swerveDrive, 5)
-            .andThen(() -> swerveDrive.drive(0, 0, 0, false, false))
+            new DriveForwardDistance(m_swerveDrive, 5)
+            .andThen(() -> m_swerveDrive.drive(0, 0, 0, false, false))
         );
 
         // Shoot our new power cells
@@ -71,17 +71,17 @@ public class S3G3S3 extends SequentialCommandGroup {
     // Routine to shoot from the Initiation line
     void shoot() {
         addCommands(
-            new AutoUseVisionCorrection(turret, vision, -5),
-            new SetAndHoldRpmSetpoint(shooter, vision, 3500),
+            new AutoUseVisionCorrection(m_turret, m_vision, -5),
+            new SetAndHoldRpmSetpoint(m_shooter, m_vision, 3500),
 
             new ConditionalCommand(
                 new WaitCommand(0),
                 new WaitCommand(0.25),
-                shooter::getCanShoot
+                m_shooter::getCanShoot
             ),
 
-            new AutoRapidFireSetpoint(shooter, indexer, intake, 0.5).withTimeout(3),
-            new SetAndHoldRpmSetpoint(shooter, vision, 0)
+            new AutoRapidFireSetpoint(m_shooter, m_indexer, m_intake, 0.5).withTimeout(3),
+            new SetAndHoldRpmSetpoint(m_shooter, m_vision, 0)
         );
     }
 }
