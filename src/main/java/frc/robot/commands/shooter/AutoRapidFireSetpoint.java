@@ -9,6 +9,7 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -50,7 +51,7 @@ public class AutoRapidFireSetpoint extends CommandBase {
     @Override
     public void execute() {
         if (m_shooter.getCanShoot() || (Timer.getFPGATimestamp() - startTime) > m_shootTimeout) {
-            m_indexer.setIndexerOutput(1);
+            m_indexer.setIndexerOutput(Constants.indexerOutput);
             m_intake.setIntakePercentOutput(1);
         }
     }
