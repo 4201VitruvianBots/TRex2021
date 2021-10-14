@@ -20,7 +20,7 @@ public class SetModuleStates extends CommandBase {
      */
     public SetModuleStates(SwerveDrive swerveDrive, SwerveModuleState... states) {
         m_swerveDrive = swerveDrive;
-
+        m_states = states;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(swerveDrive);
     }
