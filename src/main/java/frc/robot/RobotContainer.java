@@ -62,7 +62,8 @@ public class RobotContainer {
   private enum CommandSelector {
     S3G3S3,
     DRIVE_STRAIGHT,
-    TEST_SUBSYSTEMS
+    TEST_SUBSYSTEMS,
+    DO_NOTHING
   }
 
   SendableChooser<Integer> m_autoChooser = new SendableChooser();
@@ -111,7 +112,8 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 //                    entry(CommandSelector.SHOOT_AND_DRIVE_BACK, new ShootAndDriveBack(m_driveTrain,m_intake,m_indexer,m_turret,m_shooter,m_vision)),
                     entry(CommandSelector.S3G3S3, new S3G3S3(m_swerveDrive, m_intake, m_indexer, m_shooter, m_turret, m_vision)),                    
                     entry(CommandSelector.DRIVE_STRAIGHT, new DriveStraight(m_swerveDrive)),
-                    entry(CommandSelector.TEST_SUBSYSTEMS, new TestSubsystems(m_shooter, m_uptake, m_intake, m_indexer))
+                    entry(CommandSelector.TEST_SUBSYSTEMS, new TestSubsystems(m_shooter, m_uptake, m_intake, m_indexer)),
+                    entry(CommandSelector.DO_NOTHING, new DoNothing())
 //                        entry(CommandSelector.TEST_SEQUENTIAL_REVERSE_AUTO, new TestSequentialSwitching(m_driveTrain))
             ),
             this::selectCommand
@@ -254,12 +256,12 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 //      default:
 //          System.out.println("Not a recognized skills command");
 //          return null;
-//    return m_autoCommand;
+   return m_autoCommand;
 //        return new WaitCommand(0);
     //  return new TestAuto(m_swerveDrive, m_FieldSim);
 //    return new AutoNavBarrel(m_swerveDrive, m_FieldSim);
 //      return new DriveStraight(m_swerveDrive);
-    return new S3G3S3(m_swerveDrive, m_intake, m_indexer, m_shooter, m_turret, m_vision);
+    // return new S3G3S3(m_swerveDrive, m_intake, m_indexer, m_shooter, m_turret, m_vision);
       // return new AutoNavSlalom(m_swerveDrive, m_FieldSim);
     // return new AutoNavBounce(m_swerveDrive, m_FieldSim);
 //    return new DriveForwardDistance(m_swerveDrive, m_FieldSim, 5);
