@@ -142,7 +142,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 //    if(RobotBase.isReal()) {
      m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
              () -> leftJoystick.getRawAxis(1), //left x
-             () -> -leftJoystick.getRawAxis(0), //left y
+             () -> leftJoystick.getRawAxis(0), //left y
              () -> rightJoystick.getRawAxis(0))); //right x
 //    } else {
       // m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
