@@ -38,17 +38,14 @@ public class DriveBackwardDistance extends SequentialCommandGroup {
                 trajectory,
                 swerveDrive::getPose, //Functional interface to feed supplier
                 Constants.DriveConstants.kDriveKinematics,
-
                 //Position controllers
                 new PIDController(Constants.AutoConstants.kPXController, 0, 0),
                 new PIDController(Constants.AutoConstants.kPYController, 0, 0),
                 new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
                         Constants.AutoConstants.kThetaControllerConstraints),
-
+                ()-> new Rotation2d(),
                 swerveDrive::setModuleStates,
-
                 swerveDrive
-
         );
         
                 addCommands(

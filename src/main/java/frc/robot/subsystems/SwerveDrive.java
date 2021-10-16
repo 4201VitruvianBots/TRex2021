@@ -10,7 +10,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANEncoder;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.wpilibj.*;
@@ -28,9 +27,9 @@ import frc.robot.Constants;
 import static frc.robot.Constants.DriveConstants.*;
 
 public class SwerveDrive extends SubsystemBase {
-    static double kP = 0.005;
+    static double kP = 0.001;
     static double kI = 0;
-    static double kD = 0.00025;
+    static double kD = 0.00125;
 
     /**
      * Just like a graph's quadrants
@@ -50,6 +49,7 @@ public class SwerveDrive extends SubsystemBase {
 
     private AHRS mNavX = new AHRS(SerialPort.Port.kMXP);
     int navXSim = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
+    private double m_headingOffset = 180;
 
     private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(kDriveKinematics, getRotation());
 //    private final SwerveDrivePoseEstimator m_odometry = new SwerveDrivePoseEstimator(
@@ -74,13 +74,14 @@ public class SwerveDrive extends SubsystemBase {
     public SwerveDrive(PowerDistributionPanel pdp) {
         m_pdp = pdp;
 
-        turnPidController.setTolerance(0.2);
-        turnPidController.enableContinuousInput(-180, 180);
+        turnPidController.setTolerance(2);
+        // turnPidController.enableContinuousInput(-180, 180);
 
         SmartDashboardTab.putData("SwerveDrive","swerveDriveSubsystem", this);
         if (RobotBase.isSimulation()) {
 
         }
+        mNavX.setAngleAdjustment(m_headingOffset);
     }
 
     public double getGyroRate() {
@@ -128,6 +129,9 @@ public class SwerveDrive extends SubsystemBase {
         }
     }
 
+    public double getHeadingOffset() {
+        return m_headingOffset;
+    }
     /**
      * Resets the drive encoders to currently read a position of 0.
      */
@@ -177,7 +181,8 @@ public class SwerveDrive extends SubsystemBase {
 
         //If pidTurn is getting a value override the drivers steering control
         if (enablePidTurn) {
-            rot = turnPidController.calculate(getHeadingDegrees());
+            rot = -turnPidController.calculate(getHeadingDegrees(), turnPidController.getGoal()) * kMaxChassisRotationSpeed;
+            // rot = -turnPidController.calculate(getHeadingDegrees()) * kMaxChassisRotationSpeed;
         }
 
         var swerveModuleStates = kDriveKinematics.toSwerveModuleStates(
@@ -195,18 +200,22 @@ public class SwerveDrive extends SubsystemBase {
 
     public void setAngleSetpoint(double angleSetpoint, boolean enabled) {
         enablePidTurn = enabled;
-//        double differance = angle - RobotContainer.swerve.getDegrees();
-//        if (differance > 180) {
-//            differance = (360 - differance) * -1;
-//        }
-        turnPidController.setGoal(angleSetpoint - getHeadingDegrees());
+        double differance = angleSetpoint - getHeadingDegrees();
+        if (differance > 180) {
+            differance = (360 - differance) * -1;
+        }
+        System.out.println("Setpoint: " + angleSetpoint +"\tDifference:" + differance);
+        turnPidController.setGoal(differance);
     }
 
-    public void setSwerveDriveNeutralMode(boolean mode) {
+    public void setDriveNeutralMode(boolean mode) {
         for(int i = 0; i < mSwerveModules.length; i++)
-            mSwerveModules[i].setBrakeMode(mode);
+            mSwerveModules[i].setDriveBrakeMode(mode);
     }
-
+    public void setTurnNeutralMode(boolean mode) {
+        for(int i = 0; i < mSwerveModules.length; i++)
+            mSwerveModules[i].setTurnBrakeMode(mode);
+    }
     /**
      * Sets the swerve ModuleStates.
      *
@@ -367,4 +376,5 @@ public class SwerveDrive extends SubsystemBase {
         currentTrajectory = trajectory;
         startTime = Timer.getFPGATimestamp();
     }
+
 }

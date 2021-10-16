@@ -44,6 +44,7 @@ public class Indexer extends SubsystemBase {
         // Motor and PID controller setup
         master.restoreFactoryDefaults();
         master.setInverted(true);
+        master.setSmartCurrentLimit(10, 10);
 
         master.setIdleMode(IdleMode.kCoast);
 
