@@ -34,7 +34,8 @@ public class ExtendClimber extends CommandBase {
   @Override
   public void initialize() {
     //engage the piston
-    m_climber.setClimbPistons(true);
+    m_climber.setLeftPiston(true);
+    m_climber.setRightPiston(true);
     //wait a tiny bit of time before the next step
     timestamp = Timer.getFPGATimestamp();
   }

@@ -46,7 +46,7 @@ public class SetClimberOutput extends CommandBase {
   @Override
   public void execute() {
     double input = Math.abs(m_controller.getRawAxis(5)) > 0.2 ? m_controller.getRawAxis(5) : 0;
-    direction = input > 0 ? 1 : input < 0 ? -1 : 0;
+    m_climber.setClimberOutput(input);
     if(m_climber.getClimbState()) {
       SmartDashboardTab.putNumber("Climber", "Direction", direction);
       SmartDashboardTab.putBoolean("Climber", "currentDirection", currentDirection);
@@ -80,7 +80,8 @@ public class SetClimberOutput extends CommandBase {
 
   private void climberReleaseSequence() {
     SmartDashboardTab.putString("Climber", "SetClimberOutput", "Releasing");
-    m_climber.setClimbPistons(true);
+    m_climber.setLeftPiston(true);
+    m_climber.setRightPiston(true);
     m_controller.setRumble(GenericHID.RumbleType.kLeftRumble, 0.4);
     m_controller.setRumble(GenericHID.RumbleType.kRightRumble, 0.4);
     if(Math.abs(Timer.getFPGATimestamp() - timestamp) < 0.2)
@@ -98,7 +99,8 @@ public class SetClimberOutput extends CommandBase {
 
   private void climberRetractSequence() {
     SmartDashboardTab.putString("Climber", "SetClimberOutput", "Retracting");
-    m_climber.setClimbPistons(false);
+    m_climber.setLeftPiston(false);
+    m_climber.setRightPiston(false);
     m_controller.setRumble(GenericHID.RumbleType.kLeftRumble, 0.4);
     m_controller.setRumble(GenericHID.RumbleType.kRightRumble, 0.4);
     if(Math.abs(Timer.getFPGATimestamp() - timestamp) < 0.2)

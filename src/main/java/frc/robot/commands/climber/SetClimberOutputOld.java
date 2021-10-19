@@ -78,7 +78,8 @@ public class SetClimberOutputOld extends CommandBase {
 
   private void climberReleaseSequence() {
 //    SmartDashboardTab.putString("Climber", "SetClimberOutput", "Releasing");
-    m_climber.setClimbPistons(true);
+  m_climber.setLeftPiston(true);
+  m_climber.setRightPiston(true);
 
     if(Math.abs(Timer.getFPGATimestamp() - timestamp) < 0.2)
       m_climber.setClimberOutput(-0.25);
@@ -93,7 +94,8 @@ public class SetClimberOutputOld extends CommandBase {
 
   private void climberRetractSequence() {
 //    SmartDashboardTab.putString("Climber", "SetClimberOutput", "Retracting");
-    m_climber.setClimbPistons(false);
+    m_climber.setLeftPiston(false);
+    m_climber.setRightPiston(false);
     if(Math.abs(Timer.getFPGATimestamp() - timestamp) < 0.2)
       m_climber.setClimberOutput(-0.25);
     else {
