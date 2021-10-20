@@ -15,6 +15,7 @@ import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Units;
@@ -70,6 +71,8 @@ public final class Constants {
 
         public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(modulePositions[0],
                 modulePositions[1], modulePositions[2], modulePositions[3]);
+
+        public static final DifferentialDriveKinematics kTankKinematics = new DifferentialDriveKinematics(kTrackWidth);
 
         public static final boolean kGyroReversed = false;
 
