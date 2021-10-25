@@ -29,24 +29,19 @@ public class Climber extends SubsystemBase {
   public double pulleyDiameter = 2.0; // inches
 
   // Climber motors and solenoid
-  private TalonFX climbMotors[] = {new TalonFX(Constants.climbMotorA), new TalonFX(Constants.climbMotorB)};
+  private TalonFX climbMotor = new TalonFX(Constants.climbMotor);
 
-  DoubleSolenoid climbPistons = new DoubleSolenoid(Constants.pcmOne, Constants.climbPistonAForward, Constants.climbPistonAReverse);
+  DoubleSolenoid climbRatchet = new DoubleSolenoid(Constants.pcmOne, Constants.climbRatchetForward, Constants.climbRatchetReverse);
+  DoubleSolenoid climbPistons = new DoubleSolenoid(Constants.pcmOne, Constants.climbPistonForward, Constants.climbPistonReverse);
 
   private boolean climbState;
 
   public Climber() {
     // Set up climber motor
-    climbMotors[0].configFactoryDefault();
-    climbMotors[0].setSelectedSensorPosition(0);
-    climbMotors[0].setNeutralMode(NeutralMode.Brake);
-    climbMotors[0].configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-    climbMotors[1].configFactoryDefault();
-    climbMotors[1].setSelectedSensorPosition(0);
-    climbMotors[1].setNeutralMode(NeutralMode.Brake);
-    climbMotors[1].configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-    climbMotors[1].set(ControlMode.Follower, climbMotors[0].getDeviceID());
-
+    climbMotor.configFactoryDefault();
+    climbMotor.setSelectedSensorPosition(0);
+    climbMotor.setNeutralMode(NeutralMode.Brake);
+    climbMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
   }
   
 
@@ -54,6 +49,9 @@ public class Climber extends SubsystemBase {
   public boolean getClimbPistonExtendStatus(){
     return climbPistons.get() == DoubleSolenoid.Value.kForward ? true : false; //Gives the ClimbPistonExtendStatus if the climbPiston value equals the value of forward speed??
 
+  }
+  public void setClimbRatchet(boolean state){
+    climbRatchet.set(state ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse); //sets values based on the ClimbPiston State
   }
 
   public void setClimbPistons(boolean state){
@@ -71,17 +69,17 @@ public class Climber extends SubsystemBase {
 
   public void setClimberOutput(double value) {
     // Prevent backdrive
-    climbMotors[0].set(ControlMode.PercentOutput, value);
+    climbMotor.set(ControlMode.PercentOutput, value);
   }
   
   public double getClimberPosition() {
-	  return climbMotors[0].getSelectedSensorPosition();
+	  return climbMotor.getSelectedSensorPosition();
   }
 
   //sets and configures the ClimberPosition
   public void setClimberPosition(double position) { 
     double setpoint = inchesToEncoderUnits(position);
-    climbMotors[0].set(ControlMode.Position, setpoint);
+    climbMotor.set(ControlMode.Position, setpoint);
   }
 
   private double inchesToEncoderUnits(double inches) {
@@ -96,7 +94,7 @@ public class Climber extends SubsystemBase {
   private void updateShuffleboard(){
     SmartDashboard.putBoolean("Climb Mode", getClimbState());
 
-    SmartDashboardTab.putNumber("Climber", "Position", encoderUnitsToInches(climbMotors[0].getSelectedSensorPosition()));
+    SmartDashboardTab.putNumber("Climber", "Position", encoderUnitsToInches(climbMotor.getSelectedSensorPosition()));
     SmartDashboardTab.putBoolean("Climber", "Climb Mode", climbState);
     SmartDashboardTab.putBoolean("Climber", "Climb Pistons", getClimbPistonExtendStatus());
 //    try {

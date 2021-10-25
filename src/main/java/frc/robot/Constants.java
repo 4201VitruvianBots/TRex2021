@@ -144,8 +144,10 @@ public final class Constants {
     public static final int pcmOne = 11;
     public static final int intakePistonForward = 0; // 2
     public static final int intakePistonReverse = 1; // 3
-    public static final int climbPistonAForward = 2;
-    public static final int climbPistonAReverse = 3;
+    public static final int climbRatchetForward = 2;
+    public static final int climbRatchetReverse = 3;
+    public static final int climbPistonForward = 4;
+    public static final int climbPistonReverse = 5;
 
     public static final int indexerMotor = 35;
     public static final int uptakeMotor = 36;
@@ -157,8 +159,7 @@ public final class Constants {
     public static final int flywheelMotorA = 40;
     public static final int flywheelMotorB = 41;
     public static final int intakeMotor = 47;
-    public static final int climbMotorA = 50;
-    public static final int climbMotorB = 51;
+    public static final int climbMotor = 50;
     public static final int turretMotor = 60;
     public static final int turretEncoder = 61;
 

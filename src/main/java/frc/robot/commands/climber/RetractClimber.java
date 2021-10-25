@@ -34,6 +34,7 @@ public class RetractClimber extends CommandBase {
   }
   @Override
   public void execute() {
+    m_climber.setClimbRatchet(false);
     m_climber.setClimbPistons(false);
     if(!m_climber.getClimbPistonExtendStatus())
       m_climber.setClimberOutput(0.5);
