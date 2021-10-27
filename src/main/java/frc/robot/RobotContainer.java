@@ -7,7 +7,15 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.*;
+import static java.util.Map.entry;
+
+import java.util.Map;
+
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,26 +23,34 @@ import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import frc.robot.commands.autoCommands.*;
-import frc.robot.commands.shooter.SetUptakeOutput;
-import frc.robot.commands.swerve.SetAngleSetpoint;
-import frc.robot.commands.swerve.SetSwerveDrive;
+import frc.robot.commands.autoCommands.DriveStraight;
+import frc.robot.commands.autoCommands.S3G3S3;
+import frc.robot.commands.autoCommands.TestSubsystems;
+import frc.robot.commands.climber.DisableClimbMode;
+import frc.robot.commands.climber.EnableClimbMode;
+import frc.robot.commands.climber.ExtendClimber;
+import frc.robot.commands.climber.RetractClimber;
 import frc.robot.commands.indexer.SetCaroselOutput;
 import frc.robot.commands.intake.SetIntake;
 import frc.robot.commands.intake.SetIntakePiston;
-import frc.robot.commands.shooter.SetRpmSetpoint;
 import frc.robot.commands.shooter.RapidFireSetpoint;
+import frc.robot.commands.shooter.SetRpmSetpoint;
+import frc.robot.commands.swerve.SetAngleSetpoint;
+import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveDriveWithAngle;
 import frc.robot.commands.turret.SetTurretSetpointFieldAbsolute;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimulationReferencePose;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Turret;
+import frc.robot.subsystems.Uptake;
+import frc.robot.subsystems.Vision;
 import frc.vitruvianlib.utils.JoystickWrapper;
 import frc.vitruvianlib.utils.XBoxTrigger;
-
-import java.util.Map;
-
-import static java.util.Map.entry;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -186,13 +202,13 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       rightButtons[0].whileHeld(new SetAngleSetpoint(m_swerveDrive, () -> 45.0 * rightJoystick.getRawAxis(0)));
 
       xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, 2750, true)); // A button: Flywheel low speed
-      // xBoxButtons[2].whenPressed(new EnableClimbMode(m_climber, m_turret)); // X button: enable climber
-      // xBoxButtons[2].whenReleased(new DisableClimbMode(m_climber, m_turret));
       xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, 3700, true)); // B button: Flywheel medium speed
       xBoxButtons[3].whileHeld(new SetRpmSetpoint(m_shooter, 3800, true)); // Y Button: Flywheel high speed
 
-      // xBoxPOVButtons[0].whenPressed(new ExtendClimber(m_climber))//POV up: climber up
-      // xBoxPOVButtons[4].whenPressed(new RetractClimber(m_climber))//POV down: climber down
+      // xBoxButtons[2].whenPressed(new EnableClimbMode(m_climber, m_turret)); // X button: enable climber
+      // xBoxButtons[2].whenReleased(new DisableClimbMode(m_climber, m_turret));
+      xBoxPOVButtons[0].whenPressed(new EnableClimbMode(m_climber, m_turret)); // POV up: climber up
+      xBoxPOVButtons[4].whenPressed(new DisableClimbMode(m_climber, m_turret)); //POV down: climber down
 
       xBoxButtons[5].whileHeld(new SetCaroselOutput(m_indexer, Constants.indexerOutput)); // Right bumper: Spin Carousel
       xBoxButtons[4].whileHeld(new SetCaroselOutput(m_indexer, -Constants.indexerOutput)); // Left bumper: Reverse Carousel;
