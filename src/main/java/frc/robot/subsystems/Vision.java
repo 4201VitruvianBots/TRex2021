@@ -10,15 +10,11 @@ package frc.robot.subsystems;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTab;
-import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.net.PortForwarder;
 
@@ -42,10 +38,11 @@ public class Vision extends SubsystemBase {
 	private final double VERTICAL_TARGET_PIXEL_THRESHOLD = 1;
 
 	// NetworkTables for reading vision data
-	private NetworkTable oak_1;
-	private NetworkTable oak_2;
-	private NetworkTable oak_d_l;
-	private NetworkTable oak_d_i;
+	private final NetworkTable goal_camera;
+	private final NetworkTable intake_camera;
+	private final NetworkTable indexer_camera;
+
+	private int goal_camera_type = 0; // 2: PhotonVision
 
 	// Subsystems that will be controlled based on vision data
     private final SwerveDrive m_swerveDrive;
@@ -67,29 +64,30 @@ public class Vision extends SubsystemBase {
 	UsbCamera camera;
 
 	public Vision(SwerveDrive swerveDrive, Turret turret) {
-		
 		m_swerveDrive = swerveDrive;
 		m_turret = turret;
 
-		if (RobotBase.isReal() && false) {
-			// Driver cam setup
-//		camera = CameraServer.getInstance().startAutomaticCapture();
-//		camera = CameraServer.getInstance().startAutomaticCapture("intake", "/dev/video0");
-//	    camera.setConnectionStrategy(VideoSource.ConnectionStrategy.kKeepOpen);
-//	    camera.setExposureManual(25);
-//	    camera.setResolution(320, 240);
-//	    camera.setPixelFormat(VideoMode.PixelFormat.kMJPEG);
-		}
-		//CameraServer.getInstance().addAxisCamera("opensight", "opensight.local");
-
-	    // TODO: What port does opensight use?
-//		PortForwarder.add(6000, "opensight.local", 22);
-//		PortForwarder.add(5800, "10.42.1.11", 5800);
-//		PortForwarder.add(5801, "10.42.1.11", 5801);
-//		PortForwarder.add(5805, "10.42.1.11", 5805);
-
 		// Init vision NetworkTables
-		oak_1 = NetworkTableInstance.getDefault().getTable("OAK-1");
+		switch (goal_camera_type) {
+			case 2:
+				goal_camera = NetworkTableInstance.getDefault().getTable("photonvision");
+				break;
+			case 1:
+				goal_camera = NetworkTableInstance.getDefault().getTable("limelight");
+				break;
+			case 0:
+			default:
+				goal_camera = NetworkTableInstance.getDefault().getTable("OAK-D_Goal");
+				break;
+		}
+		intake_camera = NetworkTableInstance.getDefault().getTable("OAK-1_Intake");
+		indexer_camera = NetworkTableInstance.getDefault().getTable("OAK-1_Indexer");
+
+		PortForwarder.add(4200, "10.42.1.100", 80);
+		PortForwarder.add(4201, "10.42.1.100", 5801);
+		PortForwarder.add(4200, "10.42.1.101", 80);
+		PortForwarder.add(4201, "10.42.1.101", 5801);;
+		PortForwarder.add(4201, "10.42.1.101", 5802);
 
 		//initShuffleboard();
 	}
@@ -97,7 +95,7 @@ public class Vision extends SubsystemBase {
 	private void updateValidTarget() {
 		// Determine whether the camera has detected a valid target and not random noise
 		// If the target is seen for a specific amount of time it is marked as valid
-		if (hasTarget()) {
+		if (hasGoalTarget()) {
 			setLastValidTargetTime();
 		}
 		if ((Timer.getFPGATimestamp() - lastValidTargetTime) < 2) {
@@ -107,16 +105,34 @@ public class Vision extends SubsystemBase {
 		}
 	}
 
-	public boolean hasTarget() {
-		return oak_1.getEntry("tv").getDouble(0) == 1;
+	public boolean hasGoalTarget() {
+		switch (goal_camera_type) {
+			case 2:
+				return goal_camera.getEntry("hasTarget").getBoolean(false);
+			case 1:
+			case 0:
+			default:
+				return goal_camera.getEntry("tv").getDouble(0) == 1;
+		}
 	}
 
 	public double getGoalX() {
-		return oak_1.getEntry("tx").getDouble(0);
+		switch (goal_camera_type) {
+			case 2:
+				return goal_camera.getEntry("targetYaw").getDouble(0);
+			case 1:
+			case 0:
+			default:
+				return goal_camera.getEntry("tx").getDouble(0);
+		}
 	}
 
 	public String getGoalLabel() {
-		return oak_1.getEntry("target_label").getString("");
+		return goal_camera.getEntry("target_label").getString("");
+	}
+
+	public double getTargetDistance() {
+		return goal_camera.getEntry("tz").getDouble(0);
 	}
 
 	public double getFilteredTargetX() {
@@ -131,41 +147,20 @@ public class Vision extends SubsystemBase {
 		lastValidTargetTime = Timer.getFPGATimestamp();
 	}
 
+	// Read ball position data from OAK-1_Intake
+	public double getPowerCellX() {
+		double[] nullValue = {-99};
+		var values = intake_camera.getEntry("ta").getDoubleArray(nullValue);
 
-	// Calculate target distance based on field dimensions and the angle from the camera to the target
-	public double getTargetDistance() {
-		//TODO: Update
-//		double angleToTarget = getPipeline() > 0 ? getTargetY() - 12.83 : getTargetY();
-//
-//		double inches = (TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(Math.toRadians(CAMERA_MOUNT_ANGLE + angleToTarget));
-//		distances[index++ % distances.length] = inches / 12.0;
-//
-//		return computeMode(distances);
-		return 0;
+		if(values[0] == -99) {
+			return 0;
+		} else {
+			return values[0];
+		}
 	}
 
-	// Used to find the most common value to provide accurate target data
-	private double computeMode(double[] data) {
-		// Compute mode
-		this.counts = new double[data.length];
-		for (int i = 0; i < data.length; i++) {
-			for (int j = 0; j < data.length; j++) {
-				if (data[i] == data[j]) {
-					this.counts[i]++;
-				}
-			}
-		}
-
-		int highestIndex = 0;
-		double previousHigh = 0;
-		for (int i = 0; i < this.counts.length; i++) {
-			if (this.counts[i] > previousHigh) {
-				highestIndex = i;
-				previousHigh = this.counts[i];
-			}
-		}
-
-		return data[highestIndex]; // Final distance in feet
+	public boolean hasPowerCell() {
+		return intake_camera.getEntry("tv").getDouble(0) == 1;
 	}
 
 	// Read ball position data from OpenSight (Raspberry Pi)
@@ -187,12 +182,16 @@ public class Vision extends SubsystemBase {
 
 	// set smartdashboard
 	public void updateSmartDashboard() {
-		SmartDashboard.putBoolean("OAK-1 Has Target", hasTarget());
-		SmartDashboard.putNumber("OAK-1 Target X", getGoalX());
-		SmartDashboard.putString("OAK-1 Target Label", getGoalLabel());
+		SmartDashboard.putBoolean("OAK-D_Goal Has Target", hasGoalTarget());
+		SmartDashboard.putNumber("OAK-D_Goal Target X", getGoalX());
+		SmartDashboard.putNumber("OAK-D_Goal Target Distance", getTargetDistance());
 
 		SmartDashboardTab.putBoolean("Turret", "Vision Valid Output", getValidTarget());
 		SmartDashboardTab.putNumber("Turret", "Vision Target X", getFilteredTargetX());
+
+		SmartDashboardTab.putNumber("OAK", "Vision Target X", getFilteredTargetX());
+		SmartDashboardTab.putNumber("OAK", "Vision Target X", getFilteredTargetX());
+		SmartDashboardTab.putNumber("OAK", "Vision Target X", getFilteredTargetX());
 	}
 
 	@Override

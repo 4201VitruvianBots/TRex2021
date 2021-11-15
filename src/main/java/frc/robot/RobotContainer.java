@@ -28,8 +28,6 @@ import frc.robot.commands.autoCommands.S3G3S3;
 import frc.robot.commands.autoCommands.TestSubsystems;
 import frc.robot.commands.climber.DisableClimbMode;
 import frc.robot.commands.climber.EnableClimbMode;
-import frc.robot.commands.climber.ExtendClimber;
-import frc.robot.commands.climber.RetractClimber;
 import frc.robot.commands.indexer.SetCaroselOutput;
 import frc.robot.commands.intake.SetIntake;
 import frc.robot.commands.intake.SetIntakePiston;
@@ -307,7 +305,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
   public void teleOpPeriodic() {
 
     // Rumble if there is a valid target and you are in the target
-    if (m_shooter.getCanShoot() && m_vision.hasTarget() && Math.abs(m_vision.getGoalX()) < 1) {
+    if (m_shooter.getCanShoot() && m_vision.hasGoalTarget() && Math.abs(m_vision.getGoalX()) < 1) {
       xBoxController.setRumble(GenericHID.RumbleType.kLeftRumble, 0.4);
       xBoxController.setRumble(GenericHID.RumbleType.kRightRumble, 0.4);
     } else {

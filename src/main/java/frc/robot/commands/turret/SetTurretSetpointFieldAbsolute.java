@@ -7,7 +7,6 @@
 
 package frc.robot.commands.turret;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.*;
@@ -60,7 +59,7 @@ public class SetTurretSetpointFieldAbsolute extends CommandBase {
 
                 if(m_controller.getRawAxis(1) > 0)
                     setpoint = Math.toDegrees(Math.atan2(m_controller.getRawAxis(0), m_controller.getRawAxis(1)));
-            } else if (m_vision.hasTarget() && !operatorControl) {
+            } else if (m_vision.hasGoalTarget() && !operatorControl) {
                 // if camera has vision target, use that
                 usingVisionSetpoint = true;
 
