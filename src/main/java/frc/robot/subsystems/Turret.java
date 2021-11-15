@@ -49,8 +49,8 @@ public class Turret extends SubsystemBase {
     int kMotionAcceleration = kCruiseVelocity * 10;
 
     // setup variables
-    double minAngle = -60;
-    double maxAngle = 60;
+    double minAngle = -20;
+    double maxAngle = 20;
     private final int encoderUnitsPerRotation = 42;
     double gearRatio = 27.0 / 120.0;    // TODO: Ratio is correct, but values are wrong
     private double setpoint = 0; //angle
