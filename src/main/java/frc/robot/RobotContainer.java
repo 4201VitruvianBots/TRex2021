@@ -158,7 +158,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
 //    if(RobotBase.isReal()) {
      m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
              () -> leftJoystick.getRawAxis(1), //left x
-             () -> -leftJoystick.getRawAxis(0), //left y
+             () -> leftJoystick.getRawAxis(0), //left y
              () -> rightJoystick.getRawAxis(0))); //right x
 //    } else {
       // m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive,
@@ -181,7 +181,7 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
    */
   private void configureButtonBindings() {
     if (RobotBase.isReal()) {
-      leftJoystick.invertRawAxis(1, false);
+      leftJoystick.invertRawAxis(0, false);
       rightJoystick.invertRawAxis(0, true);
       rightJoystick.setAxisDeadband(0, 0.05);
       xBoxController.invertRawAxis(1, true);
