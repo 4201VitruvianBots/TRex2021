@@ -33,6 +33,7 @@ import frc.robot.commands.intake.SetIntake;
 import frc.robot.commands.intake.SetIntakePiston;
 import frc.robot.commands.shooter.RapidFireSetpoint;
 import frc.robot.commands.shooter.SetRpmSetpoint;
+import frc.robot.commands.swerve.AlignToBall;
 import frc.robot.commands.swerve.SetAngleSetpoint;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveDriveWithAngle;
@@ -197,7 +198,11 @@ private SkillsChallengeSelector selectedSkillsChallenge = SkillsChallengeSelecto
       xBoxLeftTrigger = new XBoxTrigger(xBoxController, 2);
       xBoxRightTrigger = new XBoxTrigger(xBoxController, 3);
 
-      rightButtons[0].whileHeld(new SetAngleSetpoint(m_swerveDrive, () -> 45.0 * rightJoystick.getRawAxis(0)));
+//      rightButtons[0].whileHeld(new SetAngleSetpoint(m_swerveDrive, () -> 45.0 * rightJoystick.getRawAxis(0)));
+      rightButtons[1].whileHeld(new AlignToBall(m_swerveDrive, m_vision,
+              () -> leftJoystick.getRawAxis(1), //left x
+              () -> leftJoystick.getRawAxis(0), //left y
+              () -> rightJoystick.getRawAxis(0))); //right x
 
       xBoxButtons[0].whileHeld(new SetRpmSetpoint(m_shooter, 2750, true)); // A button: Flywheel low speed
       xBoxButtons[1].whileHeld(new SetRpmSetpoint(m_shooter, 3700, true)); // B button: Flywheel medium speed
